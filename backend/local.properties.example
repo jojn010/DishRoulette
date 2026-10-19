@@ -1,0 +1,4 @@
+# Create a key at https://aistudio.google.com/apikey
+# Paste it after the equals sign, without quotes. Never put this key in app/.
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash-lite

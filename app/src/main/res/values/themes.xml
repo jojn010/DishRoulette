@@ -1,0 +1,27 @@
+<resources>
+    <style name="Base.Theme.DishRoulette" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item><item name="colorOnPrimary">@color/on_accent</item>
+        <item name="colorOnSurfaceVariant">@color/muted</item><item name="colorSurfaceVariant">@color/surface</item>
+        <item name="android:textColorPrimary">@color/ink</item><item name="android:textColorSecondary">@color/muted</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="colorSecondary">@color/ink</item><item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/ink</item><item name="android:colorBackground">@color/background</item>
+        <item name="android:windowBackground">@color/background</item><item name="android:fontFamily">monospace</item>
+        <item name="shapeAppearanceSmallComponent">@style/IndustrialShape</item>
+        <item name="shapeAppearanceMediumComponent">@style/IndustrialShape</item>
+        <item name="shapeAppearanceLargeComponent">@style/IndustrialShape</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
+    <style name="Theme.DishRoulette" parent="Base.Theme.DishRoulette" />
+    <style name="BodyText"><item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item><item name="android:textColor">@color/muted</item><item name="android:textSize">14sp</item><item name="android:lineSpacingExtra">3dp</item></style>
+    <style name="SectionTitle" parent="BodyText"><item name="android:textColor">@color/ink</item><item name="android:textSize">21sp</item><item name="android:fontFamily">monospace</item></style>
+    <style name="ActionButton" parent="Widget.Material3.Button"><item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item><item name="android:minHeight">56dp</item><item name="android:textSize">16sp</item><item name="cornerRadius">2dp</item><item name="android:insetTop">0dp</item><item name="android:insetBottom">0dp</item><item name="android:textAllCaps">true</item></style>
+    <style name="IndustrialShape" parent="ShapeAppearance.Material3.Corner.None">
+        <item name="cornerFamily">cut</item><item name="cornerSize">2dp</item>
+    </style>
+<style name="TableControl" parent="Widget.AppCompat.Button.Borderless">
+<item name="android:fontFamily">monospace</item><item name="android:textColor">@color/ink</item>
+<item name="android:textSize">11sp</item><item name="android:minWidth">0dp</item><item name="android:padding">4dp</item>
+<item name="backgroundTint">@null</item><item name="android:backgroundTint">@null</item><item name="android:background">@drawable/table_control</item><item name="android:textAllCaps">true</item>
+</style></resources>

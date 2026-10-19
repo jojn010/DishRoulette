@@ -1,0 +1,74 @@
+<resources>
+<string name="app_name">DishRoulette</string><string name="brand_caption">THE DINNER CHAMBER</string>
+<string name="saved">Saved</string><string name="hero_eyebrow">KITCHEN TABLE / LIVE CHAMBER</string>
+<string name="hero_title">LOAD. SHOOT.
+LET DINNER DECIDE.</string><string name="hero_body">Choose your loadout in filters. Load ingredients. Fire into the Dutch Oven.</string>
+<string name="pantry_title">01 / LOAD THE CHAMBER</string><string name="pantry_body">Type ingredients separated by commas, or tap a shell below.</string>
+<string name="ingredients_hint">Ingredients, separated by commas</string><string name="ingredients_helper">For example: eggs, rice, tomatoes</string>
+<string name="quick_add">AMMUNITION / QUICK LOAD</string><string name="meal_label">I’m in the mood for</string>
+<string name="spin">SHOOT</string><string name="spinning">WAIT…</string>
+<string name="collection_note">GEMINI / RECIPE TRANSMISSION</string><string name="ready">02 / DUTCH OVEN</string>
+<string name="empty_body">Load ingredients and press SHOOT to generate your recipe.</string>
+<string name="result_eyebrow">YOUR NEXT MEAL</string><string name="save_recipe">Like &amp; save</string><string name="recipe_saved">Liked &amp; saved</string>
+<string name="another">RELOAD / SHOOT AGAIN</string><string name="view_recipe">Let’s cook</string><string name="empty_title">Awaiting your first shot</string>
+<string name="saved_title">Your recipe box</string><string name="saved_empty">Save a meal you like and it will be waiting here next time.</string>
+<string name="close">Close</string><string name="remove_recipe">Remove saved recipe</string><string name="ingredients_title">Ingredients</string><string name="method_title">How to make it</string>
+<string name="ingredient_error">Add at least one ingredient to start.</string><string name="no_match">No match in this sample collection. Try eggs, rice, pasta, chicken, chickpeas, or oats, or choose Any meal.</string>
+<string name="saved_feedback">Recipe saved to your recipe box</string><string name="removed_feedback">Recipe removed from your recipe box</string>
+<string name="only_match">This is the only match. Add another ingredient or try Any meal for more choices.</string>
+<string name="match_summary">Pantry match: %1$d / %2$d</string><string name="missing">Also grab: %1$s</string>
+<string name="all_ingredients">You have all the main ingredients. Check the recipe for pantry staples.</string>
+<plurals name="spin_count"><item quantity="one">%d spin today</item><item quantity="other">%d spins today</item></plurals><string name="time_servings">%1$d min · %2$s</string>
+<plurals name="servings"><item quantity="one">%d serving</item><item quantity="other">%d servings</item></plurals>
+<string name="meal_metadata">%1$s · %2$s</string><string name="quick_add_ingredient">+ %1$s</string>
+
+<string name="ai_result_eyebrow">SUGGESTED BY GEMINI</string>
+<string name="generation_error_title">Couldn’t suggest a meal</string>
+<string name="key_missing">Gemini is not set up yet. Add your API key to the backend configuration on your computer, then restart the backend.</string>
+<string name="connection_error">Cannot reach the recipe service on your computer. Run backend/start-local.sh and keep your computer on. Keep your emulator running or your phone connected with USB debugging allowed. The development helper restores connections automatically.</string>
+<string name="provider_configuration">Gemini rejected the service configuration. Check the backend API key, model access, and Google AI Studio project.</string>
+<string name="generation_timeout">This suggestion took too long. Please try again.</string>
+<string name="rate_limited">The recipe service has reached a request or quota limit. Wait a little before trying again, or check the quota in Google AI Studio.</string>
+<string name="invalid_recipe">The recipe service couldn’t return a complete recipe. Please try again.</string>
+<string name="no_ai_recipe">Gemini couldn’t find a suitable dish with those ingredients. Try adding another ingredient or choosing Any meal.</string>
+<string name="invalid_ingredients">Use up to 20 ingredients, separated by commas, with a total of 300 characters or fewer.</string>
+<string name="service_not_deployed">The online recipe service is not deployed yet. Use the development build for local testing.</string>
+<string name="staples">Pantry staples needed: %1$s</string>
+<string name="no_extras">No extra ingredients needed.</string>
+
+<string name="filter_title">Taste, goals &amp; filters</string>
+<string name="use_favorites">Inspired by my favorites</string>
+<string name="taste_empty">Like a few recipes to help shape future suggestions.</string>
+<plurals name="taste_count"><item quantity="one">Inspired by %d eligible liked dish</item><item quantity="other">Inspired by %d eligible liked dishes</item></plurals>
+<string name="goal_label">Recipe goal</string>
+<string name="goal_note">Balanced: everyday meals. Cutting: lighter, balanced recipes. Bulking: heartier, protein-focused recipes. These are recipe styles, not personal calorie targets or dietary advice.</string>
+<string name="cuisine_label">Cuisine / culture</string>
+<string name="allergies_label">Allergies &amp; exclusions</string>
+<string name="allergies_description">Select foods to exclude. These filters take priority over your favorites.</string>
+<string name="custom_exclusions">Other foods to exclude (e.g., kiwi, banana)</string>
+<string name="allergy_note">Ingredient screening cannot guarantee allergy safety. Check every food label and cross-contact risk before cooking, including substitutions.</string>
+<string name="preferences_privacy">Your selected exclusions, goal, cuisine, and eligible liked dishes are sent to Gemini with each spin. Preferences are saved on this device.</string>
+<string name="apply_filters">Apply filters</string><string name="cancel">Cancel</string>
+<string name="custom_invalid">Enter up to 10 food names, separated by commas (40 letters per name maximum).</string>
+<string name="pantry_mode">From my pantry</string><string name="discover_mode">Surprise me</string>
+<string name="discover_title">Where shall we eat today?</string><string name="discover_body">Choose a cuisine in filters. We’ll surprise you with a dish and its shopping list—no pantry ingredients needed.</string>
+<string name="shopping_recipe">Shopping-list recipe</string><string name="shopping_note">Check the full ingredients list before you shop.</string>
+<string name="filter_summary">%1$s · %2$s · %3$s</string><string name="taste_off">Favorites off</string>
+<string name="exclusions_summary">Excluding: %1$s</string>
+<string name="allergy_conflict">The ingredients conflict with your exclusions: %1$s. Remove them or review your filters before spinning.</string>
+<string name="allergy_rejected">This recipe conflicts with your exclusions or contains a prepared food with uncertain ingredients. It has been blocked. Try simpler ingredients or another dish.</string>
+<string name="uncertain_ingredients">With exclusions selected, prepared foods such as sauces, bread, or seasoning mixes cannot be checked reliably. Use clearly named whole ingredients instead.</string>
+<string name="preferences_invalid">Some filters are invalid. Open filters and select them again.</string>
+<string name="no_filtered_recipe">No suitable recipe was found for those ingredients and filters. Try a different cuisine or add more ingredients.</string>
+<string name="why_recipe">Why this dish: %1$s</string><string name="goal_fit">Recipe style: %1$s</string>
+<string name="review_filters">Your saved filters couldn’t be read reliably. Open filters and confirm your allergies and exclusions before spinning.</string>
+<string name="personalization_details">%1$s\n\n%2$s</string>
+<string name="tabletop_description">Pixel weapon aimed at a Dutch Oven. Choose Balanced, Cutting or Bulking in filters to change weapons.</string>
+<string name="ammo_help">DRAG TO INSPECT · PINCH TO ZOOM · TAP AMMO TO EDIT</string>
+<string name="discovery_help">DISCOVERY / FIRE TO GENERATE WITHOUT PANTRY</string>
+<string name="magazine_status">LOAD %1$d / CHAMBER %2$d / %3$d INGREDIENTS</string>
+<string name="table_settings">SETUP</string><string name="back_to_table">RETURN TO TABLE</string>
+<string name="loadout_balanced">BALANCED</string><string name="loadout_cut">CUT</string><string name="loadout_bulk">BULK</string>
+<string name="previous_load">PREV LOAD</string><string name="next_load">NEXT LOAD</string><string name="clear_chamber">CLEAR</string>
+<string name="waiting_for_recipe">OVEN ACTIVE / WAITING FOR RECIPE…</string><string name="firing_recipe">FIRING / INPUT LOCKED</string><string name="shot_interrupted">SHOT INTERRUPTED / INGREDIENTS KEPT / FIRE AGAIN</string><string name="provider_unavailable">Gemini is temporarily unavailable. Your ingredients are still loaded. Please try firing again later.</string>    <string name="clear_all">CLEAR ALL</string>
+</resources>

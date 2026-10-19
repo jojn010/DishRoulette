@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/background">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="12dp">
+            <TextView android:id="@+id/tvTitle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:fontFamily="monospace" android:text="DISH / ROULETTE" android:textColor="@color/ink" android:textStyle="bold" android:textSize="13sp"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnSaved" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/saved"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnFilters" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/table_settings"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="48dp">
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnBalanced" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/loadout_balanced"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCut" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/loadout_cut"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnBulk" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/loadout_bulk"/>
+        </LinearLayout>
+        <com.example.dishroulette.WeaponInputView android:id="@+id/tabletop" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical">
+            <TextView android:id="@+id/tvMagazineStatus" style="@style/BodyText" android:layout_width="0dp" android:layout_weight="1" android:gravity="center" android:textColor="@color/muted" android:textSize="10sp" android:accessibilityLiveRegion="polite"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnClearAll" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/clear_all" android:textColor="@color/accent"/>
+        </LinearLayout>
+        <TextView android:id="@+id/tvSceneHelp" style="@style/BodyText" android:gravity="center" android:text="@string/ammo_help" android:textSize="10sp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="48dp">
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnPreviousLoad" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/previous_load"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnClearChamber" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/clear_chamber"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnNextLoad" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/next_load"/>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnSpin" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1.2" android:layout_height="48dp" android:text="@string/spin" android:textColor="@color/accent" android:textSize="16sp"/>
+        </LinearLayout>
+        <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/spinProgress" android:layout_width="match_parent" android:layout_height="3dp" android:visibility="gone" android:indeterminate="true"/>
+        <TextView android:id="@+id/tvSpinCounter" style="@style/BodyText" android:textSize="10sp" android:gravity="center"/>
+        <!-- Existing generation controls are accessible in the table settings drawer. -->
+        <LinearLayout android:id="@+id/settingsDrawer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+            <com.google.android.material.chip.ChipGroup android:id="@+id/modeChips" android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true"/>
+            <com.google.android.material.chip.ChipGroup android:id="@+id/mealChips" android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true"/>
+            <TextView android:id="@+id/tvFilterSummary" style="@style/BodyText" android:textSize="10sp"/>
+        </LinearLayout>
+    </LinearLayout>
+    <ScrollView android:id="@+id/cardMealResult" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#F0171918" android:visibility="gone" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCloseResult" style="@style/TableControl" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/back_to_table"/>
+            <TextView android:id="@+id/tvResultEyebrow" style="@style/BodyText" android:text="@string/ready" android:textSize="12sp" android:textColor="@color/accent" android:textStyle="bold"/>
+            <TextView android:id="@+id/tvMealTitle" android:accessibilityLiveRegion="polite" style="@style/SectionTitle" android:layout_marginTop="10dp" android:text="@string/empty_title" android:textSize="26sp"/>
+            <TextView android:id="@+id/tvMealMeta" style="@style/BodyText" android:layout_marginTop="8dp" android:visibility="gone"/>
+            <TextView android:id="@+id/tvMealDescription" style="@style/BodyText" android:layout_marginTop="12dp" android:text="@string/empty_body"/>
+            <TextView android:id="@+id/tvMatch" style="@style/BodyText" android:layout_marginTop="18dp" android:textStyle="bold" android:textColor="@color/ink" android:visibility="gone"/>
+            <TextView android:id="@+id/tvMissing" style="@style/BodyText" android:layout_marginTop="4dp" android:visibility="gone"/>
+            <TextView android:id="@+id/tvPersonalization" style="@style/BodyText" android:layout_marginTop="12dp" android:visibility="gone"/>
+            <TextView android:id="@+id/tvAllergyWarning" style="@style/BodyText" android:layout_marginTop="12dp" android:text="@string/allergy_note" android:textSize="12sp" android:visibility="gone"/>
+            <LinearLayout android:id="@+id/resultActions" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="20dp">
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnRecipe" style="@style/ActionButton" android:text="@string/view_recipe"/>
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnLike" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp" android:layout_marginTop="8dp" android:text="@string/save_recipe" app:icon="@drawable/ic_bookmark" app:iconGravity="textStart" app:cornerRadius="2dp"/>
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnDislike" style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/another"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

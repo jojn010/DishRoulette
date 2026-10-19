@@ -1,0 +1,20 @@
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+    <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/switchFavorites" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/use_favorites"/>
+    <TextView android:id="@+id/tvTasteSummary" style="@style/BodyText" android:text="@string/taste_empty"/>
+    <TextView style="@style/SectionTitle" android:layout_marginTop="20dp" android:text="@string/goal_label"/>
+    <com.google.android.material.chip.ChipGroup android:id="@+id/goalChips" android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true"/>
+    <TextView style="@style/BodyText" android:text="@string/goal_note" android:textSize="12sp"/>
+    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:hint="@string/cuisine_label">
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/cuisineDropdown" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" android:minHeight="56dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <TextView style="@style/SectionTitle" android:layout_marginTop="20dp" android:text="@string/allergies_label"/>
+    <TextView style="@style/BodyText" android:text="@string/allergies_description"/>
+    <com.google.android.material.chip.ChipGroup android:id="@+id/allergyChips" android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="false"/>
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/customLayout" style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/custom_exclusions">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etCustomExclusions" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textMultiLine" android:maxLength="400" android:minHeight="64dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <TextView style="@style/BodyText" android:layout_marginTop="12dp" android:text="@string/allergy_note" android:textSize="12sp"/>
+    <TextView style="@style/BodyText" android:layout_marginTop="12dp" android:text="@string/preferences_privacy" android:textSize="12sp"/>
+</LinearLayout>
+</androidx.core.widget.NestedScrollView>
