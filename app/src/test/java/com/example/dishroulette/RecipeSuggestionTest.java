@@ -27,4 +27,13 @@ public class RecipeSuggestionTest {
     @Test(expected=IllegalArgumentException.class) public void rejectsInventedPantryIngredient() {
         suggestion().toRecipe(RecipeCatalog.parseIngredients("rice"));
     }
+    @Test public void snackDessertAndGoalSurviveConversionAndSaving() {
+        for(String meal:new String[]{"Snack","Dessert"}){
+            RecipeSuggestion result=suggestion();result.meal=meal;
+            SpinProfile profile=new SpinProfile();profile.goal="Cutting";
+            RecipeCatalog.Recipe recipe=result.toRecipe(RecipeCatalog.parseIngredients("eggs"),profile);
+            RecipeCatalog.Recipe restored=gson.fromJson(gson.toJson(recipe),RecipeCatalog.Recipe.class);
+            assertEquals(meal,restored.meal);assertEquals("Cutting",restored.goal);
+        }
+    }
 }

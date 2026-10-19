@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
 import androidx.appcompat.app.AlertDialog;
@@ -55,6 +54,14 @@ public class MainActivity extends AppCompatActivity {
     private boolean firingFinished;
     private Runnable pendingReveal;
     private MechanicalAudio mechanicalSound;
+    private KitchenScreens kitchenScreens;
+    private final android.os.Handler presentation = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable waitingTick;
+    private int waitingPhase;
+    private boolean compactLayout;
+    private final List<android.widget.Button> ammoButtons = new ArrayList<>();
+    boolean hasExclusions() { return profile.hasExclusions(); }
+
 
     private void afterFiring(Runnable reveal) {
         if (firingFinished) reveal.run();
@@ -77,10 +84,12 @@ public class MainActivity extends AppCompatActivity {
             Insets padding = insets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.ime());
             view.setPadding(padding.left, padding.top, padding.right, padding.bottom);
+            configureLayout(insets.isVisible(WindowInsetsCompat.Type.ime()));
             return insets;
         });
         preferences = getSharedPreferences("dishroulette_ui", MODE_PRIVATE);
         profile = SpinProfile.load(preferences, gson);
+        meal = preferences.getString("selected_meal", "Any meal");
         savedIds.addAll(preferences.getStringSet("saved_recipes", new HashSet<>()));
         if (state != null) {
             meal = state.getString("meal", "Any meal");
@@ -90,17 +99,44 @@ public class MainActivity extends AppCompatActivity {
         recipeApi = RecipeApi.create();
         mechanicalSound = new MechanicalAudio(this);
         binding.tabletop.setAudio(mechanicalSound);
+        if (state == null) {
+            try {
+                String[] slots=gson.fromJson(preferences.getString("loaded_ammunition","[]"),String[].class);
+                binding.tabletop.restore(slots==null?null:java.util.Arrays.asList(slots),preferences.getInt("loaded_chamber",0));
+            } catch(RuntimeException ignored) { binding.tabletop.restore(null,0); }
+        }
         if (state != null) binding.tabletop.restore(state.getStringArrayList("ammunition"), state.getInt("active_chamber", 0));
         binding.tabletop.setChangedListener(this::updateMagazineStatus);
 
+        kitchenScreens = new KitchenScreens(this,binding.secondaryScreen,preferences,new KitchenScreens.Actions(){
+            public void open(RecipeCatalog.Recipe recipe){ currentRecipe=recipe;resultPantry=readPantry();renderRecipe(); }
+            public void remove(RecipeCatalog.Recipe recipe){ savedIds.remove(recipe.id);persistSaved(recipe,true);updateSaveButton(); }
+        });
+        getOnBackPressedDispatcher().addCallback(this,new androidx.activity.OnBackPressedCallback(true){
+            @Override public void handleOnBackPressed(){
+                if(kitchenScreens.isOpen())kitchenScreens.close();
+                else if(binding.cardMealResult.getVisibility()==View.VISIBLE)binding.cardMealResult.setVisibility(View.GONE);
+                else {setEnabled(false);getOnBackPressedDispatcher().onBackPressed();setEnabled(true);}
+            }
+        });
+        binding.tabletop.refreshExperience();
         createChips();
         setupActions();
         updateMode();
         updateFilterSummary();
         updateSpinCounter();
+        configureLayout(false);
         if (currentRecipe != null && (state == null || !state.getBoolean("was_firing"))) renderRecipe();
         if (state != null && state.getBoolean("was_firing"))
             binding.tvSceneHelp.setText(R.string.shot_interrupted);
+        if(state!=null){
+            if("saved".equals(state.getString("secondary_screen")))showSavedRecipes();
+            else if("cooking".equals(state.getString("secondary_screen"))){
+                RecipeCatalog.Recipe cooking=decodeRecipe(state.getString("cooking_recipe"));
+                if(cooking!=null&&!profile.blocks(cooking)&&!profile.requiresReview)kitchenScreens.cook(cooking);
+            }
+            if(!state.getBoolean("result_visible",true))binding.cardMealResult.setVisibility(View.GONE);
+        }
     }
 
     private void createChips() {
@@ -116,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-        for (String label : new String[]{"Any meal", "Breakfast", "Lunch", "Dinner"}) {
-            Chip chip = new Chip(this);
+        for (String label : SpinOptions.MEALS) {
+            Chip chip = selectableChip(label);
             chip.setId(View.generateViewId());
             chip.setText(label);
             chip.setCheckable(true);
@@ -128,12 +164,14 @@ public class MainActivity extends AppCompatActivity {
             binding.mealChips.addView(chip);
             chip.setChecked(label.equals(meal));
             chip.setOnCheckedChangeListener((button, checked) -> {
-                if (checked) meal = label;
+                if (checked) {meal = label;preferences.edit().putString("selected_meal",meal).apply();updateFilterSummary();}
             });
         }
     }
 
     private void setupActions() {
+        binding.tvLoadState.setOnClickListener(v -> showLoadoutManager());
+        binding.tvMagazineStatus.setOnClickListener(v -> showLoadoutManager());
         binding.btnPreviousLoad.setOnClickListener(v -> binding.tabletop.page(-1));
         binding.btnNextLoad.setOnClickListener(v -> binding.tabletop.page(1));
         binding.btnClearChamber.setOnClickListener(v -> binding.tabletop.clearChamber());
@@ -142,6 +180,10 @@ public class MainActivity extends AppCompatActivity {
         binding.btnBalanced.setOnClickListener(v -> selectGoal("Balanced"));
         binding.btnCut.setOnClickListener(v -> selectGoal("Cutting"));
         binding.btnBulk.setOnClickListener(v -> selectGoal("Bulking"));
+        binding.btnCancelGeneration.setOnClickListener(v -> {
+            if(pendingCall!=null){pendingCall.cancel();pendingCall=null;}
+            pendingReveal=null; binding.tabletop.cancelFire(); setSpinning(false);
+        });
         binding.btnSpin.setOnClickListener(view -> spin(false));
         binding.btnDislike.setOnClickListener(view -> spin(true));
         binding.btnLike.setOnClickListener(view -> {
@@ -169,8 +211,66 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateMagazineStatus() {
         IngredientMagazine magazine = binding.tabletop.magazine();
-        binding.tvMagazineStatus.setText(getString(R.string.magazine_status, magazine.page() + 1,
-                magazine.active() % 6 + 1, magazine.count()));
+        preferences.edit().putString("loaded_ammunition",gson.toJson(magazine.save())).putInt("loaded_chamber",magazine.active()).apply();
+        boolean discovery=profile.mode.equals("discover");
+        binding.tvLoadState.setText(discovery?"AUTO LOAD":compactLayout?"MANAGE ›":magazine.count()==0?"EMPTY":magazine.count()>=20?"FULL":"READY");
+        binding.tvLoadState.setTextColor(getColor(magazine.count()>0||discovery?R.color.accent:R.color.muted));
+        if(ammoButtons.isEmpty()){
+            for(int i=0;i<6;i++){
+                final int chamber=i;
+                android.widget.Button b=new androidx.appcompat.widget.AppCompatButton(this);
+                b.setTextSize(12);b.setAllCaps(false);b.setSingleLine(true);b.setEllipsize(android.text.TextUtils.TruncateAt.END);b.setMaxWidth(Math.round(240*getResources().getDisplayMetrics().density));int pad=Math.round(12*getResources().getDisplayMetrics().density);b.setPadding(pad,0,pad,0);b.setTextColor(getColor(R.color.ink));b.setBackgroundResource(R.drawable.table_control);
+                b.setOnClickListener(v->binding.tabletop.select(binding.tabletop.magazine().page()*6+chamber));
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-2,-1);lp.rightMargin=Math.round(6*getResources().getDisplayMetrics().density);binding.ammoTray.addView(b,lp);ammoButtons.add(b);
+            }
+        }
+        String[] names=magazine.visible();
+        for(int i=0;i<6;i++){
+            android.widget.Button b=ammoButtons.get(i);String name=names[i].trim();
+            b.setText(String.format(Locale.ROOT,"%02d  %s",magazine.page()*6+i+1,name.isEmpty()?"+ empty":name));
+            b.setContentDescription("Cartridge "+(magazine.page()*6+i+1)+": "+(name.isEmpty()?"empty, tap to add":name+", tap to edit"));
+            b.setSelected(i==magazine.active()%6);b.setEnabled(!spinning&&!discovery);
+        }
+        binding.ammoScroll.setVisibility(discovery||compactLayout?View.GONE:View.VISIBLE);
+        binding.tvMagazineStatus.setText(discovery?"CHEF’S CHOICE / NO PANTRY NEEDED":compactLayout?magazine.count()+" INGREDIENTS LOADED":String.format(Locale.ROOT,"LOAD %02d / %02d INGREDIENTS",magazine.page()+1,magazine.count()));
+    }
+
+    private void configureLayout(boolean keyboardVisible) {
+        if(binding==null)return;
+        boolean phone=getResources().getConfiguration().screenWidthDp<840;
+        compactLayout=phone&&(getResources().getConfiguration().screenHeightDp<680||keyboardVisible);
+        binding.goalRail.setVisibility(compactLayout?View.GONE:View.VISIBLE);
+        binding.tvBrandCaption.setVisibility(compactLayout?View.GONE:View.VISIBLE);
+        binding.tvWeaponName.setVisibility(compactLayout?View.GONE:View.VISIBLE);
+        binding.tvWeaponDetail.setVisibility(compactLayout?View.GONE:View.VISIBLE);
+        binding.tvSceneHelp.setVisibility(compactLayout?View.GONE:View.VISIBLE);
+        binding.tvSpinCounter.setVisibility(compactLayout?View.GONE:View.VISIBLE);
+        View navigation=(View)binding.btnPreviousLoad.getParent();navigation.setVisibility(compactLayout?View.GONE:View.VISIBLE);
+        View header=(View)binding.tvTitle.getParent().getParent();
+        android.view.ViewGroup.LayoutParams hp=header.getLayoutParams();hp.height=Math.round((compactLayout?52:60)*getResources().getDisplayMetrics().density);header.setLayoutParams(hp);
+        View status=(View)binding.tvMagazineStatus.getParent();status.setMinimumHeight(Math.round((compactLayout?48:0)*getResources().getDisplayMetrics().density));
+        binding.tvLoadState.setContentDescription("Manage loaded ingredients");
+        if(profile!=null)updateMagazineStatus();
+    }
+    private void showLoadoutManager(){
+        if(spinning||binding.tabletop.isLoading()||profile.mode.equals("discover"))return;
+        binding.tabletop.inspect();
+        List<String> slots=binding.tabletop.magazine().save();
+        List<String> labels=new ArrayList<>();List<Integer> indices=new ArrayList<>();
+        int empty=-1;
+        for(int i=0;i<slots.size();i++){
+            if(slots.get(i).trim().isEmpty()){if(empty<0)empty=i;continue;}
+            indices.add(i);labels.add(String.format(Locale.ROOT,"%02d / %s",i+1,slots.get(i)));
+        }
+        indices.add(empty<0?slots.size():empty);labels.add("+ ADD INGREDIENT");
+        indices.add(-1);labels.add("REMOVE SELECTED");indices.add(-2);labels.add("CLEAR ALL INGREDIENTS");
+        new MaterialAlertDialogBuilder(this).setTitle("YOUR INGREDIENT LOADOUT")
+            .setItems(labels.toArray(new String[0]),(d,which)->{
+                int selection=indices.get(which);
+                if(selection==-1)binding.tabletop.clearChamber();
+                else if(selection==-2)binding.tabletop.clearAll();
+                else binding.tabletop.select(selection);
+            }).setPositiveButton("CLOSE",null).show();
     }
 
     private Set<String> readPantry() {
@@ -211,6 +311,7 @@ public class MainActivity extends AppCompatActivity {
         binding.tabletop.fire(() -> {
             firingFinished = true;
             binding.tvSceneHelp.setText(R.string.waiting_for_recipe);
+            if(spinning) startWaiting();
             if (pendingReveal != null) {
                 Runnable reveal = pendingReveal;
                 pendingReveal = null;
@@ -243,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
                         renderRecipe();
                         binding.cardMealResult.setAlpha(0f);
                         binding.cardMealResult.setTranslationY(48f * getResources().getDisplayMetrics().density);
-                        binding.cardMealResult.animate().alpha(1f).translationY(0f).setDuration(480).start();
+                        binding.cardMealResult.animate().alpha(1f).translationY(0f).setDuration(Experience.duration(MainActivity.this,480)).start();
 
                     } catch (IllegalArgumentException e) {
                         showGenerationError(getString(R.string.invalid_recipe));
@@ -287,8 +388,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showGenerationError(String message) {
-        new MaterialAlertDialogBuilder(this).setTitle(R.string.generation_error_title)
-                .setMessage(message).setPositiveButton(R.string.close, null).show();
+        new MaterialAlertDialogBuilder(this).setTitle("THE KITCHEN NEEDS A MOMENT")
+                .setMessage(message).setPositiveButton("BACK TO LOADOUT",(d,w)->binding.tabletop.inspect()).show();
+    }
+    private void startWaiting(){
+        stopWaiting();binding.cookingStatus.setVisibility(View.VISIBLE);waitingPhase=0;
+        String[] messages={"PREHEATING…","MIXING INGREDIENTS…","CONSULTING THE CHEF…","PREPARING YOUR DISH…"};
+        waitingTick=new Runnable(){@Override public void run(){
+            binding.tvCookingStatus.setText(messages[Math.min(waitingPhase++,messages.length-1)]);
+            presentation.postDelayed(this,4200);
+        }};waitingTick.run();
+    }
+    private void stopWaiting(){
+        if(waitingTick!=null)presentation.removeCallbacks(waitingTick);waitingTick=null;binding.cookingStatus.setVisibility(View.GONE);
     }
 
     private void persistSaved(RecipeCatalog.Recipe recipe, boolean removed) {
@@ -315,6 +427,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setSpinning(boolean busy) {
         spinning = busy;
+        if(!busy)stopWaiting();
         if (busy) binding.tvSceneHelp.setText(R.string.firing_recipe);
         else updateMode();
         if (!busy) {
@@ -334,7 +447,8 @@ public class MainActivity extends AppCompatActivity {
         binding.btnCut.setEnabled(!busy);
         binding.btnBulk.setEnabled(!busy);
         binding.btnSpin.setText(busy ? R.string.spinning : R.string.spin);
-        binding.spinProgress.setVisibility(busy ? View.VISIBLE : View.GONE);
+        binding.spinProgress.setVisibility(View.GONE);
+        updateMagazineStatus();
         for (int i = 0; i < binding.mealChips.getChildCount(); i++) {
             binding.mealChips.getChildAt(i).setEnabled(!busy);
         }
@@ -342,11 +456,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void renderRecipe() {
         binding.cardMealResult.setVisibility(View.VISIBLE);
+        binding.tabletop.inspect();
+        binding.cardMealResult.scrollTo(0,0);
         binding.tvResultEyebrow.setText(currentRecipe.aiGenerated ? R.string.ai_result_eyebrow : R.string.result_eyebrow);
         binding.tvMealTitle.setText(currentRecipe.title);
         binding.tvMealDescription.setText(currentRecipe.description);
-        binding.tvMealMeta.setText(getString(R.string.meal_metadata, currentRecipe.meal,
-                recipeMeta(currentRecipe)));
+        binding.tvMealMeta.setText(currentRecipe.meal.toUpperCase(Locale.ROOT)+"  /  "+KitchenScreens.meta(currentRecipe));
         binding.tvMatch.setText(currentRecipe.discovery ? getString(R.string.shopping_recipe)
                 : getString(R.string.match_summary, currentRecipe.matches(resultPantry), currentRecipe.keys.size()));
         List<String> missing = currentRecipe.missing(resultPantry);
@@ -401,23 +516,7 @@ public class MainActivity extends AppCompatActivity {
             if (recipe != null) saved.add(recipe);
         }
         saved.sort((a, b) -> a.title.compareToIgnoreCase(b.title));
-        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.saved_title).setPositiveButton(R.string.close, null);
-        if (saved.isEmpty()) dialog.setMessage(R.string.saved_empty);
-        else {
-            String[] titles = new String[saved.size()];
-            for (int i = 0; i < saved.size(); i++) titles[i] = saved.get(i).title;
-            dialog.setItems(titles, (d, index) -> showRecipe(saved.get(index)));
-        }
-        dialog.show();
-    }
-
-    private String recipeMeta(RecipeCatalog.Recipe recipe) {
-        String servings = getResources().getQuantityString(
-                R.plurals.servings, recipe.servings, recipe.servings);
-        String timing = getString(R.string.time_servings, recipe.minutes, servings);
-        return recipe.cuisine == null || recipe.cuisine.isEmpty() ? timing
-                : getString(R.string.meal_metadata, recipe.cuisine, timing);
+        kitchenScreens.saved(saved);
     }
 
     private void showRecipe(RecipeCatalog.Recipe recipe) {
@@ -430,49 +529,23 @@ public class MainActivity extends AppCompatActivity {
             });
             blocked.show(); return;
         }
-        ScrollView scroll = new ScrollView(this);
-        LinearLayout content = new LinearLayout(this);
-        content.setOrientation(LinearLayout.VERTICAL);
-        int padding = Math.round(24 * getResources().getDisplayMetrics().density);
-        content.setPadding(padding, padding / 2, padding, padding);
-        addRecipeText(content, recipeMeta(recipe), false);
-        if (profile.hasExclusions()) addRecipeText(content, getString(R.string.allergy_note), false);
-        addRecipeText(content, getString(R.string.ingredients_title), true);
-        addRecipeText(content, recipe.ingredients, false);
-        addRecipeText(content, getString(R.string.method_title), true);
-        addRecipeText(content, recipe.method, false);
-        scroll.addView(content);
-        new MaterialAlertDialogBuilder(this).setTitle(recipe.title).setView(scroll)
-                .setNeutralButton(savedIds.contains(recipe.id) ? R.string.remove_recipe : R.string.save_recipe,
-                        (dialog, which) -> {
-                            boolean removed = !savedIds.add(recipe.id);
-                            if (removed) savedIds.remove(recipe.id);
-                            persistSaved(recipe, removed);
-                            updateSaveButton();
-                            Snackbar.make(binding.getRoot(), removed ? R.string.removed_feedback
-                                    : R.string.saved_feedback, Snackbar.LENGTH_SHORT).show();
-                        })
-                .setPositiveButton(R.string.close, null).show();
+        kitchenScreens.cook(recipe);
     }
-
-    private void addRecipeText(LinearLayout parent, String text, boolean heading) {
-        TextView view = new TextView(this);
-        view.setText(text);
-        view.setTextSize(heading ? 19 : 16);
-        view.setTextColor(getColor(heading ? R.color.ink : R.color.muted));
-        view.setLineSpacing(6, 1);
-        if (heading) view.setTypeface(null, android.graphics.Typeface.BOLD);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.topMargin = Math.round(16 * getResources().getDisplayMetrics().density);
-        parent.addView(view, params);
-    }
-
 
     private Chip selectableChip(String label) {
         Chip chip = new Chip(this);
         chip.setId(View.generateViewId());
         chip.setText(label);
+        chip.setTextSize(12);
+        chip.setChipCornerRadius(3*getResources().getDisplayMetrics().density);
+        chip.setChipStrokeWidth(getResources().getDisplayMetrics().density);
+        android.content.res.ColorStateList colors=new android.content.res.ColorStateList(
+            new int[][]{new int[]{android.R.attr.state_checked},new int[]{}},
+            new int[]{getColor(R.color.accent),getColor(R.color.surface)});
+        chip.setChipBackgroundColor(colors);
+        chip.setChipStrokeColor(android.content.res.ColorStateList.valueOf(getColor(R.color.line)));
+        chip.setTextColor(new android.content.res.ColorStateList(new int[][]{new int[]{android.R.attr.state_checked},new int[]{}},new int[]{getColor(R.color.on_accent),getColor(R.color.muted)}));
+        chip.setCheckedIconVisible(false);
         chip.setCheckable(true);
         chip.setEnsureMinTouchTargetSize(true);
         chip.setSaveEnabled(false);
@@ -480,7 +553,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateMode() {
-        binding.tvSceneHelp.setText(profile.mode.equals("pantry") ? R.string.ammo_help : R.string.discovery_help);
+        boolean discovery=profile.mode.equals("discover");
+        binding.tabletop.setDiscovery(discovery);
+        binding.tvSceneHelp.setText(discovery?"SURPRISE DISH / CUISINE & PREFERENCES IN SETUP":"DRAG TO INSPECT · PINCH TO ZOOM · TAP A CARTRIDGE TO EDIT");
+        binding.btnClearChamber.setVisibility(discovery?View.GONE:View.VISIBLE);
+        binding.btnClearAll.setVisibility(discovery?View.GONE:View.VISIBLE);
+        binding.btnPreviousLoad.setVisibility(discovery?View.GONE:View.VISIBLE);
+        binding.btnNextLoad.setVisibility(discovery?View.GONE:View.VISIBLE);
+        updateMagazineStatus();
     }
 
     private List<RecipeCatalog.Recipe> eligibleFavorites() {
@@ -502,13 +582,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateFilterSummary() {
         binding.tabletop.setGoal(profile.goal);
-        binding.btnBalanced.setAlpha(profile.goal.equals("Balanced") ? 1f : .5f);
-        binding.btnCut.setAlpha(profile.goal.equals("Cutting") ? 1f : .5f);
-        binding.btnBulk.setAlpha(profile.goal.equals("Bulking") ? 1f : .5f);
+        binding.btnBalanced.setSelected(profile.goal.equals("Balanced"));
+        binding.btnCut.setSelected(profile.goal.equals("Cutting"));
+        binding.btnBulk.setSelected(profile.goal.equals("Bulking"));
+        binding.tvWeaponName.setText(profile.goal.equals("Balanced")?"THE CLASSIC":profile.goal.equals("Cutting")?"THE PRECISION":"THE HEAVYWEIGHT");
+        binding.tvWeaponDetail.setText(profile.goal.equals("Balanced")?"REVOLVER / BALANCED EVERYDAY COOKING":profile.goal.equals("Cutting")?"BOLT ACTION / LIGHTER BALANCED COOKING":"PUMP ACTION / HEARTIER BALANCED COOKING");
         int count = eligibleFavorites().size();
         String taste = !profile.useFavorites ? getString(R.string.taste_off) : count == 0 ? getString(R.string.taste_empty)
                 : getResources().getQuantityString(R.plurals.taste_count, count, count);
-        String summary = getString(R.string.filter_summary, profile.goal, profile.cuisine, taste);
+        String summary = meal+" · "+getString(R.string.filter_summary, profile.goal, profile.cuisine, taste);
         List<String> exclusions = new ArrayList<>(profile.allergies); exclusions.addAll(profile.customExclusions);
         if (profile.requiresReview) summary = getString(R.string.review_filters);
         if (!exclusions.isEmpty()) summary += "\n" + getString(R.string.exclusions_summary, android.text.TextUtils.join(", ", exclusions));
@@ -518,11 +600,16 @@ public class MainActivity extends AppCompatActivity {
     private void showFilters() {
         // Resolve controls from this dialog's layout, independently of generated bindings.
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_preferences, null, false);
+        boolean drawerWasVisible=binding.settingsDrawer.getVisibility()==View.VISIBLE;
         android.view.ViewGroup settingsHome = (android.view.ViewGroup) binding.settingsDrawer.getParent();
         settingsHome.removeView(binding.settingsDrawer);
         LinearLayout dialogContent = (LinearLayout) ((android.view.ViewGroup) dialogView).getChildAt(0);
         dialogContent.addView(binding.settingsDrawer, 0);
         binding.settingsDrawer.setVisibility(View.VISIBLE);
+        MaterialSwitch switchMotion = dialogView.findViewById(R.id.switchMotion);
+        MaterialSwitch switchSound = dialogView.findViewById(R.id.switchSound);
+        switchMotion.setChecked(preferences.getBoolean("reduce_motion",false));
+        switchSound.setChecked(preferences.getBoolean("mechanical_sound",true));
         MaterialSwitch switchFavorites = dialogView.findViewById(R.id.switchFavorites);
         TextView tvTasteSummary = dialogView.findViewById(R.id.tvTasteSummary);
         ChipGroup goalChips = dialogView.findViewById(R.id.goalChips);
@@ -557,7 +644,7 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.cancel, null).create();
         dialog.setOnDismissListener(unused -> {
             dialogContent.removeView(binding.settingsDrawer);
-            binding.settingsDrawer.setVisibility(View.GONE);
+            binding.settingsDrawer.setVisibility(drawerWasVisible?View.VISIBLE:View.GONE);
             settingsHome.addView(binding.settingsDrawer);
         });
         dialog.setOnShowListener(unused -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
@@ -572,10 +659,12 @@ public class MainActivity extends AppCompatActivity {
             draft.mode = profile.mode; // The source chips update the live profile inside this drawer.
             draft.useFavorites = switchFavorites.isChecked();
             draft.requiresReview = false;
+            preferences.edit().putBoolean("reduce_motion",switchMotion.isChecked()).putBoolean("mechanical_sound",switchSound.isChecked()).apply();
+            binding.tabletop.refreshExperience();
             profile = draft;
             profile.save(preferences, gson);
             updateFilterSummary();
-            if (currentRecipe != null) renderRecipe();
+            if (currentRecipe != null && binding.cardMealResult.getVisibility()==View.VISIBLE) renderRecipe();
             dialog.dismiss();
         }));
         dialog.show();
@@ -586,6 +675,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onSaveInstanceState(Bundle state) {
         state.putBoolean("was_firing", spinning);
+        state.putBoolean("result_visible",binding.cardMealResult.getVisibility()==View.VISIBLE);
+        state.putString("secondary_screen",kitchenScreens.screen());
+        if(kitchenScreens.cookingRecipe()!=null)state.putString("cooking_recipe",gson.toJson(kitchenScreens.cookingRecipe()));
         state.putStringArrayList("ammunition", binding.tabletop.magazine().save());
         state.putInt("active_chamber", binding.tabletop.magazine().active());
         state.putString("meal", meal);
@@ -597,6 +689,7 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onDestroy() {
         // Cancel delivery and release the Activity when leaving or rotating the screen.
         pendingReveal = null;
+        stopWaiting();kitchenScreens.dispose();
         binding.tabletop.dispose();
         if (mechanicalSound != null) mechanicalSound.close();
         if (pendingCall != null) pendingCall.cancel();

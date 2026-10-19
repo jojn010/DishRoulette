@@ -6,6 +6,7 @@ import java.util.List;
 
 public final class SpinOptions {
     private SpinOptions() { }
+    public static final List<String> MEALS = Collections.unmodifiableList(Arrays.asList("Any meal", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert"));
     public static final List<String> GOALS = Collections.unmodifiableList(Arrays.asList("Balanced", "Cutting", "Bulking"));
     public static final List<String> CUISINES = Collections.unmodifiableList(Arrays.asList(
             "Any cuisine", "Palestinian", "Lebanese", "Turkish", "Moroccan", "Egyptian",

@@ -13,7 +13,7 @@ import java.util.*;
 /** Stateless Gemini adapter. Credentials and raw upstream errors never reach the Android app. */
 final class GeminiRecipes {
     private static final Gson GSON = new Gson();
-    private static final Set<String> MEALS = Set.of("Any meal", "Breakfast", "Lunch", "Dinner");
+    private static final Set<String> MEALS = Set.copyOf(SpinOptions.MEALS);
     private final String apiKey;
     private final URI endpoint;
     private final HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
@@ -110,7 +110,7 @@ final class GeminiRecipes {
             Match the chosen cuisine, or pick one for Any cuisine. The cuisine field must equal the
             selected cuisine exactly unless Any cuisine was selected. Do not force an authentic dish
             if pantry constraints make it impossible; return possible=false instead.
-            Match the requested meal; Any meal means choose Breakfast, Lunch, or Dinner.
+            Match the requested meal; Any meal means choose Breakfast, Lunch, Dinner, Snack, or Dessert.
             goal=Balanced means a balanced everyday recipe. Cutting means lighter balanced cooking,
             with vegetables and protein where possible, not skipped meals or extreme restriction.
             Bulking means a heartier balanced recipe with protein and starch where possible.

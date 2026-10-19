@@ -1,6 +1,6 @@
 <resources>
-<color name="background">#090A09</color><color name="surface">#171918</color>
-<color name="ink">#EFECE0</color><color name="muted">#B3B3A6</color>
-<color name="accent">#F06038</color><color name="on_accent">#090A09</color>
-<color name="line">#55584E</color><color name="hero">#111411</color>
-<color name="black">#000000</color><color name="white">#FFFFFF</color></resources>
+<color name="background">#101310</color><color name="surface">#1B201B</color>
+<color name="ink">#EEE5CE</color><color name="muted">#B5B7A6</color>
+<color name="accent">#D5AB68</color><color name="on_accent">#131610</color>
+<color name="line">#3A4237</color><color name="hero">#151A14</color>
+<color name="danger">#BA503A</color><color name="black">#000000</color><color name="white">#FFFFFF</color></resources>

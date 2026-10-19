@@ -52,4 +52,14 @@ public class PreferenceRulesTest {
         try { GeminiRecipes.validateRequest(request); fail(); }
         catch (GeminiRecipes.ApiFailure e) { assertEquals("UNCERTAIN_INGREDIENTS", e.code); }
     }
+    @Test public void snackAndDessertMatchTheRequestedMealEndToEnd() throws Exception {
+        for (String meal : new String[]{"Snack", "Dessert"}) {
+            JsonObject request=request();request.addProperty("meal",meal);
+            JsonObject response=recipe();response.addProperty("meal",meal);
+            assertEquals(meal,GeminiRecipes.validateRecipe(response,request).get("meal").getAsString());
+            response.addProperty("meal","Dinner");
+            try { GeminiRecipes.validateRecipe(response,request);fail(); }
+            catch(GeminiRecipes.ApiFailure e){assertEquals("INVALID_RECIPE",e.code);}
+        }
+    }
 }

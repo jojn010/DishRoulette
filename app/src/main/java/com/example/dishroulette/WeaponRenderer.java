@@ -30,10 +30,10 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
             "if(m>.5&&m<1.5){float wood=sin(pos.y*71.+sin(pos.x*21.)*2.+sin(pos.y*11.)*3.);base*=.87+.08*wood+.08*grain;float check=step(.55,fract((pos.x+pos.y)*40.))*step(.55,fract((pos.x-pos.y)*40.));base*=1.-check*.2;gloss=18.;spec=.14;}"+
             "if(m>7.5&&m<8.5){base*=.52+.36*abs(sin(pos.x*105.)*sin(pos.y*105.));gloss=10.;spec=.08;}"+
             "if(m>3.5&&m<4.5){float wood=sin(pos.x*5.+sin(pos.y*14.)*.25);base*=.7+.12*wood+.2*grain;gloss=8.;spec=.025;}"+
-            "float key=max(dot(N,L),0.);float fill=max(dot(N,normalize(vec3(4.,-1.,5.))),0.);float shine=pow(max(dot(N,normalize(L+V)),0.),gloss);"+
-            "vec3 c=base*(.22+key*.78+fill*.13)*( .94+grain*.12)+vec3(1.,.84,.62)*shine*spec;"+
-            "c+=scratch*key*.025;float rim=pow(1.-abs(dot(N,V)),3.);c+=vec3(.12,.14,.14)*rim*key;"+
-            "if(m>4.5&&m<5.5)c=base*1.7;float film=(hash(vec3(floor(gl_FragCoord.xy),1.))-.5)*.022;"+
+            "float pool=exp(-dot(pos.xy-vec2(-.5,.7),pos.xy-vec2(-.5,.7))*.028);float key=max(dot(N,L),0.);float fill=max(dot(N,normalize(vec3(4.,-1.,5.))),0.);float shine=pow(max(dot(N,normalize(L+V)),0.),gloss);"+
+            "vec3 c=base*(vec3(.28,.31,.25)+vec3(1.,.83,.58)*key*.95+vec3(.42,.53,.54)*fill*.3)*( .94+grain*.12)+vec3(1.,.86,.65)*shine*spec; c*=.58+.42*pool;"+
+            "c+=scratch*key*.025;float rim=pow(1.-abs(dot(N,V)),3.);c+=vec3(.20,.23,.22)*rim*key;"+
+            "if(m>4.5&&m<5.5)c=base*1.7; if(m>3.5&&m<4.5)c*=.83;float film=(hash(vec3(floor(gl_FragCoord.xy),1.))-.5)*.022;"+
             "float vignette=1.-.12*pow(length(gl_FragCoord.xy/vec2(600.,1000.)-.5),2.);gl_FragColor=vec4(max(vec3(.0),c*vignette+film),uColor.a);}";
     private int program,aPos,aNormal,aUv,uMvp,uModel,uNormal,uColor,uMaterial,uTex,uEye,uCutaway;
     private SceneMesh box,cylinder,hollow,quad,tip,body,grip,gripPlate,hammer,guard,trigger,cylinderSkin,chamberSkin,rifleStock,shotgunStock,receiver,pot;
@@ -62,10 +62,11 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
     private float angle,loadProgress=-1,aspect=1,halfX=5,halfY=5;
     private String goal="Balanced";
     float shot=-1,transition,focus;
-    boolean waiting;
+    boolean waiting, discovery, reducedMotion;
+    Runnable requestFrame;
     volatile boolean ovenVisible;
     private long origin;
-    private float cameraX,cameraY,eyeX,eyeY,eyeZ;
+    private float cameraX,cameraY,eyeX,eyeY,eyeZ,desiredTrackX,desiredTrackY;
     private static final float MUZZLE_X=-4.75f,MUZZLE_Y=.88f,POT_X=-7.15f,POT_Y=.88f;
 
     void setIngredients(String[] values,int selection){labels=values;active=selection;labelsDirty=true;}
@@ -171,18 +172,19 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
     private void camera(){
         shownYaw+=(inspectYaw-shownYaw)*frameBlend;shownPitch+=(inspectPitch-shownPitch)*frameBlend;shownZoom+=(inspectZoom-shownZoom)*frameBlend;
         boolean cooking=shot>=0||waiting;
-        float staged=cooking?(shot<0?1:smooth(Math.min(1,shot/.25f))):0;
-        float normal=goal.equals("Balanced")?4.55f:5.45f;
+        float staged=cooking?(shot<0?1:smooth(Math.min(1,shot/.25f))):0; if(reducedMotion)staged=cooking?1:0;
+        float normal=goal.equals("Balanced")?4.65f:5.4f;
         float zoom=(normal+(1.18f-normal)*focus)*shownZoom;
         halfX=Math.max(.82f,Math.min(9,zoom))+(6.75f-Math.max(.82f,Math.min(9,zoom)))*staged;
         halfX=Math.max(halfX,(.68f+staged*2.12f)*aspect);halfY=halfX/aspect;
         ammunitionPosition(active,localPoint);
         float desiredX=-.65f+(localPoint[0]+.65f)*focus;
-        float desiredY=-.35f+((manualCylinder?.70f:localPoint[1])+.35f)*focus;
+        float desiredY=.10f+((manualCylinder?.70f:localPoint[1])-.10f)*focus;
+        desiredTrackX=desiredX;desiredTrackY=desiredY;
         float desiredZ=localPoint[2]*focus;
         trackedX+=(desiredX-trackedX)*frameBlend;trackedY+=(desiredY-trackedY)*frameBlend;trackedZ+=(desiredZ-trackedZ)*frameBlend;
         cameraX=trackedX*(1-staged)-2.55f*staged;cameraY=trackedY*(1-staged)+.05f*staged;
-        double yaw=Math.toRadians(shownYaw),pitch=Math.toRadians(shownPitch);
+        double yaw=Math.toRadians(shownYaw-12),pitch=Math.toRadians(shownPitch+14);
         float inspectionX=(float)(14*Math.sin(yaw)*Math.cos(pitch)),inspectionY=(float)(14*Math.sin(pitch)),inspectionZ=(float)(14*Math.cos(yaw)*Math.cos(pitch));
         eyeX=cameraX+inspectionX*(1-staged)-4.7f*staged;eyeY=cameraY+inspectionY*(1-staged)-6.5f*staged;eyeZ=trackedZ*(1-staged)+inspectionZ*(1-staged)+9*staged;
         Matrix.setLookAtM(view,0,eyeX,eyeY,eyeZ,cameraX,cameraY,trackedZ*(1-staged),0,1,0);
@@ -194,7 +196,7 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
         long now=System.nanoTime();float elapsed=frameTime==0?.016f:Math.min(.05f,(now-frameTime)/1e9f);frameTime=now;frameBlend=1-(float)Math.exp(-elapsed*16);
         if(labelsDirty)updateLabels();camera();inGun=false;Matrix.setIdentityM(root,0);
         environment();
-        float recoil=shot>.29f&&shot<.43f?(float)Math.sin((shot-.29f)/.14f*Math.PI):0;
+        float recoil=!reducedMotion&&shot>.29f&&shot<.43f?(float)Math.sin((shot-.29f)/.14f*Math.PI):0;
         Matrix.setIdentityM(gunRoot,0);Matrix.translateM(gunRoot,0,recoil*.22f,-transition*.15f,-.10f+recoil*.06f);Matrix.rotateM(gunRoot,0,recoil*3,0,1,0);
         synchronized(this){
             Matrix.invertM(pickVp,0,vp,0);Matrix.invertM(pickGun,0,gunRoot,0);
@@ -215,18 +217,29 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
         inGun=false;
         // The pot is not submitted to the renderer at all during ingredient entry.
         ovenVisible = (shot>=.16f)||waiting&&shot<0;
-        if(ovenVisible){oven();if(shot>=0)effects();else steam(((System.nanoTime()-origin)/1e9f)%2/2,.44f);}
+        if(ovenVisible){oven();if(shot>=0)effects();else steam(reducedMotion?.3f:((System.nanoTime()-origin)/1e9f)%2/2,.44f);}
+        boolean moving=Math.abs(inspectYaw-shownYaw)+Math.abs(inspectPitch-shownPitch)+Math.abs(inspectZoom-shownZoom)+Math.abs(trackedX-desiredTrackX)+Math.abs(trackedY-desiredTrackY)>.006f;
+        if(requestFrame!=null&&(moving||waiting&&!reducedMotion))requestFrame.run();
     }
     private void environment(){
-        mesh(box,-1,0,-.92f,35,30,.22f,0,0,0,.075f,.095f,.065f,4,1);
-        // Worn seams, table rim and a few score marks, all behind the object rather than UI slots.
-        for(int i=-4;i<=4;i++)mesh(box,i*2.8f,0,-.80f,.018f,30,.015f,0,0,0,.024f,.032f,.021f,4,1);
-        mesh(box,0,-5,-.65f,25,.15f,.22f,0,0,0,.13f,.065f,.04f,1,1);
-        for(int i=0;i<35;i++)mesh(box,(i*43%135)/10f-7,(i*29%119)/10f-6,-.79f,.05f+i%4*.04f,.009f,.008f,0,0,i%3*21,.14f,.15f,.10f,4,.45f);
+        // An original olive butcher's workbench, inlaid steel edges and warm light pools.
+        mesh(box,-1,0,-.98f,35,30,.24f,0,0,0,.14f,.155f,.105f,4,1);
+        for(int i=-6;i<=6;i++)mesh(box,i*1.8f,0,-.85f,.012f,30,.018f,0,0,0,.037f,.048f,.03f,4,1);
+        mesh(box,0,4.1f,-.76f,25,.20f,.16f,0,0,0,.15f,.16f,.13f,0,1);
+        mesh(box,0,4.27f,-.75f,25,.045f,.20f,0,0,0,.31f,.29f,.21f,0,1);
+        // Set dressing lives above the loadout, never over ingredient input.
+        for(int i=0;i<4;i++){
+            mesh(cylinder,2.9f+i*.31f,3.35f,-.56f,.22f,.10f,.10f,0,90,0,.30f,.26f,.15f,2,1);
+            mesh(cylinder,2.9f+i*.31f,3.35f,-.40f,.12f,.085f,.085f,0,90,0,.095f,.12f,.08f,3,1);
+        }
+        mesh(box,-3.1f,3.05f,-.78f,2.10f,.74f,.04f,0,0,-6,.30f,.26f,.16f,4,1);
+        for(int i=0;i<5;i++)mesh(box,-3.78f+i*.31f,3.03f,-.746f,.15f,.45f,.009f,0,0,-6,.11f,.13f,.09f,4,1);
+        for(int i=0;i<48;i++)mesh(box,(i*43%135)/10f-7,(i*29%119)/10f-6,-.848f,.03f+i%4*.045f,.007f,.006f,0,0,i%3*21,.20f,.21f,.14f,4,.5f);
         GLES20.glDepthMask(false);
-        mesh(quad,-.4f,-.15f,-.72f,8.7f,4.6f,1,0,0,0,0,0,0,7,.48f);
+        mesh(quad,-.4f,-.15f,-.80f,8.7f,4.6f,1,0,0,0,0,0,0,7,.38f);
         GLES20.glDepthMask(true);
     }
+
     private void revolver(){
         // Cylinder 1.85 units / full gun 7.7 units = 24%, following the supplied side-profile reference.
         part(body,0,0,0,1,1,1,0,0,0,.075f,.09f,.10f,0,1);
@@ -255,9 +268,14 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
         }
         // The selected case remains exposed through the localized cutaway, including a rear chamber.
         double selectedTheta=Math.toRadians(20+active*60+rotation);
-        if(!shadowPass)GLES20.glDepthRangef(0,.90f);
+        if(!shadowPass&&focus>.05f)GLES20.glDepthRangef(0,.90f);
         ammunition(active,-.18f,.70f+(float)Math.sin(selectedTheta)*.405f,(float)Math.cos(selectedTheta)*.405f,1.48f,.116f,false);
         GLES20.glDepthRangef(0,1);
+        // Barrel collars, rear frame plate and individual grip fasteners.
+        part(hollow,-1.25f,.88f,0,.10f,.28f,.28f,0,0,0,.25f,.27f,.25f,0,1);
+        part(hollow,-4.12f,.88f,0,.06f,.265f,.265f,0,0,0,.21f,.23f,.22f,0,1);
+        part(box,.87f,.70f,-.33f,.16f,1.30f,.07f,0,0,0,.16f,.18f,.18f,0,1);
+        part(gripPlate,0,0,-.36f,1,1,1,0,0,0,.18f,.084f,.034f,8,1);
         // Small screws, checkered grip inset and cylinder latch finish the silhouette.
         screw(1.35f,.62f,.313f,.09f);screw(1.89f,-1.40f,.415f,.085f);screw(.96f,.10f,.315f,.055f);
         part(box,1.13f,.82f,.32f,.32f,.16f,.07f,0,0,15,.18f,.20f,.20f,0,1);
@@ -290,10 +308,13 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
             part(box,-.12f,-.22f,-.12f,.91f,.65f,.36f,0,0,0,.15f,.18f,.17f,0,1);
             for(int i=0;i<6;i++)ammunition(i,-.12f+(i==active?movement*.30f:0),.76f-i*.155f,.34f,1.02f,.070f,false);
         }
+        part(box,3.99f,-.43f,0,.12f,shotgun?1.8f:1.5f,.60f,0,0,-3,.035f,.04f,.035f,8,1);
+        part(box,-1.13f,.98f,0,.35f,.12f,.54f,0,0,0,.22f,.24f,.22f,0,1);
+        for(int i=0;i<4;i++)part(box,.10f+i*.16f,.20f,.301f,.012f,.37f,.025f,0,0,0,.07f,.08f,.07f,0,1);
         screw(.92f,.37f,.32f,.065f);screw(2.81f,-.17f,.29f,.07f);
     }
     private void ammunition(int i,float x,float y,float z,float length,float radius,boolean shell){
-        boolean filled=!labels[i].trim().isEmpty();boolean selected=i==active;
+        boolean filled=discovery||!labels[i].trim().isEmpty();boolean selected=i==active;
         if(filled||selected){
             float a=filled?1:.32f;
             part(cylinder,x,y,z,length,radius,radius,0,0,0,shell?.37f:.63f,shell?.055f:.41f,shell?.03f:.15f,shell?0:2,a);
@@ -301,7 +322,7 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
             if(!shell)part(tip,x-length/2-.10f,y,z,.25f,radius*.92f,radius*.92f,0,180,0,.42f,.23f,.11f,2,a);
         }
         if(shadowPass)return;
-        if(shot>=0||waiting)return;
+        if(shot>=0||waiting||discovery)return;
         localPoint[0]=x;localPoint[1]=y;localPoint[2]=z;localPoint[3]=1;
         Matrix.multiplyMV(worldPoint,0,root,0,localPoint,0);
         float wx=worldPoint[0],wy=worldPoint[1],wz=worldPoint[2];
@@ -311,10 +332,10 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
         localPoint[0]=wx;localPoint[1]=wy;localPoint[2]=wz;localPoint[3]=1;
         Matrix.multiplyMV(projectPoint,0,vp,0,localPoint,0);float w=projectPoint[3];
         synchronized(this){hitX[i]=.5f+projectPoint[0]/w*.5f;hitY[i]=.5f-projectPoint[1]/w*.5f;hitZ[i]=projectPoint[2]/w;hitW[i]=bandWidth/(4*halfX);hitH[i]=bandHeight/(4*halfY);}
-        if(filled||selected){
+        if((filled||selected)&&focus>.07f){
             GLES20.glDisable(GLES20.GL_DEPTH_TEST);
             billboard(wx,wy,wz,bandWidth,bandHeight,textures[i]);
-            if(selected&&loadProgress<0&&(System.nanoTime()/500000000L)%2==0){
+            if(selected&&loadProgress<0){
                 float cx=wx+view[0]*bandWidth*cursor[i],cy=wy+view[4]*bandWidth*cursor[i],cz=wz+view[8]*bandWidth*cursor[i];
                 // A cursor is drawn into the same local billboard basis as its cartridge band.
                 billboardCursor(cx,cy,cz,.012f,bandHeight*.66f);
@@ -347,11 +368,11 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
     }
     private void effects(){
         float muzzle=goal.equals("Balanced")?MUZZLE_X:-4.88f;
-        if(shot>=.29f&&shot<.36f){
+        if(!reducedMotion&&shot>=.29f&&shot<.36f){
             mesh(tip,muzzle-.28f,MUZZLE_Y,0,.65f,.23f,.23f,0,180,0,1,.56f,.13f,5,.9f);
             mesh(cylinder,muzzle-.12f,MUZZLE_Y,.01f,.30f,.11f,.11f,0,0,0,1,.91f,.52f,5,1);
         }
-        if(shot>.30f&&shot<.76f)for(int i=0;i<6;i++){
+        if(!reducedMotion&&shot>.30f&&shot<.76f)for(int i=0;i<6;i++){
             float t=clamp((shot-.30f-i*.016f)/.30f);if(t<=0||t>=1)continue;
             float x=muzzle+(POT_X-muzzle)*t;
             float z=.03f+1.7f*t*(1-t)-.06f*t;
@@ -383,7 +404,7 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mvp,0,vp,0,model,0);
         if(!shadowPass){Matrix.invertM(inverse,0,model,0);Matrix.transposeM(normal,0,inverse,0);}
         else {material=10;alpha=.22f;}
-        GLES20.glUniformMatrix4fv(uMvp,1,false,mvp,0);GLES20.glUniformMatrix4fv(uModel,1,false,model,0);GLES20.glUniformMatrix4fv(uNormal,1,false,normal,0);GLES20.glUniform4f(uColor,r,g,b,alpha);GLES20.glUniform1f(uMaterial,material);GLES20.glUniform1f(uCutaway,mesh==cylinderSkin&&!shadowPass?1:0);
+        GLES20.glUniformMatrix4fv(uMvp,1,false,mvp,0);GLES20.glUniformMatrix4fv(uModel,1,false,model,0);GLES20.glUniformMatrix4fv(uNormal,1,false,normal,0);GLES20.glUniform4f(uColor,r,g,b,alpha);GLES20.glUniform1f(uMaterial,material);GLES20.glUniform1f(uCutaway,mesh==cylinderSkin&&!shadowPass&&focus>.05f?1:0);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texture==0?textures[0]:texture);GLES20.glUniform1i(uTex,0);
         mesh.vertices.position(0);GLES20.glVertexAttribPointer(aPos,3,GLES20.GL_FLOAT,false,32,mesh.vertices);GLES20.glEnableVertexAttribArray(aPos);mesh.vertices.position(3);GLES20.glVertexAttribPointer(aNormal,3,GLES20.GL_FLOAT,false,32,mesh.vertices);GLES20.glEnableVertexAttribArray(aNormal);mesh.vertices.position(6);GLES20.glVertexAttribPointer(aUv,2,GLES20.GL_FLOAT,false,32,mesh.vertices);GLES20.glEnableVertexAttribArray(aUv);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES,0,mesh.count);

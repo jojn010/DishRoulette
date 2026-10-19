@@ -28,7 +28,7 @@ public class InspectionGestureTest {
     private WeaponRenderer renderer(MainActivity a){return (WeaponRenderer)field(weapon(a),"renderer");}
     private WeaponGestureController controller(MainActivity a){return (WeaponGestureController)field(weapon(a),"gestures");}
     private InspectionState state(MainActivity a){return controller(a).state;}
-    @Before public void defaults(){InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0).edit().putString("spin_profile","{}").commit();}
+    @Before public void defaults(){InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0).edit().remove("loaded_ammunition").remove("loaded_chamber").putBoolean("reduce_motion",false).putString("selected_meal","Any meal").putString("spin_profile","{}").commit();}
     private void event(MainActivity a,int action,float x,float y,int source){
         long time=SystemClock.uptimeMillis();if(action==MotionEvent.ACTION_DOWN)downTime=time;
         MotionEvent e=MotionEvent.obtain(downTime,time,action,x,y,0);e.setSource(source);surface(a).dispatchTouchEvent(e);e.recycle();
@@ -90,9 +90,9 @@ public class InspectionGestureTest {
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             scenario.onActivity(a->weapon(a).restore(Arrays.asList("Chicken Breast","Sweet Potatoes","Greek Yogurt","Rice","Beef","Eggs"),0));Thread.sleep(500);
             scenario.onActivity(a->{float[] p=center(a,0);event(a,0,p[0],p[1],InputDevice.SOURCE_TOUCHSCREEN);event(a,1,p[0],p[1],InputDevice.SOURCE_TOUCHSCREEN);});Thread.sleep(900);
-            scenario.onActivity(a->{assertTrue(((EditText)a.findViewById(R.id.ammunitionEditor)).hasFocus());assertTrue(renderer(a).focus>.95f);assertEquals(1024,((Bitmap)field(renderer(a),"labelBitmap")).getWidth());});capture("03-readable-cartridge");
-            scenario.onActivity(a->{EditText e=a.findViewById(R.id.ammunitionEditor);e.selectAll();e.onCreateInputConnection(new EditorInfo()).commitText("Turkey Breast",1);e.onCreateInputConnection(new EditorInfo()).performEditorAction(EditorInfo.IME_ACTION_NEXT);});Thread.sleep(850);
-            scenario.onActivity(a->{assertEquals(1,weapon(a).magazine().active());assertTrue(weapon(a).magazine().ingredients().contains("Turkey Breast"));assertTrue(renderer(a).focus>.95f);});capture("04-follow-next-chamber");
+            scenario.onActivity(a->{assertTrue("Native ingredient editor must receive cartridge taps; active="+weapon(a).magazine().active(),((EditText)a.findViewById(R.id.ammunitionEditor)).hasFocus());assertEquals(1f,((EditText)a.findViewById(R.id.ammunitionEditor)).getAlpha(),.001f);assertEquals(1024,((Bitmap)field(renderer(a),"labelBitmap")).getWidth());});capture("03-readable-cartridge");
+            scenario.onActivity(a->{EditText e=a.findViewById(R.id.ammunitionEditor);android.view.inputmethod.InputConnection input=e.onCreateInputConnection(new EditorInfo());input.finishComposingText();e.selectAll();input.commitText("Turkey Breast",1);e.onCreateInputConnection(new EditorInfo()).performEditorAction(EditorInfo.IME_ACTION_NEXT);});Thread.sleep(850);
+            scenario.onActivity(a->{assertEquals(1,weapon(a).magazine().active());assertTrue("Ingredients="+weapon(a).magazine().ingredients(),weapon(a).magazine().ingredients().contains("Turkey Breast"));assertEquals("Sweet Potatoes",((EditText)a.findViewById(R.id.ammunitionEditor)).getText().toString());});capture("04-follow-next-chamber");
             scenario.onActivity(a->{a.findViewById(R.id.btnCut).performClick();});Thread.sleep(500);scenario.onActivity(a->{mouseOrbit(a);});Thread.sleep(600);
             scenario.onActivity(a->{assertTrue(Math.abs(state(a).yaw)>1);weapon(a).select(0);});Thread.sleep(600);capture("05-rifle-inspection");
             scenario.onActivity(a->{a.findViewById(R.id.btnBulk).performClick();});Thread.sleep(500);scenario.onActivity(a->{mouseOrbit(a);});Thread.sleep(600);scenario.onActivity(a->{float[] p=center(a,0);event(a,0,p[0],p[1],InputDevice.SOURCE_TOUCHSCREEN);event(a,1,p[0],p[1],InputDevice.SOURCE_TOUCHSCREEN);});Thread.sleep(850);scenario.onActivity(a->assertTrue(((EditText)a.findViewById(R.id.ammunitionEditor)).hasFocus()));capture("06-shotgun-inspection");

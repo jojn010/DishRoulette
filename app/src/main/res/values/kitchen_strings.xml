@@ -1,0 +1,31 @@
+<resources>
+    <string name="kitchen_dish_roulette">DISH / ROULETTE</string>
+    <string name="kitchen_the_midnight_kitchen_01">THE MIDNIGHT KITCHEN  /  01</string>
+    <string name="kitchen_01_the_loadout">01 / THE LOADOUT</string>
+    <string name="kitchen_the_classic">THE CLASSIC</string>
+    <string name="kitchen_six_chambers_endless_possibilities">SIX CHAMBERS. ENDLESS POSSIBILITIES.</string>
+    <string name="kitchen_the_kitchen_is_working">THE KITCHEN IS WORKING</string>
+    <string name="kitchen_preheating">PREHEATING…</string>
+    <string name="kitchen_your_recipe_is_being_generated">Your recipe is being generated.</string>
+    <string name="kitchen_cancel_return_to_loadout">CANCEL / RETURN TO LOADOUT</string>
+    <string name="kitchen_balanced">BALANCED</string>
+    <string name="kitchen_cut">CUT</string>
+    <string name="kitchen_bulk">BULK</string>
+    <string name="kitchen_empty">EMPTY</string>
+    <string name="kitchen_load">‹ LOAD</string>
+    <string name="kitchen_remove">REMOVE</string>
+    <string name="kitchen_load_label">LOAD ›</string>
+    <string name="kitchen_clear_all">CLEAR ALL</string>
+    <string name="kitchen_meal_what_are_you_craving">MEAL / WHAT ARE YOU CRAVING?</string>
+    <string name="kitchen_back_to_loadout">← BACK TO LOADOUT</string>
+    <string name="kitchen_02_fresh_from_the_kitchen">02 / FRESH FROM THE KITCHEN</string>
+    <string name="kitchen_let_s_cook">LET’S COOK →</string>
+    <string name="kitchen_dish_roulette_the_midnight_kitchen">DISH / ROULETTE     •     THE MIDNIGHT KITCHEN</string>
+    <string name="kitchen_ingredient_console">INGREDIENT CONSOLE</string>
+    <string name="kitchen_recipe_profile">RECIPE PROFILE</string>
+    <string name="kitchen_03_kitchen_settings">03 / KITCHEN SETTINGS</string>
+    <string name="kitchen_experience">Experience</string>
+    <string name="kitchen_reduce_motion">Reduce motion</string>
+    <string name="kitchen_shorter_transitions_steady_camera_and_softer_firing_effects">Shorter transitions, steady camera and softer firing effects.</string>
+    <string name="kitchen_mechanical_sound">Mechanical sound</string>
+</resources>

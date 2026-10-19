@@ -23,6 +23,7 @@ public final class RecipeCatalog {
         @SerializedName("minutes") public final int minutes;
         @SerializedName("servings") public final int servings;
         @SerializedName("keys") public final List<String> keys;
+        @SerializedName("goal") public String goal = "";
         @SerializedName("cuisine") public String cuisine = "";
         @SerializedName("whyThisDish") public String whyThisDish = "";
         @SerializedName("goalFit") public String goalFit = "";

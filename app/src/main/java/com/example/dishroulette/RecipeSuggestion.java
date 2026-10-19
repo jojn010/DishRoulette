@@ -25,7 +25,7 @@ public final class RecipeSuggestion {
     public RecipeCatalog.Recipe toRecipe(Set<String> pantry) { return toRecipe(pantry, new SpinProfile()); }
     public RecipeCatalog.Recipe toRecipe(Set<String> pantry, SpinProfile profile) {
         if (!text(title, 120) || !text(description, 600) || !text(meal, 30)
-                || !(meal.equals("Breakfast") || meal.equals("Lunch") || meal.equals("Dinner"))
+                || (!com.example.dishroulette.core.SpinOptions.MEALS.contains(meal) || meal.equals("Any meal"))
                 || minutes == null || minutes < 1 || minutes > 240
                 || servings == null || servings < 1 || servings > 12
                 || !list(ingredients, 1, 24, 200) || !list(steps, 1, 12, 700)
@@ -41,6 +41,7 @@ public final class RecipeSuggestion {
         RecipeCatalog.Recipe recipe = new RecipeCatalog.Recipe("ai_" + UUID.randomUUID(),
                 title, meal, minutes, servings, description, String.join(",", pantryUsed),
                 String.join("\n", ingredients), method.toString());
+        recipe.goal = profile.goal;
         recipe.cuisine = cuisine == null ? "" : cuisine;
         recipe.whyThisDish = whyThisDish == null ? "" : whyThisDish;
         recipe.goalFit = goalFit == null ? "" : goalFit;

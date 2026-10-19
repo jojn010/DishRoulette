@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public class WeaponInteractionTest {
     @Before public void cleanProfile() {
         InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0)
-                .edit().putString("spin_profile","{}").commit();
+                .edit().remove("loaded_ammunition").remove("loaded_chamber").putBoolean("reduce_motion",false).putString("selected_meal","Any meal").putString("spin_profile","{}").commit();
     }
     private WeaponInputView weapon(MainActivity activity) { return activity.findViewById(R.id.tabletop); }
     private void type(MainActivity a,String text,boolean enter) {

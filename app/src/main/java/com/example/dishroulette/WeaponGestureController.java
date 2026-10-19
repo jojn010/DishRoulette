@@ -30,6 +30,7 @@ final class WeaponGestureController implements View.OnTouchListener,View.OnGener
     private final GestureDetector taps;
     private final ScaleGestureDetector scale;
     private final int slop;
+    private final Context context;
     private View view;
     private VelocityTracker velocity;
     private ValueAnimator settlement;
@@ -37,7 +38,7 @@ final class WeaponGestureController implements View.OnTouchListener,View.OnGener
     private float downX,downY,lastX,lastY,dragScale;
     private boolean enabled=true,cylinderCandidate,dragging,pinching,suppressSingle,settling,doubleTap;
     WeaponGestureController(Context context,WeaponRenderer picker,Listener listener){
-        this.picker=picker;this.listener=listener;slop=ViewConfiguration.get(context).getScaledTouchSlop();
+        this.context=context;this.picker=picker;this.listener=listener;slop=ViewConfiguration.get(context).getScaledTouchSlop();
         taps=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
             @Override public boolean onDown(MotionEvent e){return true;}
             @Override public boolean onSingleTapConfirmed(MotionEvent e){
@@ -134,8 +135,8 @@ final class WeaponGestureController implements View.OnTouchListener,View.OnGener
         if(Math.abs(target-start)<.01f){listener.cylinderChanged(target,false);if(select){listener.chamberSettled(InspectionState.chamber(target));listener.detent();}listener.rotationFinished();return;}
         settling=true;
         settlement=ValueAnimator.ofFloat(start,target);
-        settlement.setDuration(Math.min(430,Math.max(200,(int)(180+Math.abs(target-start)*1.4f))));
-        settlement.setInterpolator(new android.view.animation.OvershootInterpolator(.45f));
+        settlement.setDuration(Experience.duration(context,Math.min(430,Math.max(200,(int)(180+Math.abs(target-start)*1.4f)))));
+        settlement.setInterpolator(new android.view.animation.DecelerateInterpolator(1.7f));
         settlement.addUpdateListener(a->{state.cylinderAngle=(float)a.getAnimatedValue();listener.cylinderChanged(state.cylinderAngle,true);});
         settlement.addListener(new AnimatorListenerAdapter(){
             private boolean cancelled;

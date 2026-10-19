@@ -19,7 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import java.util.List;
 
-/** Owns the native IME and loading state; only textured 3D ammunition displays the text. */
+/** Owns the accessible native ingredient editor, mechanical loading and interactive scene. */
 public final class WeaponInputView extends FrameLayout {
     private final IngredientMagazine magazine = new IngredientMagazine();
     private final GLSurfaceView surface;
@@ -27,6 +27,9 @@ public final class WeaponInputView extends FrameLayout {
     private final EditText keyboard;
     private final WeaponGestureController gestures;
     private boolean editing, pendingCommit;
+    private boolean discovery;
+    private final android.widget.LinearLayout editorBar;
+    private final android.widget.Button loadButton;
     private boolean syncing, locked, loading;
     private String goal = "Balanced";
     private ValueAnimator animation, transition, focusAnimation;
@@ -36,6 +39,7 @@ public final class WeaponInputView extends FrameLayout {
     public WeaponInputView(Context c, AttributeSet attrs) {
         super(c, attrs);
         surface = new GLSurfaceView(c) {
+            @Override public void queueEvent(Runnable task) { super.queueEvent(task); requestRender(); }
             @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
                 super.onSizeChanged(w, h, oldw, oldh);
                 if (w > 0 && h > 0) {
@@ -48,25 +52,43 @@ public final class WeaponInputView extends FrameLayout {
         surface.setEGLConfigChooser(8, 8, 8, 0, 16, 0);
         surface.setPreserveEGLContextOnPause(true);
         surface.setRenderer(renderer);
-        addView(surface, new LayoutParams(-1, -1));
+        surface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        renderer.requestFrame = surface::requestRender;
+        LayoutParams sceneParams = new LayoutParams(-1, -1); sceneParams.bottomMargin = dp(64);
+        addView(surface, sceneParams);
         keyboard = new EditText(c);
         keyboard.setId(R.id.ammunitionEditor);
         keyboard.setSingleLine(true);
-        keyboard.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        keyboard.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         keyboard.setImeOptions(EditorInfo.IME_ACTION_NEXT | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         keyboard.setFilters(new InputFilter[]{new InputFilter.LengthFilter(80)});
-        keyboard.setBackgroundColor(Color.TRANSPARENT);
-        keyboard.setTextColor(Color.TRANSPARENT);
-        keyboard.setCursorVisible(false);
-        keyboard.setAlpha(0f);
+        editorBar = new android.widget.LinearLayout(c);
+        editorBar.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        editorBar.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        editorBar.setPadding(dp(16), dp(4), dp(16), dp(4));
+        keyboard.setBackgroundResource(R.drawable.console_panel);
+        keyboard.setTextColor(c.getColor(R.color.ink));
+        keyboard.setHintTextColor(c.getColor(R.color.muted));
+        keyboard.setTextSize(15);
+        keyboard.setPadding(dp(14),0,dp(8),0);
+        keyboard.setHint("Ingredient / tap to load");
+        keyboard.setCursorVisible(true);
         keyboard.setSaveEnabled(false);
-        keyboard.setContentDescription("Active ammunition ingredient. Type, then Next to load.");
-        LayoutParams imeParams = new LayoutParams(1, 1, android.view.Gravity.CENTER);
-        addView(keyboard, imeParams);
+        keyboard.setContentDescription("Active ingredient. Enter a name, then press Next or Load.");
+        editorBar.addView(keyboard, new android.widget.LinearLayout.LayoutParams(0, dp(52), 1));
+        loadButton = new androidx.appcompat.widget.AppCompatButton(c);
+        loadButton.setText("+ LOAD"); loadButton.setTextSize(12); loadButton.setTextColor(c.getColor(R.color.accent));
+        loadButton.setBackgroundResource(R.drawable.table_control);
+        loadButton.setContentDescription("Load ingredient and select next cartridge");
+        android.widget.LinearLayout.LayoutParams loadParams = new android.widget.LinearLayout.LayoutParams(dp(80), dp(52));
+        loadParams.leftMargin=dp(6); editorBar.addView(loadButton, loadParams);
+        addView(editorBar,new LayoutParams(-1,dp(64),android.view.Gravity.BOTTOM));
+        loadButton.setOnClickListener(v -> commit());
+        keyboard.setOnFocusChangeListener((v, focused) -> { if(focused) editing=true; });
         keyboard.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!syncing && !locked && !loading) { magazine.edit(s.toString()); setPresentationFocus(true); publish(); }
+                if (!syncing && !locked && !loading) { magazine.edit(s.toString()); publish(); }
             }
             @Override public void afterTextChanged(Editable e) { }
         });
@@ -96,8 +118,20 @@ public final class WeaponInputView extends FrameLayout {
         surface.setOnTouchListener(gestures);
         surface.setOnGenericMotionListener(gestures);
         surface.setFocusableInTouchMode(true);
+        setFocusableInTouchMode(true);requestFocus();
         publish();
     }
+    private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
+    public void setDiscovery(boolean value) {
+        discovery=value;
+        keyboard.setHint(value ? "Chef’s choice / no ingredients needed" : "Ingredient / tap to load");
+        keyboard.setEnabled(!value && !locked); loadButton.setEnabled(!value && !locked);
+        editorBar.setAlpha(value ? .65f : 1f);
+        if(value) hideKeyboardForInspection();
+        surface.queueEvent(() -> renderer.discovery=value);
+    }
+    public void refreshExperience() { boolean reduce=Experience.reduced(getContext()); surface.queueEvent(() -> renderer.reducedMotion=reduce); }
+    public void inspect() { hideKeyboardForInspection(); setPresentationFocus(false); }
     public void setAudio(MechanicalAudio value) { audio = value; }
     public IngredientMagazine magazine() { return magazine; }
     public boolean isLoading() { return loading || gestures.isSettling(); }
@@ -112,7 +146,7 @@ public final class WeaponInputView extends FrameLayout {
         syncing = true; keyboard.setText(magazine.text()); keyboard.setSelection(keyboard.length()); syncing = false;
     }
     public void select(int slot) {
-        if (locked || loading) return;
+        if (locked || loading || discovery) return;
         magazine.select(slot); syncKeyboard(); publish();
         if(goal.equals("Balanced"))gestures.align(slot%6,true);
         // Focus restores a useful side angle while preserving a modest inspection tilt.
@@ -140,7 +174,7 @@ public final class WeaponInputView extends FrameLayout {
         gestures.setEnabled(true);
     }
     public void focusCartridge() {
-        if (locked || loading) return;
+        if (locked || loading || discovery) return;
         editing=true;
         setPresentationFocus(true);
         showKeyboard();
@@ -150,8 +184,8 @@ public final class WeaponInputView extends FrameLayout {
         focusTarget = focused;
         if (focusAnimation != null) focusAnimation.cancel();
         float start = presentationFocus;
-        focusAnimation = ValueAnimator.ofFloat(start, focused ? 1f : 0f);
-        focusAnimation.setDuration(320);
+        focusAnimation = ValueAnimator.ofFloat(start, focused ? .25f : 0f);
+        focusAnimation.setDuration(Experience.duration(getContext(),320));
         focusAnimation.setInterpolator(new android.view.animation.DecelerateInterpolator());
         focusAnimation.addUpdateListener(a -> {
             presentationFocus = (float) a.getAnimatedValue();
@@ -167,7 +201,7 @@ public final class WeaponInputView extends FrameLayout {
         if (ime != null) ime.showSoftInput(keyboard, InputMethodManager.SHOW_IMPLICIT);
     }
     public boolean commit() {
-        if (locked || loading || magazine.text().trim().isEmpty()) return false;
+        if (discovery || locked || loading || magazine.text().trim().isEmpty()) return false;
         if (gestures.isSettling()) {pendingCommit=editing;return editing;}
         String error = magazine.validationError();
         if (error != null) { Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show(); return false; }
@@ -176,17 +210,17 @@ public final class WeaponInputView extends FrameLayout {
         loading = true; gestures.setEnabled(false); keyboard.setEnabled(false);
         if (audio != null) audio.load(goal);
         animation = ValueAnimator.ofFloat(0, 1);
-        animation.setDuration(goal.equals("Bulking") ? 640 : 540);
+        animation.setDuration(Experience.duration(getContext(),goal.equals("Bulking") ? 640 : 540));
         animation.setInterpolator(new android.view.animation.LinearInterpolator());
         animation.addUpdateListener(a -> { float t = (float) a.getAnimatedValue(); surface.queueEvent(() -> renderer.load(t)); });
         animation.addListener(new AnimatorListenerAdapter() {
             @Override public void onAnimationEnd(Animator a) {
-                loading = false; keyboard.setEnabled(!locked);
+                loading = false; keyboard.setEnabled(!locked && !discovery); loadButton.setEnabled(!locked && !discovery);
                 if(goal.equals("Balanced"))gestures.automaticAdvance();
                 surface.queueEvent(renderer::settleLoad);
                 gestures.setEnabled(!locked);
                 syncKeyboard(); publish();
-                if (!locked) {setPresentationFocus(true);showKeyboard();}
+                if (!locked && editing) {showKeyboard();}
             }
         });
         animation.start(); return true;
@@ -199,11 +233,11 @@ public final class WeaponInputView extends FrameLayout {
         if (transition != null) transition.cancel();
         surface.queueEvent(() -> renderer.setGoal(value));
         if(value.equals("Balanced"))gestures.align(magazine.active()%6,false);
-        transition = ValueAnimator.ofFloat(1, 0); transition.setDuration(420);
+        transition = ValueAnimator.ofFloat(1, 0); transition.setDuration(Experience.duration(getContext(),420));
         transition.addUpdateListener(a -> { float t=(float)a.getAnimatedValue(); surface.queueEvent(() -> renderer.transition=t); });
         transition.start();
     }
-    public void lock(boolean value) { locked = value; gestures.setEnabled(!value && !loading); keyboard.setEnabled(!value && !loading); }
+    public void lock(boolean value) { locked = value; gestures.setEnabled(!value && !loading); keyboard.setEnabled(!value && !loading && !discovery); loadButton.setEnabled(!value && !loading && !discovery); }
     private void hideKeyboardForInspection() {
         editing=false;pendingCommit=false;keyboard.clearFocus();
         InputMethodManager ime=(InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -216,7 +250,7 @@ public final class WeaponInputView extends FrameLayout {
         keyboard.clearFocus();
         setPresentationFocus(false);
         surface.queueEvent(() -> renderer.waiting=true);
-        animation = ValueAnimator.ofFloat(0,1); animation.setDuration(2600);
+        animation = ValueAnimator.ofFloat(0,1); animation.setDuration(Experience.reduced(getContext()) ? 250 : 2600);
         animation.setInterpolator(new android.view.animation.LinearInterpolator());
         final boolean[] sounded = {false};
         animation.addUpdateListener(a -> {
@@ -230,6 +264,7 @@ public final class WeaponInputView extends FrameLayout {
         });
         animation.start();
     }
+    public void cancelFire() { if(animation!=null){animation.removeAllListeners();animation.cancel();} finish(); }
     public void finish() { lock(false); surface.queueEvent(() -> { renderer.waiting=false;renderer.shot=-1; }); }
     public void resume() {
         surface.onResume();
