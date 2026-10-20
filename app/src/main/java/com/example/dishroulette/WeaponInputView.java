@@ -20,7 +20,7 @@ import android.widget.Toast;
 import java.util.List;
 
 /** Owns the accessible native ingredient editor, mechanical loading and interactive scene. */
-public final class WeaponInputView extends FrameLayout {
+public final class WeaponInputView extends FrameLayout implements IngredientLoadout {
     private final IngredientMagazine magazine = new IngredientMagazine();
     private final GLSurfaceView surface;
     private final WeaponRenderer renderer = new WeaponRenderer();
@@ -51,6 +51,7 @@ public final class WeaponInputView extends FrameLayout {
         surface.setEGLContextClientVersion(2);
         surface.setEGLConfigChooser(8, 8, 8, 0, 16, 0);
         surface.setPreserveEGLContextOnPause(true);
+        if(InterfaceSettings.language(c).equals("ar"))renderer.arabicTypeface=UiTypography.arabic(c);
         surface.setRenderer(renderer);
         surface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         renderer.requestFrame = surface::requestRender;
@@ -58,7 +59,7 @@ public final class WeaponInputView extends FrameLayout {
         addView(surface, sceneParams);
         keyboard = new EditText(c);
         keyboard.setId(R.id.ammunitionEditor);
-        keyboard.setSingleLine(true);
+        keyboard.setSingleLine(true);UiTypography.apply(keyboard);
         keyboard.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         keyboard.setImeOptions(EditorInfo.IME_ACTION_NEXT | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         keyboard.setFilters(new InputFilter[]{new InputFilter.LengthFilter(80)});
@@ -71,15 +72,15 @@ public final class WeaponInputView extends FrameLayout {
         keyboard.setHintTextColor(c.getColor(R.color.muted));
         keyboard.setTextSize(15);
         keyboard.setPadding(dp(14),0,dp(8),0);
-        keyboard.setHint("Ingredient / tap to load");
+        keyboard.setHint(R.string.weapon_editor_hint);
         keyboard.setCursorVisible(true);
         keyboard.setSaveEnabled(false);
-        keyboard.setContentDescription("Active ingredient. Enter a name, then press Next or Load.");
+        keyboard.setContentDescription(c.getString(R.string.weapon_editor_a11y));
         editorBar.addView(keyboard, new android.widget.LinearLayout.LayoutParams(0, dp(52), 1));
         loadButton = new androidx.appcompat.widget.AppCompatButton(c);
-        loadButton.setText("+ LOAD"); loadButton.setTextSize(12); loadButton.setTextColor(c.getColor(R.color.accent));
+        UiTypography.apply(loadButton);loadButton.setText(R.string.weapon_load); loadButton.setTextSize(12); loadButton.setTextColor(c.getColor(R.color.accent));
         loadButton.setBackgroundResource(R.drawable.table_control);
-        loadButton.setContentDescription("Load ingredient and select next cartridge");
+        loadButton.setContentDescription(c.getString(R.string.weapon_load_a11y));
         android.widget.LinearLayout.LayoutParams loadParams = new android.widget.LinearLayout.LayoutParams(dp(80), dp(52));
         loadParams.leftMargin=dp(6); editorBar.addView(loadButton, loadParams);
         addView(editorBar,new LayoutParams(-1,dp(64),android.view.Gravity.BOTTOM));
@@ -117,6 +118,8 @@ public final class WeaponInputView extends FrameLayout {
         });
         surface.setOnTouchListener(gestures);
         surface.setOnGenericMotionListener(gestures);
+        surface.setContentDescription(c.getString(R.string.tabletop_description));
+        surface.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         surface.setFocusableInTouchMode(true);
         setFocusableInTouchMode(true);requestFocus();
         publish();
@@ -124,7 +127,7 @@ public final class WeaponInputView extends FrameLayout {
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
     public void setDiscovery(boolean value) {
         discovery=value;
-        keyboard.setHint(value ? "Chef’s choice / no ingredients needed" : "Ingredient / tap to load");
+        keyboard.setHint(value ? R.string.weapon_discovery_hint : R.string.weapon_editor_hint);
         keyboard.setEnabled(!value && !locked); loadButton.setEnabled(!value && !locked);
         editorBar.setAlpha(value ? .65f : 1f);
         if(value) hideKeyboardForInspection();
@@ -204,7 +207,7 @@ public final class WeaponInputView extends FrameLayout {
         if (discovery || locked || loading || magazine.text().trim().isEmpty()) return false;
         if (gestures.isSettling()) {pendingCommit=editing;return editing;}
         String error = magazine.validationError();
-        if (error != null) { Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show(); return false; }
+        if (error != null) { Toast.makeText(getContext(), IngredientValidation.message(getContext(),error), Toast.LENGTH_LONG).show(); return false; }
         // Freeze this page until its geometry settles, then publish the new active slot/page.
         if (!magazine.commit()) return false;
         loading = true; gestures.setEnabled(false); keyboard.setEnabled(false);

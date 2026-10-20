@@ -1,0 +1,4 @@
+<resources>
+<style name="Instrument" parent="BodyText"><item name="android:fontFamily">sans</item><item name="android:textSize">12sp</item><item name="android:letterSpacing">0</item><item name="android:textColor">?attr/kitchenAccent</item></style>
+<style name="SectionTitle" parent="BodyText"><item name="android:textColor">?attr/kitchenInk</item><item name="android:textSize">24sp</item><item name="android:fontFamily">sans</item><item name="android:textStyle">bold</item></style>
+</resources>

@@ -1,0 +1,1 @@
+<resources><attr name="kitchenBackground" format="color"/><attr name="kitchenSurface" format="color"/><attr name="kitchenInk" format="color"/><attr name="kitchenMuted" format="color"/><attr name="kitchenAccent" format="color"/><attr name="kitchenOnAccent" format="color"/><attr name="kitchenLine" format="color"/></resources>

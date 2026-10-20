@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.dishroulette"
         minSdk = 24
         targetSdk = 37
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.1.0"
         buildConfigField("String", "RECIPE_BASE_URL", "\"https://localhost/\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -31,6 +31,7 @@ android {
             }
         }
     }
+    bundle { language { enableSplit = false } }
     buildFeatures {
         viewBinding = true
         buildConfig = true

@@ -18,6 +18,7 @@ public interface RecipeApi {
     final class Request {
         @SerializedName("ingredients") final List<String> ingredients;
         @SerializedName("meal") final String meal;
+        @SerializedName("language") final String language;
         @SerializedName("avoidTitle") final String avoidTitle;
         @SerializedName("mode") final String mode;
         @SerializedName("goal") final String goal;
@@ -26,6 +27,10 @@ public interface RecipeApi {
         @SerializedName("customExclusions") final List<String> customExclusions;
         @SerializedName("likedDishes") final List<Favorite> likedDishes;
         Request(Set<String> ingredients, String meal, String avoidTitle, SpinProfile profile, List<Favorite> likedDishes) {
+            this(ingredients,meal,avoidTitle,profile,likedDishes,"en");
+        }
+        Request(Set<String> ingredients,String meal,String avoidTitle,SpinProfile profile,List<Favorite> likedDishes,String language){
+            this.language=language;
             this.ingredients = new ArrayList<>(ingredients);
             this.meal = meal;
             this.avoidTitle = avoidTitle;

@@ -53,46 +53,65 @@ final class KitchenScreens {
         FrameLayout page=new FrameLayout(activity);
         FrameLayout.LayoutParams width=new FrameLayout.LayoutParams(Math.min(activity.getResources().getDisplayMetrics().widthPixels,dp(720)),-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL);
         page.addView(body,width);scroll.addView(page);host.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
-        button(body,"← BACK",false,back);
+        button(body,activity.getString(R.string.back),false,back);
         text(body,label,11,R.color.accent,"monospace",24);
         text(body,title,34,R.color.ink,"serif",12);
         line(body);
     }
-    private void line(LinearLayout parent) { View v=new View(activity);v.setBackgroundColor(activity.getColor(R.color.line));LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(1));lp.topMargin=dp(20);lp.bottomMargin=dp(12);parent.addView(v,lp); }
+    private void line(LinearLayout parent) { View v=new View(activity);v.setBackgroundColor(UiColors.color(activity,R.color.line));LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(1));lp.topMargin=dp(20);lp.bottomMargin=dp(12);parent.addView(v,lp); }
     private TextView text(LinearLayout parent,String value,int size,int color,String font,int margin) {
-        TextView t=new TextView(activity);t.setText(value);t.setTextSize(size);t.setTextColor(activity.getColor(color));t.setTypeface(Typeface.create(font,Typeface.NORMAL));t.setLineSpacing(dp(3),1);
+        TextView t=new TextView(activity);t.setText(value);t.setTextSize(size);t.setTextColor(UiColors.color(activity,color));t.setTypeface(Typeface.create(InterfaceSettings.language(activity).equals("ar")||activity.isSimple()?"sans":font,Typeface.NORMAL));t.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);UiTypography.apply(t);t.setLineSpacing(dp(3),1);androidx.core.view.ViewCompat.setAccessibilityHeading(t,size>=24);
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(margin);parent.addView(t,lp);return t;
     }
     private Button button(LinearLayout parent,String title,boolean primary,Runnable click) {
-        Button b=new androidx.appcompat.widget.AppCompatButton(activity);b.setText(title);b.setTextSize(13);b.setTypeface(Typeface.create("sans-serif-condensed",Typeface.BOLD));b.setTextColor(activity.getColor(primary?R.color.on_accent:R.color.ink));
-        b.setBackgroundResource(R.drawable.table_control);if(primary)b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(activity.getColor(R.color.accent)));
+        Button b=new androidx.appcompat.widget.AppCompatButton(activity);b.setText(title);UiTypography.apply(b);b.setTextSize(activity.isSimple()?15:13);b.setAllCaps(false);b.setTypeface(Typeface.create("sans-serif-condensed",Typeface.BOLD));b.setTextColor(UiColors.color(activity,primary?R.color.on_accent:R.color.ink));
+        b.setBackgroundResource(R.drawable.table_control);
+        if(activity.isSimple()){
+            android.graphics.drawable.GradientDrawable shape=new android.graphics.drawable.GradientDrawable();shape.setColor(UiColors.color(activity,primary?R.color.accent:R.color.surface));shape.setCornerRadius(dp(14));shape.setStroke(dp(1),UiColors.color(activity,R.color.line));b.setBackground(shape);
+        }
+        if(primary)b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(UiColors.color(activity,R.color.accent)));
         b.setMinHeight(dp(52));b.setPadding(dp(14),dp(8),dp(14),dp(8));b.setOnClickListener(v->click.run());
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(10);parent.addView(b,lp);return b;
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(10);UiTypography.apply(b);parent.addView(b,lp);return b;
     }
     void saved(List<RecipeCatalog.Recipe> recipes) {
         screen="saved";cooking=null;
-        base("THE RECIPE ARCHIVE / "+recipes.size()+" SAVED","Good meals.\nWorth keeping.",this::close);
+        base(activity.getString(R.string.archive_label,recipes.size()),activity.getString(R.string.archive_title),this::close);
         if(recipes.isEmpty()){
-            text(body,"Your first favorite starts at the table.",22,R.color.ink,"sans-serif-condensed",28);
-            text(body,"Save a dish after your next shot. Your recipes stay on this device, ready whenever you are.",16,R.color.muted,"sans",12);
-            button(body,"RETURN TO LOADOUT →",true,this::close);return;
+            text(body,activity.getString(R.string.archive_empty_heading),22,R.color.ink,"sans-serif-condensed",28);
+            text(body,activity.getString(R.string.archive_empty_detail),16,R.color.muted,"sans",12);
+            button(body,activity.getString(R.string.home),true,this::close);return;
         }
         int index=0;
         for(RecipeCatalog.Recipe recipe:recipes){
-            text(body,String.format(Locale.ROOT,"%02d / %s",++index,recipe.meal.toUpperCase(Locale.ROOT)),11,R.color.accent,"monospace",18);
+            text(body,String.format(Locale.ROOT,"%02d / %s",++index,UiLabels.option(activity,recipe.meal)),11,R.color.accent,"monospace",18);
             text(body,recipe.title,25,R.color.ink,"sans-serif-condensed",8);
             text(body,recipe.description,15,R.color.muted,"sans",8);
-            text(body,meta(recipe),12,R.color.accent,"monospace",12);
-            button(body,"OPEN RECIPE →",true,()->{close();actions.open(recipe);});
-            button(body,"REMOVE FROM SAVED",false,()->{
+            text(body,meta(activity,recipe),12,R.color.accent,"monospace",12);
+            button(body,activity.getString(R.string.open_recipe),true,()->{close();actions.open(recipe);});
+            button(body,activity.getString(R.string.remove_saved),false,()->{
                 actions.remove(recipe);List<RecipeCatalog.Recipe> remaining=new ArrayList<>(recipes);remaining.remove(recipe);saved(remaining);
             });line(body);
         }
     }
-    static String meta(RecipeCatalog.Recipe r) {
-        String value=r.minutes+" MIN  /  "+r.servings+(r.servings==1?" SERVING":" SERVINGS");
-        if(r.cuisine!=null&&!r.cuisine.trim().isEmpty())value+="\n"+r.cuisine;
-        if(r.goal!=null&&!r.goal.trim().isEmpty())value+="  /  "+r.goal;
+    void settings(){
+        screen="settings";cooking=null;
+        base(activity.getString(R.string.settings),activity.getString(R.string.appearance),this::close);
+        text(body,activity.getString(R.string.settings_description),16,R.color.muted,"sans",6);
+        text(body,activity.getString(R.string.interface_mode),21,R.color.ink,"sans",24);
+        Button simple=button(body,activity.getString(R.string.simple_mode)+"\n"+activity.getString(R.string.simple_description),activity.isSimple(),()->activity.changeInterface("simple",InterfaceSettings.language(activity)));simple.setId(R.id.settingsSimple);
+        Button advanced=button(body,activity.getString(R.string.advanced_mode)+"\n"+activity.getString(R.string.advanced_description),!activity.isSimple(),()->activity.changeInterface("advanced",InterfaceSettings.language(activity)));advanced.setId(R.id.settingsAdvanced);
+        text(body,activity.getString(R.string.language),21,R.color.ink,"sans",24);
+        text(body,activity.getString(R.string.language_description),14,R.color.muted,"sans",8);
+        Button english=button(body,"English",InterfaceSettings.language(activity).equals("en"),()->activity.changeLanguage("en"));english.setId(R.id.settingsEnglish);
+        Button arabic=button(body,"العربية",InterfaceSettings.language(activity).equals("ar"),()->activity.changeLanguage("ar"));arabic.setId(R.id.settingsArabic);
+        line(body);
+        Button preferences=button(body,activity.getString(R.string.recipe_preferences),false,activity::showFilters);preferences.setId(R.id.settingsRecipePreferences);
+    }
+
+    static String meta(android.content.Context context,RecipeCatalog.Recipe r) {
+        String value=context.getString(R.string.recipe_metadata,r.minutes,r.servings);
+        if(r.cuisine!=null&&!r.cuisine.trim().isEmpty())value+="\n"+UiLabels.option(context,r.cuisine);
+        if(r.goal!=null&&!r.goal.trim().isEmpty())value+=" · "+UiLabels.option(context,r.goal);
         return value;
     }
     static List<String> steps(RecipeCatalog.Recipe recipe) {
@@ -103,7 +122,7 @@ final class KitchenScreens {
         return result;
     }
     static int suggestedMinutes(String step) {
-        Matcher m=Pattern.compile("(?i)(\\d{1,3})(?:\\s*[-–]\\s*(\\d{1,3}))?\\s*(?:minutes?|mins?)\\b").matcher(step);
+        Matcher m=Pattern.compile("(?i)([0-9٠-٩]{1,3})(?:\\s*[-–إلىto]+\\s*([0-9٠-٩]{1,3}))?\\s*(?:minutes?|mins?|دقيقة|دقائق)(?![\\p{L}])").matcher(step);
         if(!m.find())return 0;
         return Math.max(1,Math.min(240,Integer.parseInt(m.group(2)==null?m.group(1):m.group(2))));
     }
@@ -111,58 +130,58 @@ final class KitchenScreens {
         screen="cooking";cooking=recipe;
         List<String> steps=steps(recipe);
         int selected=Math.max(0,Math.min(steps.size()-1,prefs.getInt("cook_step_"+recipe.id,0)));
-        base("03 / LET’S COOK",recipe.title,this::close);
-        text(body,meta(recipe),12,R.color.accent,"monospace",8);
+        base(activity.getString(R.string.cook_label),recipe.title,this::close);
+        text(body,meta(activity,recipe),12,R.color.accent,"monospace",8);
         LinearLayout checklist=new LinearLayout(activity);checklist.setOrientation(LinearLayout.VERTICAL);
-        Button checklistToggle=button(body,"INGREDIENT CHECKLIST  +",false,()->{});
-        checklistToggle.setContentDescription("Show or hide ingredient checklist");
+        Button checklistToggle=button(body,activity.getString(R.string.checklist_closed),false,()->{});
+        checklistToggle.setContentDescription(activity.getString(R.string.checklist_a11y));
         body.addView(checklist);checklist.setVisibility(View.GONE);
-        checklistToggle.setOnClickListener(v->{boolean open=checklist.getVisibility()!=View.VISIBLE;checklist.setVisibility(open?View.VISIBLE:View.GONE);checklistToggle.setText(open?"INGREDIENT CHECKLIST  −":"INGREDIENT CHECKLIST  +");});
+        checklistToggle.setOnClickListener(v->{boolean open=checklist.getVisibility()!=View.VISIBLE;checklist.setVisibility(open?View.VISIBLE:View.GONE);checklistToggle.setText(open?activity.getString(R.string.checklist_open):activity.getString(R.string.checklist_closed));});
         int ingredient=0;
         for(String value:recipe.ingredients.split("\\n")){
             if(value.trim().isEmpty())continue;
             String key="cook_ingredient_"+recipe.id+"_"+ingredient++;
-            CheckBox check=new androidx.appcompat.widget.AppCompatCheckBox(activity);check.setText(value);check.setTextSize(17);check.setTextColor(activity.getColor(R.color.ink));check.setMinHeight(dp(52));check.setPadding(0,dp(5),0,dp(5));check.setChecked(prefs.getBoolean(key,false));
+            CheckBox check=new androidx.appcompat.widget.AppCompatCheckBox(activity);check.setText(value);UiTypography.apply(check);check.setTextSize(17);check.setTextColor(UiColors.color(activity,R.color.ink));check.setMinHeight(dp(52));check.setPadding(0,dp(5),0,dp(5));check.setChecked(prefs.getBoolean(key,false));
             check.setOnCheckedChangeListener((v,on)->prefs.edit().putBoolean(key,on).apply());checklist.addView(check,new LinearLayout.LayoutParams(-1,-2));
         }
         if(activity.hasExclusions())text(body,activity.getString(R.string.allergy_note),13,R.color.muted,"sans",12);
         line(body);
         TextView progress=text(body,"",11,R.color.accent,"monospace",12);progress.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        ProgressBar bar=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(steps.size());bar.setProgressTintList(android.content.res.ColorStateList.valueOf(activity.getColor(R.color.accent)));LinearLayout.LayoutParams barLp=new LinearLayout.LayoutParams(-1,dp(4));barLp.topMargin=dp(14);body.addView(bar,barLp);
+        ProgressBar bar=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(steps.size());bar.setProgressTintList(android.content.res.ColorStateList.valueOf(UiColors.color(activity,R.color.accent)));LinearLayout.LayoutParams barLp=new LinearLayout.LayoutParams(-1,dp(4));barLp.topMargin=dp(14);body.addView(bar,barLp);
         TextView stepNumber=text(body,"",32,R.color.accent,"serif",24);
         TextView instruction=text(body,"",21,R.color.ink,"sans",14);
-        CheckBox done=new androidx.appcompat.widget.AppCompatCheckBox(activity);done.setText("Mark this step complete");done.setTextSize(16);done.setTextColor(activity.getColor(R.color.ink));done.setMinHeight(dp(56));body.addView(done);
-        TextView timer=text(body,"",18,R.color.accent,"monospace",8);timer.setContentDescription("Cooking timer");
+        CheckBox done=new androidx.appcompat.widget.AppCompatCheckBox(activity);done.setText(activity.getString(R.string.step_complete));UiTypography.apply(done);done.setTextSize(16);done.setTextColor(UiColors.color(activity,R.color.ink));done.setMinHeight(dp(56));body.addView(done);
+        TextView timer=text(body,"",18,R.color.accent,"monospace",8);timer.setContentDescription(activity.getString(R.string.cooking_timer));
         LinearLayout timerActions=new LinearLayout(activity);timerActions.setOrientation(LinearLayout.VERTICAL);body.addView(timerActions);
         Button startTimer=button(timerActions,"",false,()->{});
-        Button resetTimer=button(timerActions,"RESET TIMER",false,()->{});
-        text(timerActions,"Timer is shown here. No background alarm is scheduled.",12,R.color.muted,"sans",8);
+        Button resetTimer=button(timerActions,activity.getString(R.string.reset_timer),false,()->{});
+        text(timerActions,activity.getString(R.string.timer_notice),12,R.color.muted,"sans",8);
         LinearLayout nav=new LinearLayout(activity);nav.setOrientation(LinearLayout.HORIZONTAL);body.addView(nav);
-        Button previous=button(nav,"← PREVIOUS",false,()->{}),next=button(nav,"NEXT STEP →",true,()->{});
+        Button previous=button(nav,activity.getString(R.string.previous_step),false,()->{}),next=button(nav,activity.getString(R.string.next_step),true,()->{});
         LinearLayout.LayoutParams left=new LinearLayout.LayoutParams(0,-2,1);left.topMargin=dp(18);left.rightMargin=dp(6);previous.setLayoutParams(left);
         LinearLayout.LayoutParams right=new LinearLayout.LayoutParams(0,-2,1);right.topMargin=dp(18);next.setLayoutParams(right);
         TextView finish=text(body,"",19,R.color.accent,"serif",20);
-        button(body,"BACK TO RECIPE OVERVIEW",false,this::close);
+        button(body,activity.getString(R.string.back_overview),false,this::close);
         final int[] current={selected};
         final Runnable[] render={null};
         render[0]=()->{
             int step=current[0];String completeKey="cook_done_"+recipe.id+"_"+step;
             prefs.edit().putInt("cook_step_"+recipe.id,step).apply();
             int completed=0;for(int i=0;i<steps.size();i++)if(prefs.getBoolean("cook_done_"+recipe.id+"_"+i,false))completed++;
-            progress.setText("STEP "+(step+1)+" OF "+steps.size()+"  /  "+completed+" COMPLETE");bar.setProgress(completed);
-            stepNumber.setText(String.format(Locale.ROOT,"%02d /",step+1));instruction.setText(steps.get(step));
+            progress.setText(activity.getString(R.string.step_progress,step+1,steps.size(),completed));bar.setProgress(completed);
+            stepNumber.setText(String.format(activity.getResources().getConfiguration().getLocales().get(0),"%02d /",step+1));instruction.setText(steps.get(step));
             done.setOnCheckedChangeListener(null);done.setChecked(prefs.getBoolean(completeKey,false));
             done.setOnCheckedChangeListener((v,on)->{prefs.edit().putBoolean(completeKey,on).apply();render[0].run();});
             previous.setEnabled(step>0);next.setEnabled(step<steps.size()-1);
-            finish.setText(completed==steps.size()?"Service is ready. Enjoy your meal.":"");
+            finish.setText(completed==steps.size()?activity.getString(R.string.enjoy_meal):"");
             int minutes=suggestedMinutes(steps.get(step));timerActions.setVisibility(minutes>0?View.VISIBLE:View.GONE);timer.setVisibility(minutes>0?View.VISIBLE:View.GONE);
             stopTick();
             if(minutes>0){
                 String prefix="cook_timer_"+recipe.id+"_"+step;
                 timerTick=new Runnable(){@Override public void run(){
                     long deadline=prefs.getLong(prefix+"_end",0),remaining=deadline>0?Math.max(0,deadline-System.currentTimeMillis()):prefs.getLong(prefix+"_left",minutes*60000L);
-                    timer.setText(String.format(Locale.ROOT,"TIMER  %02d:%02d%s",(remaining+999)/60000,((remaining+999)/1000)%60,deadline>0&&remaining==0?" / READY":""));
-                    startTimer.setText(deadline>0&&remaining>0?"PAUSE TIMER":remaining==0?"RESTART "+minutes+" MIN TIMER":"START / RESUME TIMER");
+                    timer.setText(activity.getString(R.string.timer_display,String.format(activity.getResources().getConfiguration().getLocales().get(0),"%02d:%02d",(remaining+999)/60000,((remaining+999)/1000)%60),deadline>0&&remaining==0?activity.getString(R.string.timer_ready):""));
+                    startTimer.setText(deadline>0&&remaining>0?activity.getString(R.string.pause_timer):remaining==0?activity.getString(R.string.restart_timer,minutes):activity.getString(R.string.start_timer));
                     if(deadline>0&&remaining==0)prefs.edit().putLong(prefix+"_end",0).putLong(prefix+"_left",0).apply();
                     handler.postDelayed(this,1000);
                 }};timerTick.run();

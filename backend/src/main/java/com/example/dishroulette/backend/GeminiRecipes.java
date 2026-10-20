@@ -38,6 +38,8 @@ final class GeminiRecipes {
 
     static JsonObject validateRequest(JsonObject input) throws ApiFailure {
         try {
+            String language=input.has("language")?string(input,"language",2):"en";
+            if(!Set.of("en","ar").contains(language))throw new ApiFailure(400,"INVALID_FILTERS");
             String mode = input.has("mode") ? string(input, "mode", 20) : "pantry";
             if (!Set.of("pantry", "discover").contains(mode)) throw new IllegalArgumentException();
             List<String> ingredients = strings(input, "ingredients", mode.equals("discover") ? 0 : 1, 20, 80);
@@ -66,6 +68,7 @@ final class GeminiRecipes {
             clean.addProperty("meal", meal);
             clean.addProperty("avoidTitle", avoid);
             clean.addProperty("mode", mode);
+            clean.addProperty("language",language);
             clean.addProperty("goal", goal);
             clean.addProperty("cuisine", cuisine);
             clean.add("allergies", GSON.toJsonTree(allergies));
@@ -122,11 +125,20 @@ final class GeminiRecipes {
             taste. In whyThisDish, briefly explain the actual taste link or chosen cuisine/ingredients.
             Suggest a different dish than avoidTitle; return possible=false if no suitable alternative.
             Give a short title, description, realistic total minutes, servings, quantified ingredients,
-            and sequential cooking steps in English. Include fully cooked meat, poultry and egg
+            and sequential cooking steps in the selected language. Include fully cooked meat, poultry and egg
             instructions when applicable. Do not recommend raw meat or poultry. Do not repeat the
             excluded ingredients in recipe text, even in phrases such as 'without X'.
             If no sensible dish satisfies constraints, possible=false, text/list fields empty, numbers=1.
             Otherwise possible=true. Output only the requested structured recipe.
+            Language: if language=ar, write title, description, ingredients, steps, whyThisDish and
+            goalFit in natural Arabic with correctly shaped Unicode text. If language=en, use English.
+            Understand ingredient names, exclusions and favorites in either Arabic or English.
+            Keep JSON keys, meal and cuisine canonical English enum values. Keep pantryUsed strings
+            EXACTLY as supplied, and pantry-mode additionalIngredients as canonical English staples.
+            In Arabic ingredients, translate food nouns too: write "كوب أرز" and "حبتا طماطم",
+            never "كوب rice" or "حبتا tomato". The exact-string exception applies ONLY to
+            pantryUsed and pantry-mode additionalIngredients, never to the visible ingredients list.
+            Never weaken an allergy or exclusion because of a language difference.
             """;
         JsonObject payload = new JsonObject();
         payload.add("systemInstruction", GSON.toJsonTree(Map.of("parts", List.of(Map.of("text", instructions)))));
@@ -216,6 +228,8 @@ final class GeminiRecipes {
         JsonObject properties = new JsonObject();
         properties.add("possible", GSON.toJsonTree(Map.of("type", "boolean")));
         for (String field : List.of("title", "meal", "description", "cuisine", "whyThisDish", "goalFit")) properties.add(field, GSON.toJsonTree(Map.of("type", "string")));
+        java.util.List<String> outputCuisines=new java.util.ArrayList<>(SpinOptions.CUISINES);outputCuisines.remove("Any cuisine");outputCuisines.add("");
+        properties.getAsJsonObject("cuisine").add("enum",GSON.toJsonTree(outputCuisines));
         for (String field : List.of("minutes", "servings")) properties.add(field, GSON.toJsonTree(Map.of("type", "integer")));
         for (String field : List.of("ingredients", "steps", "pantryUsed", "additionalIngredients")) {
             properties.add(field, GSON.toJsonTree(Map.of("type", "array", "items", Map.of("type", "string"))));

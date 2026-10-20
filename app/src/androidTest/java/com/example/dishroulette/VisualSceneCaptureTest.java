@@ -28,7 +28,7 @@ public class VisualSceneCaptureTest {
         bitmap.recycle();
     }
     @Test public void sideProfileFocusAndMuzzleAlignedCookingFrames() throws Exception {
-        InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0).edit().putString("spin_profile","{}").commit();
+        InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0).edit().putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"en").putString("spin_profile","{}").commit();
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             scenario.onActivity(a->weapon(a).restore(Arrays.asList("Chicken","Rice","","Spinach","",""),0));
             Thread.sleep(900);scenario.onActivity(a->assertFalse(renderer(a).ovenVisible));capture("01-revolver-loading");

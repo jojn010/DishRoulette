@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public class WeaponInteractionTest {
     @Before public void cleanProfile() {
         InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0)
-                .edit().remove("loaded_ammunition").remove("loaded_chamber").putBoolean("reduce_motion",false).putString("selected_meal","Any meal").putString("spin_profile","{}").commit();
+                .edit().remove("loaded_ammunition").remove("loaded_chamber").putBoolean("reduce_motion",false).putString("selected_meal","Any meal").putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"en").putString("spin_profile","{}").commit();
     }
     private WeaponInputView weapon(MainActivity activity) { return activity.findViewById(R.id.tabletop); }
     private void type(MainActivity a,String text,boolean enter) {
@@ -64,7 +64,7 @@ public class WeaponInteractionTest {
     @Test public void setupKeepsSourceAndMealWhenApplyingAndReopening() throws Exception {
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(a -> {
-                a.findViewById(R.id.btnFilters).performClick();
+                a.showFilters();
                 try {
                     Field f=MainActivity.class.getDeclaredField("binding");f.setAccessible(true);
                     com.example.dishroulette.databinding.ActivityMainBinding b=(com.example.dishroulette.databinding.ActivityMainBinding)f.get(a);
@@ -76,7 +76,7 @@ public class WeaponInteractionTest {
             scenario.onActivity(a -> {
                 SpinProfile p=SpinProfile.load(a.getSharedPreferences("dishroulette_ui",0),new com.google.gson.Gson());
                 assertEquals("discover",p.mode);
-                a.findViewById(R.id.btnFilters).performClick();
+                a.showFilters();
             });
             scenario.onActivity(a -> clickDialogButton(a, android.R.id.button2));
         }

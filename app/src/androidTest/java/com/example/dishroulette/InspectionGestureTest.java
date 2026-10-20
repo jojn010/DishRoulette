@@ -28,7 +28,7 @@ public class InspectionGestureTest {
     private WeaponRenderer renderer(MainActivity a){return (WeaponRenderer)field(weapon(a),"renderer");}
     private WeaponGestureController controller(MainActivity a){return (WeaponGestureController)field(weapon(a),"gestures");}
     private InspectionState state(MainActivity a){return controller(a).state;}
-    @Before public void defaults(){InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0).edit().remove("loaded_ammunition").remove("loaded_chamber").putBoolean("reduce_motion",false).putString("selected_meal","Any meal").putString("spin_profile","{}").commit();}
+    @Before public void defaults(){InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0).edit().remove("loaded_ammunition").remove("loaded_chamber").putBoolean("reduce_motion",false).putString("selected_meal","Any meal").putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"en").putString("spin_profile","{}").commit();}
     private void event(MainActivity a,int action,float x,float y,int source){
         long time=SystemClock.uptimeMillis();if(action==MotionEvent.ACTION_DOWN)downTime=time;
         MotionEvent e=MotionEvent.obtain(downTime,time,action,x,y,0);e.setSource(source);surface(a).dispatchTouchEvent(e);e.recycle();

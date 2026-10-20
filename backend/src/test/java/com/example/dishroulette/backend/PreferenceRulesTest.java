@@ -62,4 +62,17 @@ public class PreferenceRulesTest {
             catch(GeminiRecipes.ApiFailure e){assertEquals("INVALID_RECIPE",e.code);}
         }
     }
+    @Test public void languageDefaultsAreCompatibleAndOnlySupportedLanguagesPass() throws Exception {
+        JsonObject input=request();assertEquals("en",GeminiRecipes.validateRequest(input).get("language").getAsString());
+        input.addProperty("language","ar");assertEquals("ar",GeminiRecipes.validateRequest(input).get("language").getAsString());
+        input.addProperty("language","zz");try{GeminiRecipes.validateRequest(input);fail();}catch(GeminiRecipes.ApiFailure e){assertEquals("INVALID_FILTERS",e.code);}
+    }
+    @Test public void arabicGeneratedRecipesCannotEvadeEnglishAllergyOrCustomFilters() throws Exception {
+        JsonObject input=request();input.addProperty("language","ar");
+        JsonObject output=recipe();output.addProperty("title","أرز بالدجاج");
+        output.add("ingredients",JsonParser.parseString("[\"١ كوب أرز\",\"١ ملعقة طحينة\"]"));
+        try{GeminiRecipes.validateRecipe(output,input);fail();}catch(GeminiRecipes.ApiFailure e){assertEquals("ALLERGY_REJECTED",e.code);}
+        output.add("ingredients",JsonParser.parseString("[\"١ كوب أرز\",\"كيوي\"]"));
+        try{GeminiRecipes.validateRecipe(output,input);fail();}catch(GeminiRecipes.ApiFailure e){assertEquals("ALLERGY_REJECTED",e.code);}
+    }
 }

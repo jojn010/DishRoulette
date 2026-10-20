@@ -26,6 +26,6 @@
     <string name="kitchen_03_kitchen_settings">03 / KITCHEN SETTINGS</string>
     <string name="kitchen_experience">Experience</string>
     <string name="kitchen_reduce_motion">Reduce motion</string>
-    <string name="kitchen_shorter_transitions_steady_camera_and_softer_firing_effects">Shorter transitions, steady camera and softer firing effects.</string>
+    <string name="kitchen_shorter_transitions_steady_camera_and_softer_firing_effects">Shorter transitions and fewer visual effects.</string>
     <string name="kitchen_mechanical_sound">Mechanical sound</string>
 </resources>

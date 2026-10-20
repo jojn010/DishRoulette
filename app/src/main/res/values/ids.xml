@@ -1,1 +1,1 @@
-<resources><item name="ammunitionEditor" type="id"/></resources>
+<resources><item name="ammunitionEditor" type="id"/><item name="tabletop" type="id"/><item name="simpleIngredientInput" type="id"/><item name="simpleGenerate" type="id"/><item name="settingsSimple" type="id"/><item name="settingsAdvanced" type="id"/><item name="settingsEnglish" type="id"/><item name="settingsArabic" type="id"/><item name="settingsRecipePreferences" type="id"/></resources>

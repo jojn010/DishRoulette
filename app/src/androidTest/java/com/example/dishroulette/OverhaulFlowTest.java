@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class OverhaulFlowTest {
     private SharedPreferences prefs(){return InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0);}
-    @Before public void defaults(){SharedPreferences.Editor fixture=prefs().edit();for(String key:prefs().getAll().keySet())if(key.startsWith("cook_")&&key.contains("overhaul_test_recipe"))fixture.remove(key);fixture.commit();prefs().edit().remove("loaded_ammunition").remove("loaded_chamber").putString("selected_meal","Any meal").putBoolean("reduce_motion",false).putString("spin_profile","{}").commit();}
+    @Before public void defaults(){SharedPreferences.Editor fixture=prefs().edit();for(String key:prefs().getAll().keySet())if(key.startsWith("cook_")&&key.contains("overhaul_test_recipe"))fixture.remove(key);fixture.commit();prefs().edit().remove("loaded_ammunition").remove("loaded_chamber").putString("selected_meal","Any meal").putBoolean("reduce_motion",false).putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"en").putString("spin_profile","{}").commit();}
     private WeaponInputView weapon(MainActivity a){return a.findViewById(R.id.tabletop);}
     private KitchenScreens screens(MainActivity a){try{Field f=MainActivity.class.getDeclaredField("kitchenScreens");f.setAccessible(true);return (KitchenScreens)f.get(a);}catch(Exception e){throw new AssertionError(e);}}
     private void capture(String name)throws Exception{
@@ -57,11 +57,11 @@ public class OverhaulFlowTest {
     @Test public void cookingChecklistStepsTimerAndRecreation()throws Exception{
         RecipeCatalog.Recipe r=recipe();
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
-            scenario.onActivity(a->{screens(a).cook(r);text(a.findViewById(R.id.secondaryScreen),"INGREDIENT CHECKLIST  +").performClick();TextView check=text(a.findViewById(R.id.secondaryScreen),"1 cup rice");assertNotNull(check);check.performClick();text(a.findViewById(R.id.secondaryScreen),"NEXT STEP →").performClick();});Thread.sleep(500);capture("08-cooking");
-            scenario.onActivity(a->{assertNotNull(text(a.findViewById(R.id.secondaryScreen),"START / RESUME TIMER"));text(a.findViewById(R.id.secondaryScreen),"START / RESUME TIMER").performClick();});
+            scenario.onActivity(a->{screens(a).cook(r);text(a.findViewById(R.id.secondaryScreen),a.getString(R.string.checklist_closed)).performClick();TextView check=text(a.findViewById(R.id.secondaryScreen),"1 cup rice");assertNotNull(check);check.performClick();text(a.findViewById(R.id.secondaryScreen),a.getString(R.string.next_step)).performClick();});Thread.sleep(500);capture("08-cooking");
+            scenario.onActivity(a->{assertNotNull(text(a.findViewById(R.id.secondaryScreen),a.getString(R.string.start_timer)));text(a.findViewById(R.id.secondaryScreen),a.getString(R.string.start_timer)).performClick();});
             scenario.recreate();Thread.sleep(500);
-            scenario.onActivity(a->{assertEquals("cooking",screens(a).screen());assertTrue(((CheckBox)text(a.findViewById(R.id.secondaryScreen),"1 cup rice")).isChecked());assertNotNull(text(a.findViewById(R.id.secondaryScreen),"PAUSE TIMER"));screens(a).saved(Collections.singletonList(r));});Thread.sleep(500);capture("09-saved-archive");
-            scenario.onActivity(a->{text(a.findViewById(R.id.secondaryScreen),"OPEN RECIPE →").performClick();assertEquals(View.VISIBLE,a.findViewById(R.id.cardMealResult).getVisibility());});Thread.sleep(500);capture("07-recipe-reveal");
+            scenario.onActivity(a->{assertEquals("cooking",screens(a).screen());assertTrue(((CheckBox)text(a.findViewById(R.id.secondaryScreen),"1 cup rice")).isChecked());assertNotNull(text(a.findViewById(R.id.secondaryScreen),a.getString(R.string.pause_timer)));screens(a).saved(Collections.singletonList(r));});Thread.sleep(500);capture("09-saved-archive");
+            scenario.onActivity(a->{text(a.findViewById(R.id.secondaryScreen),a.getString(R.string.open_recipe)).performClick();assertEquals(View.VISIBLE,a.findViewById(R.id.cardMealResult).getVisibility());});Thread.sleep(500);capture("07-recipe-reveal");
         }
     }
     @Test public void waitingAndCancelKeepIngredientsAndUnlockInput()throws Exception{
@@ -87,7 +87,7 @@ public class OverhaulFlowTest {
             androidx.test.espresso.Espresso.onView(androidx.test.espresso.matcher.ViewMatchers.withText("02 / Tomato")).perform(androidx.test.espresso.action.ViewActions.click());
             Thread.sleep(500);
             scenario.onActivity(a->{assertEquals("Tomato",((EditText)a.findViewById(R.id.ammunitionEditor)).getText().toString());a.findViewById(R.id.tvLoadState).performClick();});
-            androidx.test.espresso.Espresso.onView(androidx.test.espresso.matcher.ViewMatchers.withText("REMOVE SELECTED")).perform(androidx.test.espresso.action.ViewActions.click());
+            androidx.test.espresso.Espresso.onView(androidx.test.espresso.matcher.ViewMatchers.withText(R.string.remove_selected)).perform(androidx.test.espresso.action.ViewActions.click());
             scenario.onActivity(a->{assertEquals(1,weapon(a).magazine().count());assertTrue(weapon(a).magazine().ingredients().contains("Rice"));});
         }
     }

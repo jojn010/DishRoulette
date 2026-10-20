@@ -64,6 +64,7 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
     float shot=-1,transition,focus;
     boolean waiting, discovery, reducedMotion;
     Runnable requestFrame;
+    Typeface arabicTypeface;
     volatile boolean ovenVisible;
     private long origin;
     private float cameraX,cameraY,eyeX,eyeY,eyeZ,desiredTrackX,desiredTrackY;
@@ -136,6 +137,16 @@ final class WeaponRenderer implements GLSurfaceView.Renderer {
             if(labels[i].equals(uploadedLabels[i])&&(i==active)==(i==uploadedActive))continue;
             labelBitmap.eraseColor(Color.TRANSPARENT);
             String text=labels[i].trim();
+            if(java.text.Bidi.requiresBidi(text.toCharArray(),0,text.length())){
+                labelPaint.setColor(0xee1c190f);labelCanvas.drawRect(0,4,1024,252,labelPaint);
+                android.text.TextPaint arabic=new android.text.TextPaint(labelPaint);arabic.setTypeface(arabicTypeface==null?Typeface.create("sans-serif",Typeface.BOLD):Typeface.create(arabicTypeface,Typeface.BOLD));arabic.setTextSize(190);if(arabic.measureText(text)>950)arabic.setTextSize(126);arabic.setColor(0xfffff1ce);
+                android.text.StaticLayout layout=android.text.StaticLayout.Builder.obtain(text,0,text.length(),arabic,960)
+                    .setAlignment(android.text.Layout.Alignment.ALIGN_OPPOSITE).setTextDirection(android.text.TextDirectionHeuristics.FIRSTSTRONG_RTL)
+                    .setIncludePad(false).setMaxLines(2).setEllipsize(android.text.TextUtils.TruncateAt.END).build();
+                labelCanvas.save();labelCanvas.translate(32,Math.max(4,(256-layout.getHeight())/2f));layout.draw(labelCanvas);labelCanvas.restore();
+                cursor[i]=-.42f;
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textures[i]);GLUtils.texSubImage2D(GLES20.GL_TEXTURE_2D,0,0,0,labelBitmap);uploadedLabels[i]=labels[i];continue;
+            }
             // Printed, high-contrast cartridge band. Its full height stays within the case diameter.
             if(!text.isEmpty()){
                 labelPaint.setColor(0xaa1c190f);labelCanvas.drawRect(0,4,1024,252,labelPaint);

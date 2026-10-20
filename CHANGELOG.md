@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.1.0 — Two ways to cook
+
+- New cream/green Simple interface with pantry chips, recipe goals, preferences, recipe details, saved archive and guided cooking. Simple is the default for new installations.
+- Advanced retains the 3D experience and initializes its renderer/audio only when selected. Both interfaces share all recipe logic and persisted state.
+- Independent, persistent interface and language settings, including legacy installation handling.
+- Complete English/Arabic native resources, RTL controls, bundled Cairo font, correctly shaped cartridge labels and mixed-script ingredient input.
+- Selected-language Gemini content with stable JSON schema and canonical filters, bilingual common-food matching and expanded Arabic exclusion screening. Saved recipe content is preserved.
+- Arabic minute timers, responsive phone/wide layouts, accessible headings and reduced-motion support.
+- Version name 1.1.0, version code 3. Existing v1.0.0 and v1.0.1 checkpoints remain available.
+
+Android only; recipe generation still requires the local backend. Cooking timers have no background alarm. Ingredient screening remains heuristic.
+
+
 ## v1.0.1 — The Midnight Kitchen
 
 - Original charcoal/olive, tungsten/amber visual system with readable native typography, squared metal controls, scene instrumentation and an unmistakable firing action.

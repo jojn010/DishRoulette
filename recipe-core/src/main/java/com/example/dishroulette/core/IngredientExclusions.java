@@ -21,18 +21,32 @@ public final class IngredientExclusions {
         add("Shellfish", "shellfish,shrimp,shrimps,prawn,prawns,crab,lobster,crayfish,crawfish,krill,scampi");
         add("Molluscs", "mollusc,molluscs,mollusk,mollusks,mussel,mussels,clam,clams,oyster,oysters,scallop,scallops,squid,octopus,calamari,snail,snails");
         add("Mustard", "mustard,dijon"); add("Celery", "celery,celeriac"); add("Lupin", "lupin,lupine");
+        extend("Milk","حليب,لبن,ألبان,زبدة,سمن,جبن,جبنة,زبادي,كريمة,قشطة,مصل اللبن,كازين,كفير,لبنة,حلوم,موزاريلا,بارميزان,فيتا");
+        extend("Eggs","بيض,بيضة,بياض البيض,صفار البيض,ألبومين,مايونيز,ميرنغ,أيولي");
+        extend("Peanuts","فول سوداني,فستق سوداني,زبدة الفول السوداني");
+        extend("Tree nuts","مكسرات,لوز,جوز,جوز عين الجمل,كاجو,فستق,بندق,بيكان,مكاديميا,صنوبر,مرصبان");
+        extend("Soy","صويا,فول الصويا,توفو,تمبيه,إدامامي,ميسو,تماري");
+        extend("Wheat","قمح,طحين,دقيق,سميد,برغل,كسكس,فريكة,خبز,معكرونة,مكرونة,شعيرية,نودلز,تورتيلا");
+        extend("Gluten","غلوتين,جلوتين,قمح,شعير,جاودار,مالت,سميد,برغل,كسكس,فريكة,طحين,دقيق,خبز,معكرونة,مكرونة,شعيرية,نودلز,شوفان");
+        extend("Sesame","سمسم,طحينة,طحينية,حلاوة طحينية");
+        extend("Fish","سمك,أسماك,سلمون,تونة,سردين,أنشوفة,ماكريل,قد,صلصة السمك,داشي");
+        extend("Shellfish","قشريات,جمبري,روبيان,قريدس,سلطعون,سرطان البحر,كركند,استاكوزا");
+        extend("Molluscs","رخويات,محار,بلح البحر,اسقلوب,حبار,أخطبوط,كاليماري,حلزون");
+        extend("Mustard","خردل,ديجون");
+        extend("Celery","كرفس,جذر الكرفس");
+        extend("Lupin","ترمس");
     }
     private static final List<String> UNCERTAIN = Arrays.asList("sauce", "dressing", "seasoning mix",
             "stock", "broth", "pesto", "bread", "tortilla", "tortillas", "pasta", "noodles",
-            "mayonnaise", "chocolate", "protein powder", "curry paste", "bouillon");
+            "mayonnaise", "chocolate", "protein powder", "curry paste", "bouillon", "صلصة", "صوص", "تتبيلة", "خلطة توابل", "مرق", "خبز", "معكرونة", "مكرونة", "نودلز", "مايونيز", "شوكولاتة", "مسحوق بروتين", "مكعب مرق");
+    private static void extend(String group,String terms){List<String> all=new ArrayList<>(ALIASES.get(group));all.addAll(Arrays.asList(terms.split(",")));ALIASES.put(group,all);}
     private static void add(String group, String terms) { ALIASES.put(group, Arrays.asList(terms.split(","))); }
     private static String normalize(String value) {
-        return Normalizer.normalize(value == null ? "" : value, Normalizer.Form.NFKD)
-                .replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]+", " ").trim();
+        return FoodNames.normalize(value).replaceAll("[^\\p{L}\\p{N}]+", " ").trim();
     }
     private static boolean contains(String text, String term) {
         String normalized = normalize(term);
-        return !normalized.isEmpty() && Pattern.compile("(?<![\\p{L}\\p{N}])" + Pattern.quote(normalized)
+        return !normalized.isEmpty() && Pattern.compile("(?<![\\p{L}\\p{N}])(?:ال)?" + Pattern.quote(normalized)
                 + "(?:s|es)?(?![\\p{L}\\p{N}])").matcher(normalize(text)).find();
     }
     public static Set<String> conflicts(Collection<String> foods, Collection<String> allergies, Collection<String> custom) {
@@ -43,7 +57,7 @@ public final class IngredientExclusions {
                 if (terms == null) { found.add(allergy); continue; }
                 for (String term : terms) if (contains(food, term)) { found.add(allergy); break; }
             }
-            for (String term : custom) if (contains(food, term)) found.add(term);
+            for (String term : custom) for(String equivalent:FoodNames.equivalents(term)) if (contains(food, equivalent)) {found.add(term);break;}
         }
         return found;
     }
@@ -54,7 +68,7 @@ public final class IngredientExclusions {
     public static List<String> parseCustom(String input) {
         LinkedHashSet<String> values = new LinkedHashSet<>();
         if (input == null) return new ArrayList<>();
-        for (String term : input.split("[,;\\n]+")) {
+        for (String term : input.split("[,;،؛\\n]+")) {
             term = term.trim();
             if (term.isEmpty()) continue;
             if (term.length() > 40 || !term.matches("[\\p{L}][\\p{L}\\p{M} '\\-]*")) throw new IllegalArgumentException("Invalid exclusion");

@@ -47,7 +47,7 @@ LET DINNER DECIDE.</string><string name="hero_body">Choose your loadout in filte
 <string name="allergies_description">Select foods to exclude. These filters take priority over your favorites.</string>
 <string name="custom_exclusions">Other foods to exclude (e.g., kiwi, banana)</string>
 <string name="allergy_note">Ingredient screening cannot guarantee allergy safety. Check every food label and cross-contact risk before cooking, including substitutions.</string>
-<string name="preferences_privacy">Your selected exclusions, goal, cuisine, and eligible liked dishes are sent to Gemini with each spin. Preferences are saved on this device.</string>
+<string name="preferences_privacy">Your selected exclusions, goal, cuisine, and eligible liked dishes are sent to Gemini with each request. Preferences are saved on this device.</string>
 <string name="apply_filters">Apply filters</string><string name="cancel">Cancel</string>
 <string name="custom_invalid">Enter up to 10 food names, separated by commas (40 letters per name maximum).</string>
 <string name="pantry_mode">From my pantry</string><string name="discover_mode">Surprise me</string>
@@ -55,13 +55,13 @@ LET DINNER DECIDE.</string><string name="hero_body">Choose your loadout in filte
 <string name="shopping_recipe">Shopping-list recipe</string><string name="shopping_note">Check the full ingredients list before you shop.</string>
 <string name="filter_summary">%1$s · %2$s · %3$s</string><string name="taste_off">Favorites off</string>
 <string name="exclusions_summary">Excluding: %1$s</string>
-<string name="allergy_conflict">The ingredients conflict with your exclusions: %1$s. Remove them or review your filters before spinning.</string>
+<string name="allergy_conflict">The ingredients conflict with your exclusions: %1$s. Remove them or review your filters before continuing.</string>
 <string name="allergy_rejected">This recipe conflicts with your exclusions or contains a prepared food with uncertain ingredients. It has been blocked. Try simpler ingredients or another dish.</string>
 <string name="uncertain_ingredients">With exclusions selected, prepared foods such as sauces, bread, or seasoning mixes cannot be checked reliably. Use clearly named whole ingredients instead.</string>
 <string name="preferences_invalid">Some filters are invalid. Open filters and select them again.</string>
 <string name="no_filtered_recipe">No suitable recipe was found for those ingredients and filters. Try a different cuisine or add more ingredients.</string>
 <string name="why_recipe">Why this dish: %1$s</string><string name="goal_fit">Recipe style: %1$s</string>
-<string name="review_filters">Your saved filters couldn’t be read reliably. Open filters and confirm your allergies and exclusions before spinning.</string>
+<string name="review_filters">Your saved filters couldn’t be read reliably. Open filters and confirm your allergies and exclusions before continuing.</string>
 <string name="personalization_details">%1$s\n\n%2$s</string>
 <string name="tabletop_description">Pixel weapon aimed at a Dutch Oven. Choose Balanced, Cutting or Bulking in filters to change weapons.</string>
 <string name="ammo_help">DRAG TO INSPECT · PINCH TO ZOOM · TAP AMMO TO EDIT</string>
@@ -70,5 +70,5 @@ LET DINNER DECIDE.</string><string name="hero_body">Choose your loadout in filte
 <string name="table_settings">SETUP</string><string name="back_to_table">RETURN TO TABLE</string>
 <string name="loadout_balanced">BALANCED</string><string name="loadout_cut">CUT</string><string name="loadout_bulk">BULK</string>
 <string name="previous_load">PREV LOAD</string><string name="next_load">NEXT LOAD</string><string name="clear_chamber">CLEAR</string>
-<string name="waiting_for_recipe">OVEN ACTIVE / WAITING FOR RECIPE…</string><string name="firing_recipe">FIRING / INPUT LOCKED</string><string name="shot_interrupted">SHOT INTERRUPTED / INGREDIENTS KEPT / FIRE AGAIN</string><string name="provider_unavailable">Gemini is temporarily unavailable. Your ingredients are still loaded. Please try firing again later.</string>    <string name="clear_all">CLEAR ALL</string>
+<string name="waiting_for_recipe">OVEN ACTIVE / WAITING FOR RECIPE…</string><string name="firing_recipe">FIRING / INPUT LOCKED</string><string name="shot_interrupted">SHOT INTERRUPTED / INGREDIENTS KEPT / FIRE AGAIN</string><string name="provider_unavailable">Gemini is temporarily unavailable. Your ingredients are still loaded. Please try again later.</string>    <string name="clear_all">Clear all</string>
 </resources>

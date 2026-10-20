@@ -23,6 +23,7 @@ public final class RecipeCatalog {
         @SerializedName("minutes") public final int minutes;
         @SerializedName("servings") public final int servings;
         @SerializedName("keys") public final List<String> keys;
+        @SerializedName("language") public String language = "";
         @SerializedName("goal") public String goal = "";
         @SerializedName("cuisine") public String cuisine = "";
         @SerializedName("whyThisDish") public String whyThisDish = "";
@@ -95,7 +96,7 @@ public final class RecipeCatalog {
     public static Set<String> parseIngredients(String input) {
         Set<String> result = new LinkedHashSet<>();
         if (input == null) return result;
-        for (String token : input.toLowerCase(Locale.ROOT).split("[,;\\n]+")) {
+        for (String token : input.toLowerCase(Locale.ROOT).split("[,;،؛\\n]+")) {
             String key = normalize(token.trim());
             if (!key.isEmpty()) result.add(key);
         }
@@ -103,6 +104,7 @@ public final class RecipeCatalog {
     }
 
     private static String normalize(String key) {
+        key=com.example.dishroulette.core.FoodNames.canonical(key);
         switch (key) {
             case "egg": return "eggs";
             case "tomatoes": case "tomatos": case "canned tomatoes": return "tomato";
