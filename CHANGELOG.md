@@ -1,3 +1,10 @@
+## v1.2.5
+
+- Add an opt-in owner-only APK build that imports the existing Gemini connection on first launch, with no API entry or laptop tether needed.
+- Preserve an existing saved connection. Keep ordinary/public APKs free of bootstrap credentials.
+- Add a private build helper that verifies its embedded setup, keeps the personal APK in ignored output, and rebuilds ordinary output without the key.
+- The private APK contains an extractable key and must never be publicly distributed; public APKs continue to use personal setup.
+
 ## v1.2.4
 
 - Tell recipe generation to choose a coherent subset of available pantry ingredients instead of trying to use everything.

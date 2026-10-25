@@ -51,9 +51,28 @@ final class GeminiCredentials {
     }
     boolean configured(){return read()!=null;}
     synchronized void clear(){file.delete();}
+    /** Optional private owner APK. Standard builds contain no bootstrap asset. */
+    private static void importPrivateApkSetup(Context c) {
+        GeminiCredentials credentials = new GeminiCredentials(c);
+        // An existing user connection always wins; never silently replace it on upgrade.
+        if (credentials.configured()) return;
+        try (InputStream in = c.getAssets().open("private-gemini-setup.json")) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            byte[] buffer = new byte[512];
+            int count;
+            while ((count = in.read(buffer)) != -1) {
+                if (bytes.size() + count > 2048) return;
+                bytes.write(buffer, 0, count);
+            }
+            JsonObject data = JsonParser.parseString(bytes.toString("UTF-8")).getAsJsonObject();
+            credentials.save(data.get("key").getAsString(),
+                    data.has("model") ? data.get("model").getAsString() : DEFAULT_MODEL);
+        } catch (Exception ignored) { /* Ordinary APKs have no asset; keep manual setup available. */ }
+    }
     /** Development-only USB provisioning in the app's private directory; never packaged in an APK. */
     static void importSetup(Context c){
         if(!BuildConfig.DEBUG)return;
+        importPrivateApkSetup(c);
         File setup=new File(c.getFilesDir(),"personal-gemini-setup.json");if(!setup.isFile())return;
         try(FileInputStream in=new FileInputStream(setup)){
             if(setup.length()>2048)return;byte[] bytes=new byte[(int)setup.length()];new DataInputStream(in).readFully(bytes);

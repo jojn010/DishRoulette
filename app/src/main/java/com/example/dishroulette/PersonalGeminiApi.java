@@ -13,7 +13,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** HTTPS directly from the owner's phone to Gemini; no laptop, proxy, key in APK, or logging. */
+/** HTTPS directly from the owner's phone to Gemini; no laptop, proxy, or credential logging. */
 final class PersonalGeminiApi implements RecipeApi {
     private static final Gson GSON=new Gson();
     private final GeminiCredentials credentials;

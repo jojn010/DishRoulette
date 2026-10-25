@@ -12,10 +12,16 @@ android {
         applicationId = "com.example.dishroulette"
         minSdk = 24
         targetSdk = 37
-        versionCode = 8
-        versionName = "1.2.4"
+        versionCode = 9
+        versionName = "1.2.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Opt-in private owner build; ordinary builds never include bootstrap credentials.
+    val privateSetupAssets = providers.gradleProperty("privateSetupAssetsDir")
+    if (privateSetupAssets.isPresent) {
+        sourceSets.getByName("debug").assets.srcDir(privateSetupAssets.get())
     }
 
     buildTypes {
