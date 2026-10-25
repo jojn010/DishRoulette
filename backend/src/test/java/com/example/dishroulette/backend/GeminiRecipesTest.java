@@ -20,6 +20,15 @@ public class GeminiRecipesTest {
                  "steps":["Cook the eggs until set."],"pantryUsed":["eggs"],"additionalIngredients":["cooking oil"]}
                 """);
     }
+    @Test public void availablePantryDoesNotRequireEveryIngredient() throws Exception {
+        JsonObject input = request();
+        input.add("ingredients", json("{\"items\":[\"eggs\",\"rice\",\"banana\",\"milk\"]}").get("items"));
+        JsonObject result = GeminiRecipes.validateRecipe(recipe(), input);
+        assertEquals(json("{\"items\":[\"eggs\"]}").get("items"), result.get("pantryUsed"));
+        // Using the whole pantry is also valid when it fits the selected dish.
+        assertEquals(recipe().get("pantryUsed"),
+                GeminiRecipes.validateRecipe(recipe(), request()).get("pantryUsed"));
+    }
     @Test public void rejectsMissingInputsAndOversizeValues() throws Exception {
         for (String body : new String[]{"{}", "{\"ingredients\":[],\"meal\":\"Breakfast\"}",
                 "{\"ingredients\":[\"eggs\"],\"meal\":\"anything\"}"}) {

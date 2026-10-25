@@ -80,7 +80,13 @@ public final class RecipeRules {
             When any exclusions are active, use simple identifiable whole foods and avoid generic
             prepared sauces, breads, dressings, stocks, noodles, pasta, or seasoning mixes whose
             contents cannot be verified. Do not claim that a recipe is allergy-safe or allergen-free.
-            mode=pantry: use only supplied ingredients plus water, salt, pepper, and cooking oil;
+            mode=pantry: supplied ingredients describe what is available, NOT a list that must all be used.
+            Choose a sensible subset that makes one coherent, tasty dish. Use one, some, or all of the
+            available ingredients only when they suit that dish; never add an ingredient just to use
+            everything up. Do not maximize pantry coverage or combine unrelated foods to clear the pantry.
+            Leave unused ingredients out of the recipe and pantryUsed. For example, with eggs, rice,
+            banana and milk available, egg fried rice can use eggs and rice while leaving banana and milk.
+            Use only supplied ingredients plus water, salt, pepper, and cooking oil;
             pantryUsed must be the exact strings of supplied ingredients actually used. List required
             staples in additionalIngredients using only water/salt/pepper/cooking oil as their names.
             mode=discover: invent a varied random dish from the chosen cuisine, without requiring

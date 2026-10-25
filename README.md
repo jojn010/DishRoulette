@@ -1,6 +1,6 @@
 # DishRoulette
 
-**v1.2.3 — Ingredient paste validation**
+**v1.2.4 — Smarter pantry choices**
 
 A native Android recipe app with a warm, lightweight Simple interface and the immersive 3D Advanced interface. Both share ingredients, preferences, saved recipes, cooking progress and the Gemini connection. Choose English or Arabic independently of the interface.
 
@@ -17,6 +17,8 @@ The `backend` module remains available as an optional local development service;
 ## Interfaces and languages
 
 New installs start in **Simple** mode. Existing installations keep their saved choice or the familiar Advanced interface. Open **Settings** from either interface to select Simple/Advanced and English/العربية independently. Choices persist across restarts.
+
+Pantry ingredients describe availability: a recipe may use one, some, or all when appropriate, without forcing unrelated ingredients together.
 
 Simple mode offers editable ingredient chips, Pantry/Surprise selection, goal cards, shared preferences, full recipe details, saved recipes and guided cooking. It does not instantiate the OpenGL renderer or mechanical audio. Advanced mode retains the 3D weapon, camera and firing experience.
 

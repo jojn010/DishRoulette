@@ -156,7 +156,7 @@
     <string name="pantry_title">٠١ / أضف المكونات</string>
     <string name="pantry_body">اكتب مكونًا أو اضغط على خرطوشة لتعديلها.</string>
     <string name="ingredients_hint">أضف المكونات</string>
-    <string name="ingredients_helper">مثلًا: بيض، أرز، بندورة</string>
+    <string name="ingredients_helper">أضف ما هو متوفر لديك. قد يستخدم الطبق بعض المكونات أو كلها.</string>
     <string name="quick_add">المكونات / إضافة سريعة</string>
     <string name="meal_label">نفسي في</string>
     <string name="spin">إطلاق</string>

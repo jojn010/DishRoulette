@@ -4,7 +4,7 @@
 <string name="hero_title">LOAD. SHOOT.
 LET DINNER DECIDE.</string><string name="hero_body">Choose your loadout in filters. Load ingredients. Fire into the Dutch Oven.</string>
 <string name="pantry_title">01 / LOAD THE CHAMBER</string><string name="pantry_body">Type ingredients separated by commas, or tap a shell below.</string>
-<string name="ingredients_hint">Ingredients, separated by commas</string><string name="ingredients_helper">For example: eggs, rice, tomatoes</string>
+<string name="ingredients_hint">Ingredients, separated by commas</string><string name="ingredients_helper">List what you have. Each dish can use some or all of it.</string>
 <string name="quick_add">AMMUNITION / QUICK LOAD</string><string name="meal_label">I’m in the mood for</string>
 <string name="spin">SHOOT</string><string name="spinning">WAIT…</string>
 <string name="collection_note">GEMINI / RECIPE TRANSMISSION</string><string name="ready">02 / DUTCH OVEN</string>

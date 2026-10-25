@@ -1,3 +1,9 @@
+## v1.2.4
+
+- Tell recipe generation to choose a coherent subset of available pantry ingredients instead of trying to use everything.
+- Explain optional pantry usage in English and Arabic ingredient helper text.
+- Keep accepting both subsets and complete pantry usage when appropriate; no new ingredients beyond allowed staples.
+
 ## v1.2.3
 
 - Reject pasted multiline ingredient lists before whitespace normalization can hide line breaks.
