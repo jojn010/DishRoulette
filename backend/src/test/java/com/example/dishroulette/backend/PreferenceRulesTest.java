@@ -75,4 +75,20 @@ public class PreferenceRulesTest {
         output.add("ingredients",JsonParser.parseString("[\"١ كوب أرز\",\"كيوي\"]"));
         try{GeminiRecipes.validateRecipe(output,input);fail();}catch(GeminiRecipes.ApiFailure e){assertEquals("ALLERGY_REJECTED",e.code);}
     }
+    @Test public void rejectsUnknownCuisineAndRepeatedTitle() throws Exception {
+        JsonObject input=request();input.addProperty("cuisine","Any cuisine");
+        JsonObject output=recipe();output.addProperty("cuisine","Invented cuisine");
+        try { GeminiRecipes.validateRecipe(output,input);fail("Unknown cuisine accepted"); }
+        catch(GeminiRecipes.ApiFailure e){assertEquals("INVALID_RECIPE",e.code);}
+        output=recipe();input.addProperty("avoidTitle","  LEMON CHICKEN RICE  ");
+        try { GeminiRecipes.validateRecipe(output,input);fail("Repeated title accepted"); }
+        catch(GeminiRecipes.ApiFailure e){assertEquals("NO_RECIPE",e.code);}
+    }
+    @Test public void screensEveryDisplayedRecipeTextForExclusions() throws Exception {
+        for(String field:new String[]{"description","whyThisDish","goalFit"}) {
+            JsonObject output=recipe();output.addProperty(field,"Serve with tahini.");
+            try { GeminiRecipes.validateRecipe(output,request());fail("Unchecked field: "+field); }
+            catch(GeminiRecipes.ApiFailure e){assertEquals("ALLERGY_REJECTED",e.code);}
+        }
+    }
 }

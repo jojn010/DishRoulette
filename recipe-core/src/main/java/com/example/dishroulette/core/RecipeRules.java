@@ -148,6 +148,9 @@ public final class RecipeRules {
             if (!result.get("possible").getAsJsonPrimitive().isBoolean()) throw new IllegalArgumentException();
             if (!result.get("possible").getAsBoolean()) throw new ApiFailure(422, "NO_RECIPE");
             String title = string(result, "title", 120);
+            if (title.equalsIgnoreCase(request.get("avoidTitle").getAsString())) {
+                throw new ApiFailure(422, "NO_RECIPE");
+            }
             String meal = string(result, "meal", 30);
             if (!MEALS.contains(meal) || meal.equals("Any meal")) throw new IllegalArgumentException();
             if (!request.get("meal").getAsString().equals("Any meal")
@@ -159,6 +162,9 @@ public final class RecipeRules {
             if (!discovery && !Set.of("water", "salt", "pepper", "cooking oil").containsAll(extras)) throw new IllegalArgumentException();
             JsonObject clean = new JsonObject();
             String cuisine = string(result, "cuisine", 80);
+            if (!SpinOptions.CUISINES.contains(cuisine) || cuisine.equals("Any cuisine")) {
+                throw new IllegalArgumentException();
+            }
             if (!request.get("cuisine").getAsString().equals("Any cuisine")
                     && !request.get("cuisine").getAsString().equals(cuisine)) throw new IllegalArgumentException();
             clean.addProperty("cuisine", cuisine);
@@ -178,6 +184,9 @@ public final class RecipeRules {
             List<String> check = new ArrayList<>(strings(result, "ingredients", 1, 24, 200));
             check.addAll(strings(result, "steps", 1, 12, 700));
             check.addAll(extras); check.add(title);
+            for (String field : List.of("description", "whyThisDish", "goalFit")) {
+                check.add(clean.get(field).getAsString());
+            }
             if (!IngredientExclusions.conflicts(check, allergies, custom).isEmpty()) {
                 throw new ApiFailure(422, "ALLERGY_REJECTED");
             }

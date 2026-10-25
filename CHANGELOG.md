@@ -1,3 +1,9 @@
+## v1.2.1
+
+- Reject unsupported generated cuisines and repeated recipe titles when requesting another dish.
+- Apply exclusion screening to descriptions, taste explanations, and goal explanations.
+- Add regression coverage for these shared Android/backend validation rules.
+
 ## v1.2.0
 
 - Publish the existing personal Gemini connection and interface improvements.
