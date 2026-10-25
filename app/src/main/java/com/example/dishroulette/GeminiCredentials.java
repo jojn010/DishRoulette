@@ -32,7 +32,7 @@ final class GeminiCredentials {
     }
     synchronized void save(String key,String model) throws Exception {
         key=key.trim();model=model.trim();
-        if(key.length()<20||key.length()>256||!key.matches("[A-Za-z0-9_-]+")||!model.matches("gemini-[A-Za-z0-9.-]{1,70}"))throw new IllegalArgumentException();
+        if(!GeminiKeyFormat.accepts(key)||!model.matches("gemini-[A-Za-z0-9.-]{1,70}"))throw new IllegalArgumentException();
         JsonObject data=new JsonObject();data.addProperty("key",key);data.addProperty("model",model);
         Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.ENCRYPT_MODE,secret());
         byte[] encrypted=cipher.doFinal(data.toString().getBytes(StandardCharsets.UTF_8));

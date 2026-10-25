@@ -5,6 +5,7 @@ The key is extractable from this APK. Ordinary builds remain credential-free.
 """
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -23,6 +24,10 @@ key = os.environ.get('GEMINI_API_KEY', props.get('GEMINI_API_KEY', '')).strip()
 model = os.environ.get('GEMINI_MODEL', props.get('GEMINI_MODEL', 'gemini-3.5-flash-lite')).strip()
 if not key:
     raise SystemExit('No existing local Gemini key found.')
+if not re.fullmatch(r'[A-Za-z0-9_.-]{20,256}', key):
+    raise SystemExit('Existing key has an unsupported format; no private APK built.')
+if not re.fullmatch(r'gemini-[A-Za-z0-9.-]{1,70}', model):
+    raise SystemExit('Existing model has an unsupported format; no private APK built.')
 apk = root / 'app/build/outputs/apk/debug/app-debug.apk'
 output = root / 'work/private/DishRoulette-personal.apk'
 output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)

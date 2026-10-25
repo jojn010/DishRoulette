@@ -1,3 +1,8 @@
+## v1.2.6
+
+- Accept dotted Gemini keys in both encrypted storage and manual setup, fixing automatic private-build import for the existing owner connection.
+- Share key-format checks and test dotted keys, legacy keys, length bounds, and invalid header characters.
+
 ## v1.2.5
 
 - Add an opt-in owner-only APK build that imports the existing Gemini connection on first launch, with no API entry or laptop tether needed.

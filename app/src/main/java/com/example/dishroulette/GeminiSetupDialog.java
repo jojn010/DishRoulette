@@ -34,7 +34,7 @@ final class GeminiSetupDialog {
             connect.setOnClickListener(v->{
                 GeminiCredentials.Value current=store.read();String secret=key.getText().toString().trim();if(secret.isEmpty()&&current!=null)secret=current.key;
                 String selected=model.getText().toString().trim();
-                if(secret.length()<20||secret.length()>256||!secret.matches("[A-Za-z0-9_-]+")){key.setError(activity.getString(R.string.gemini_invalid_key));return;}
+                if(!GeminiKeyFormat.accepts(secret)){key.setError(activity.getString(R.string.gemini_invalid_key));return;}
                 if(!selected.matches("gemini-[A-Za-z0-9.-]{1,70}")){model.setError(activity.getString(R.string.gemini_invalid_model));return;}
                 final String checkedKey=secret;connect.setEnabled(false);remove.setEnabled(false);key.setEnabled(false);model.setEnabled(false);status.setText(R.string.gemini_checking);
                 OkHttpClient client=new OkHttpClient.Builder().connectTimeout(10,TimeUnit.SECONDS).callTimeout(20,TimeUnit.SECONDS).followRedirects(false).followSslRedirects(false).build();
