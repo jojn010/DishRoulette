@@ -27,9 +27,13 @@ public final class IngredientMagazine {
         Set<String> names = new LinkedHashSet<>();
         int chars = 0;
         for (String value : slots) {
+            // Check the original text before whitespace normalization erases line breaks.
+            if (value.contains(",") || value.contains("،") || value.contains("؛")
+                    || value.contains(";") || value.contains("\n") || value.contains("\r")) {
+                return "One ingredient per cartridge. Use Enter to load the next.";
+            }
             String name = value.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
             if (name.isEmpty()) continue;
-            if (name.contains(",") || name.contains("،") || name.contains("؛") || name.contains(";") || name.contains("\n")) return "One ingredient per cartridge. Use Enter to load the next.";
             String canonical = RecipeCatalog.parseIngredients(name).iterator().next();
             if (!names.add(canonical)) return "That ingredient is already loaded. Edit or clear this cartridge.";
             chars += name.length();

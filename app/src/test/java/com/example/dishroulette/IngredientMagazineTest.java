@@ -24,4 +24,24 @@ public class IngredientMagazineTest {
         m.edit("");for(int i=1;i<=20;i++){m.edit("item"+i);m.select(i+1);}
         assertNotNull(m.validationError());assertEquals(21,m.count());
     }
+    @Test public void pastedIngredientListsCannotBypassSingleCartridgeValidation() {
+        for (String separator : Arrays.asList("\n", "\r\n", "\r", ",", ";", "،", "؛")) {
+            IngredientMagazine m = new IngredientMagazine();
+            String pasted = "rice" + separator + "chicken";
+            m.edit(pasted);
+            assertTrue(m.validationError().startsWith("One ingredient"));
+            assertFalse(m.commit());
+            assertEquals(0, m.active());
+            assertEquals(pasted, m.text());
+            m.edit("rice");
+            assertNull(m.validationError());
+            assertTrue(m.commit());
+        }
+    }
+    @Test public void spacesAndTabsRemainValidInsideAnIngredientName() {
+        IngredientMagazine m = new IngredientMagazine();
+        m.edit("  olive\t oil  ");
+        assertNull(m.validationError());
+        assertTrue(m.commit());
+    }
 }

@@ -1,3 +1,9 @@
+## v1.2.3
+
+- Reject pasted multiline ingredient lists before whitespace normalization can hide line breaks.
+- Preserve rejected cartridge text and selection so it can be corrected without losing input.
+- Add regression coverage for LF, CRLF, CR, English/Arabic separators, and valid spaces/tabs.
+
 ## v1.2.2
 
 - Correct cooking timers for fractional minutes: round up the full duration instead of reading only the decimal suffix.
