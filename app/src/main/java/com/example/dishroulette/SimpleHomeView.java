@@ -27,21 +27,28 @@ final class SimpleHomeView extends LinearLayout {
     private boolean editing,busy,syncing;
     private final ScrollView scroll;
     private int editIndex;
+    private final ImageView foodPhoto;
+    private final MaterialButton connect;
     SimpleHomeView(MainActivity a,NativeIngredientLoadout loadout){
         super(a);activity=a;this.loadout=loadout;setOrientation(VERTICAL);setBackgroundColor(color(R.color.background));
         LinearLayout header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
-        TextView logo=label(header,"DishRoulette",23,R.color.ink,0);logo.setTypeface(Typeface.create("serif",Typeface.BOLD));logo.setLayoutParams(new LayoutParams(0,-2,1));
+        TextView logo=label(header,"DishRoulette",23,R.color.ink,0);logo.setTypeface(Typeface.create("serif",Typeface.BOLD));logo.setLayoutParams(new LayoutParams(0,-2,1));logo.setGravity(isArabic()?Gravity.RIGHT:Gravity.LEFT);UiIcons.text(logo,R.drawable.ic_bowl);
         language=button(header,InterfaceSettings.language(a).equals("ar")?"EN":"العربية",false,()->a.changeLanguage(InterfaceSettings.language(a).equals("ar")?"en":"ar"));language.setContentDescription(a.getString(R.string.language));language.setLayoutParams(new LayoutParams(-2,dp(48)));addView(header,new LayoutParams(-1,dp(64)));
         scroll=new ScrollView(a);scroll.setFillViewport(true);addView(scroll,new LayoutParams(-1,0,1));
         FrameLayout frame=new FrameLayout(a);scroll.addView(frame);
         LinearLayout page=column();page.setPadding(dp(24),dp(16),dp(24),dp(28));
         int max=Math.min(a.getResources().getDisplayMetrics().widthPixels,dp(1000));frame.addView(page,new FrameLayout.LayoutParams(max,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL));
         label(page,a.getString(R.string.simple_eyebrow),11,R.color.accent,8);
-        TextView hero=label(page,a.getString(R.string.simple_hero),38,R.color.ink,12);hero.setTypeface(UiTypography.face(a,"serif",Typeface.NORMAL));androidx.core.view.ViewCompat.setAccessibilityHeading(hero,true);
-        label(page,a.getString(R.string.simple_intro),17,R.color.muted,10);
+        TextView hero=label(page,a.getString(R.string.simple_hero),30,R.color.ink,12);hero.setTypeface(UiTypography.face(a,"serif",Typeface.NORMAL));androidx.core.view.ViewCompat.setAccessibilityHeading(hero,true);
+        label(page,a.getString(R.string.simple_intro),15,R.color.muted,10);
+        FrameLayout photoCard=new FrameLayout(a);android.graphics.drawable.GradientDrawable photoShape=panel(20,R.color.surface);photoCard.setBackground(photoShape);photoCard.setClipToOutline(true);LayoutParams photoLp=new LayoutParams(-1,dp(150));photoLp.topMargin=dp(18);page.addView(photoCard,photoLp);
+        foodPhoto=new ImageView(a);foodPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);foodPhoto.setImageResource(R.drawable.pantry_photo);foodPhoto.setContentDescription(a.getString(R.string.food_photo_description));photoCard.addView(foodPhoto,new FrameLayout.LayoutParams(-1,-1));
+        TextView photoCaption=new TextView(a);photoCaption.setText(R.string.food_photo_caption);photoCaption.setTextSize(11);photoCaption.setTextColor(0xff243a2c);photoCaption.setPadding(dp(12),dp(5),dp(12),dp(5));photoCaption.setBackgroundColor(0xeeFBF8F2);UiTypography.apply(photoCaption);FrameLayout.LayoutParams cap=new FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM|Gravity.START);cap.setMargins(dp(10),0,dp(10),dp(10));photoCard.addView(photoCaption,cap);
+        connect=button(page,a.getString(R.string.connection_cta),false,a::showGeminiSettings);UiIcons.button(connect,R.drawable.ic_connect);connect.setVisibility(new GeminiCredentials(a).configured()?GONE:VISIBLE);
         LinearLayout modeRail=row();LayoutParams modeLp=new LayoutParams(-1,-2);modeLp.topMargin=dp(24);page.addView(modeRail,modeLp);
         pantryMode=button(modeRail,a.getString(R.string.pantry_mode),false,()->a.chooseGenerationMode("pantry"));
         surpriseMode=button(modeRail,a.getString(R.string.discover_mode),false,()->a.chooseGenerationMode("discover"));
+        UiIcons.button(pantryMode,R.drawable.ic_bowl);UiIcons.button(surpriseMode,R.drawable.ic_shuffle);
         LayoutParams one=new LayoutParams(0,-2,1);one.setMarginEnd(dp(8));pantryMode.setLayoutParams(one);surpriseMode.setLayoutParams(new LayoutParams(0,-2,1));
         LinearLayout columns=new LinearLayout(a);boolean wide=a.getResources().getConfiguration().screenWidthDp>=840;columns.setOrientation(wide?HORIZONTAL:VERTICAL);page.addView(columns,new LayoutParams(-1,-2));
         LinearLayout left=column();columns.addView(left,new LayoutParams(wide?0:-1,-2,wide?1.4f:0));
@@ -69,7 +76,7 @@ final class SimpleHomeView extends LinearLayout {
         page.removeView(generate);LinearLayout actionDock=row();actionDock.setPadding(dp(24),dp(8),dp(24),dp(4));actionDock.addView(generate,new LayoutParams(-1,dp(60)));addView(actionDock,new LayoutParams(-1,-2));
         page.removeView(loading);page.addView(loading,0);
         LinearLayout navigation=row();navigation.setPadding(dp(16),dp(6),dp(16),dp(6));navigation.setBackgroundColor(color(R.color.surface));addView(navigation,new LayoutParams(-1,-2));
-        for(int index=0;index<3;index++){final int i=index;MaterialButton b=button(navigation,a.getString(index==0?R.string.home:index==1?R.string.saved:R.string.settings),false,()->{if(i==1)a.showSavedRecipes();else if(i==2)a.showSettings();else if(Experience.reduced(a))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);});b.setLayoutParams(new LayoutParams(0,dp(52),1));}
+        for(int index=0;index<3;index++){final int i=index;MaterialButton b=button(navigation,a.getString(index==0?R.string.home:index==1?R.string.saved:R.string.settings),false,()->{if(i==1)a.showSavedRecipes();else if(i==2)a.showSettings();else if(Experience.reduced(a))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);});UiIcons.button(b,index==0?R.drawable.ic_home:index==1?R.drawable.ic_bookmark:R.drawable.ic_settings);b.setIconGravity(MaterialButton.ICON_GRAVITY_TOP);b.setIconPadding(dp(1));b.setTextSize(12);b.setLayoutParams(new LayoutParams(0,dp(64),1));}
         input.setText(InterfaceSettings.prefs(a).getString("simple_input_draft",""));loadout.setFocusListener(this::editCurrent);refresh();setFocusableInTouchMode(true);requestFocus();
     }
     private boolean isArabic(){return InterfaceSettings.language(activity).equals("ar");}
@@ -90,14 +97,16 @@ final class SimpleHomeView extends LinearLayout {
         m.commit();editing=false;setDraft("");add.setText(R.string.add);loadout.publish();return true;
     }
     void refresh(){
-        if(input==null)return;boolean discovery=activity.profile().mode.equals("discover");pantry.setVisibility(discovery?GONE:VISIBLE);
+        if(input==null)return;boolean discovery=activity.profile().mode.equals("discover");
+        if(!Boolean.valueOf(discovery).equals(foodPhoto.getTag())){foodPhoto.setImageResource(discovery?R.drawable.inspiration_photo:R.drawable.pantry_photo);foodPhoto.setContentDescription(activity.getString(discovery?R.string.food_inspiration_description:R.string.food_photo_description));foodPhoto.setTag(discovery);}pantry.setVisibility(discovery?GONE:VISIBLE);
         pantryMode.setChecked(!discovery);surpriseMode.setChecked(discovery);pantryMode.setBackgroundTintList(ColorStateList.valueOf(color(!discovery?R.color.accent:R.color.surface)));pantryMode.setTextColor(color(!discovery?R.color.on_accent:R.color.ink));surpriseMode.setBackgroundTintList(ColorStateList.valueOf(color(discovery?R.color.accent:R.color.surface)));surpriseMode.setTextColor(color(discovery?R.color.on_accent:R.color.ink));
         ingredientCount.setText(activity.getString(R.string.ingredients_count,loadout.magazine().count()));empty.setVisibility(loadout.magazine().count()==0?VISIBLE:GONE);
         ingredients.removeAllViews();List<String> slots=loadout.magazine().save();
-        for(int i=0;i<slots.size();i++){if(slots.get(i).trim().isEmpty())continue;final int slot=i;String name=slots.get(i);Chip chip=new Chip(activity);chip.setText(name);UiTypography.apply(chip);chip.setTextSize(15);chip.setCloseIconVisible(true);chip.setChipBackgroundColor(ColorStateList.valueOf(color(R.color.surface)));chip.setTextColor(color(R.color.ink));chip.setCloseIconContentDescription(activity.getString(R.string.remove_ingredient_a11y,name));chip.setContentDescription(activity.getString(R.string.edit_ingredient_a11y,name));chip.setOnClickListener(v->loadout.select(slot));chip.setOnCloseIconClickListener(v->{loadout.magazine().select(slot);loadout.clearChamber();if(editing&&editIndex==slot){editing=false;setDraft("");}});chip.setEnabled(!busy);ingredients.addView(chip);}
+        for(int i=0;i<slots.size();i++){if(slots.get(i).trim().isEmpty())continue;final int slot=i;String name=slots.get(i);Chip chip=new Chip(activity);chip.setText(name);UiTypography.apply(chip);chip.setTextSize(15);chip.setChipIconResource(R.drawable.ic_leaf);chip.setChipIconVisible(true);chip.setChipIconTint(ColorStateList.valueOf(color(R.color.accent)));chip.setCloseIconVisible(true);chip.setChipBackgroundColor(ColorStateList.valueOf(color(R.color.surface)));chip.setTextColor(color(R.color.ink));chip.setCloseIconContentDescription(activity.getString(R.string.remove_ingredient_a11y,name));chip.setContentDescription(activity.getString(R.string.edit_ingredient_a11y,name));chip.setOnClickListener(v->loadout.select(slot));chip.setOnCloseIconClickListener(v->{loadout.magazine().select(slot);loadout.clearChamber();if(editing&&editIndex==slot){editing=false;setDraft("");}});chip.setEnabled(!busy);ingredients.addView(chip);}
         summary.setText(discovery?activity.getString(R.string.simple_surprise_description):activity.getString(R.string.preferences_summary,UiLabels.option(activity,activity.meal()),UiLabels.option(activity,activity.profile().cuisine),UiLabels.option(activity,activity.profile().goal)));
         goals.removeAllViews();String[] values={"Balanced","Cutting","Bulking"};int[] descriptions={R.string.balanced_description,R.string.cut_description,R.string.bulk_description};
-        for(int i=0;i<values.length;i++){final String goal=values[i];MaterialButton b=button(goals,UiLabels.option(activity,goal)+"\n"+activity.getString(descriptions[i]),goal.equals(activity.profile().goal),()->activity.chooseGoal(goal));b.setEnabled(!busy);}
+        for(int i=0;i<values.length;i++){final String goal=values[i];MaterialButton b=button(goals,UiLabels.option(activity,goal)+"\n"+activity.getString(descriptions[i]),goal.equals(activity.profile().goal),()->activity.chooseGoal(goal));UiIcons.button(b,i==0?R.drawable.ic_bowl:i==1?R.drawable.ic_leaf:R.drawable.ic_flame);b.setEnabled(!busy);}
+        UiIcons.button(generate,discovery?R.drawable.ic_sparkle:R.drawable.ic_bowl);connect.setVisibility(new GeminiCredentials(activity).configured()?GONE:VISIBLE);
         generate.setText(busy?activity.getString(R.string.cancel_generation):activity.getString(discovery?R.string.surprise_action:R.string.find_recipe));
     }
     void setBusy(boolean value){busy=value;input.setEnabled(!value);add.setEnabled(!value);language.setEnabled(!value);pantryMode.setEnabled(!value);surpriseMode.setEnabled(!value);generate.setEnabled(true);loading.setVisibility(value?VISIBLE:GONE);if(value){if(Experience.reduced(activity))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);}refresh();}

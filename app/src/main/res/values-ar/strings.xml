@@ -189,9 +189,9 @@
     <string name="quick_add_ingredient">+ %1$s</string>
     <string name="ai_result_eyebrow">اقتراح من GEMINI</string>
     <string name="generation_error_title">تعذّر اقتراح وجبة</string>
-    <string name="key_missing">خدمة Gemini غير مهيأة بعد. أضف مفتاح API إلى إعدادات الخادم على الكمبيوتر ثم أعد تشغيله.</string>
-    <string name="connection_error">تعذّر الاتصال بخدمة الوصفات. شغّل backend/start-local.sh على الكمبيوتر وأبقِ الكمبيوتر والهاتف أو المحاكي متصلين.</string>
-    <string name="provider_configuration">رفضت Gemini إعدادات الخدمة. تحقق من المفتاح وصلاحية النموذج وإعدادات المشروع.</string>
+    <string name="key_missing">اربط مفتاح Gemini في الإعدادات لتوليد الوصفات.</string>
+    <string name="connection_error">تعذّر الوصول إلى Gemini. تحقّق من الإنترنت وحاول مرة أخرى.</string>
+    <string name="provider_configuration">تعذّر استخدام مفتاح Gemini أو النموذج. تحقّق من إعدادات الاتصال.</string>
     <string name="generation_timeout">استغرق الاقتراح وقتًا طويلًا. حاول مجددًا.</string>
     <string name="rate_limited">وصلت الخدمة إلى حد الطلبات المتاح. انتظر قليلًا ثم حاول مجددًا.</string>
     <string name="invalid_recipe">لم تتمكن الخدمة من تقديم وصفة مكتملة. حاول مجددًا.</string>

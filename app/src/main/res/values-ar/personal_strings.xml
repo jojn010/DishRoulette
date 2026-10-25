@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gemini_settings">الاتصال بـ Gemini</string>
+    <string name="gemini_intro">اربط مفتاح Gemini الخاص بك مرة واحدة. بعدها تعمل الوصفات عبر الواي فاي أو بيانات الهاتف دون اللابتوب. يُشفّر المفتاح على هذا الهاتف ولا يُضمّن في التطبيق.</string>
+    <string name="gemini_key_hint">ألصق مفتاح Gemini API الخاص بك</string>
+    <string name="gemini_key_replace">اتركه فارغاً للاحتفاظ بالمفتاح المحفوظ</string>
+    <string name="gemini_model">نموذج Gemini</string>
+    <string name="gemini_key_saved">المفتاح مشفّر على هذا الهاتف</string>
+    <string name="gemini_not_connected">اربط مفتاحك لتبدأ الطبخ</string>
+    <string name="gemini_get_key">احصل على مفتاح من Google AI Studio ↗</string>
+    <string name="gemini_connect">تحقّق واتصل</string>
+    <string name="gemini_remove">حذف المفتاح</string>
+    <string name="gemini_removed">حُذف مفتاح Gemini من هذا الهاتف</string>
+    <string name="gemini_checking">جارٍ التحقّق من الاتصال…</string>
+    <string name="gemini_connected">تم الاتصال! الوصفات الآن تعمل دون اللابتوب.</string>
+    <string name="gemini_check_failed">تعذّر الاتصال. تحقّق من المفتاح والنموذج والإنترنت وإمكانية الوصول إلى API، ثم أعد المحاولة.</string>
+    <string name="gemini_storage_error">تعذّر الحفظ الآمن. حاول مرة أخرى.</string>
+    <string name="gemini_invalid_key">ألصق مفتاح Gemini API صالحاً</string>
+    <string name="gemini_invalid_model">استخدم اسم نموذج مثل gemini-3.5-flash-lite</string>
+    <string name="food_photo_description">طماطم طازجة وأرز وبيض وأعشاب على طاولة المطبخ</string>
+    <string name="food_inspiration_description">إلهام للطبخ: خضار مشوية وحبوب</string>
+    <string name="food_photo_caption">شوية إلهام لمطبخك</string>
+    <string name="food_fresh_note">أفكار جديدة، مكونات من كل يوم</string>
+    <string name="connection_cta">ربط Gemini</string>
+</resources>

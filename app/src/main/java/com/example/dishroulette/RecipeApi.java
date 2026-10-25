@@ -4,16 +4,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
 
 public interface RecipeApi {
-    @POST("recipes/suggest") Call<RecipeSuggestion> suggest(@Body Request request);
+    Call<RecipeSuggestion> suggest(Request request);
 
     final class Request {
         @SerializedName("ingredients") final List<String> ingredients;
@@ -55,13 +49,5 @@ public interface RecipeApi {
             }
         }
     }
-    static RecipeApi create() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(5, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS)
-                .callTimeout(65, TimeUnit.SECONDS).retryOnConnectionFailure(false).build();
-        // The development helper keeps adb reverse active for both phones and emulators.
-        return new Retrofit.Builder().baseUrl(BuildConfig.RECIPE_BASE_URL)
-                .client(client).addConverterFactory(GsonConverterFactory.create())
-                .build().create(RecipeApi.class);
-    }
+    static RecipeApi create(android.content.Context context) { return new PersonalGeminiApi(context); }
 }

@@ -1,6 +1,6 @@
 # DishRoulette Gemini development service
 
-The Java Android app sends ingredients and meal choice to this local Java service.
+This optional development service accepts ingredients and meal choices. The current Android app uses a direct personal Gemini connection instead; see the root README.
 The service calls Gemini, validates the structured response, and returns a recipe.
 Generated recipes can be saved locally in the app. The API key is never packaged in the APK.
 

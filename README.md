@@ -1,17 +1,18 @@
 # DishRoulette
 
-**v1.1.0 — Two ways to cook, English and Arabic**
+**v1.2.0 — Personal Gemini connection**
 
-A native Android recipe app with a warm, lightweight Simple interface and the immersive 3D Advanced interface. Both share ingredients, preferences, saved recipes, cooking progress and the Gemini backend. Choose English or Arabic independently of the interface.
+A native Android recipe app with a warm, lightweight Simple interface and the immersive 3D Advanced interface. Both share ingredients, preferences, saved recipes, cooking progress and the Gemini connection. Choose English or Arabic independently of the interface.
 
 ## Run locally
 
 1. Open this folder in Android Studio and let Gradle sync. Use the project's configured Android SDK/JDK toolchain.
-2. Keep your existing Gemini key in `backend/local.properties` (see `backend/local.properties.example`). This local file is excluded from Git and APKs.
-3. Run `./backend/start-local.sh`. It starts the local recipe service and forwards port 8080 to connected emulators/USB phones.
-4. Run the **app / debug** configuration in Android Studio, or install the debug APK from the private GitHub release.
+2. Run the **app / debug** configuration in Android Studio, or install the debug APK from the GitHub release.
+3. Open **Settings → Gemini connection**, enter your own Gemini API key and model, and connect.
 
-The computer and backend must remain running. The release build deliberately has no public recipe endpoint; a standalone cloud deployment is separate work.
+The Android app calls Gemini directly over HTTPS. Once configured, recipe generation does not require a running computer or local backend. The owner's key is encrypted using Android Keystore and stored outside Android backups; it is never packaged in the APK. Gemini usage is charged against the owner's provider account.
+
+The `backend` module remains available as an optional local development service; see `backend/README.md`. It is not used by the current Android client. For USB setup of a debug installation, `tools/provision-personal.py --device SERIAL` imports the owner's existing local configuration without including it in the APK.
 
 ## Interfaces and languages
 
@@ -37,7 +38,7 @@ Original procedural steel/wood meshes and warm lighting use OpenGL ES 2.0; all r
 
 Phones use a vertical loadout. Narrow/short phones and open keyboards use a compact layout: tap **Manage** to edit/remove loaded ingredients, and use **Setup** for goal selection. Android windows at least 840dp wide use side consoles around the central weapon. This is an Android app, not a separate desktop/web port.
 
-No fabricated dish images, image service, or production mock recipes are included. Gemini calls still go through the existing backend and shared exclusion validation; ingredient screening cannot guarantee allergy safety.
+No fabricated dish images, image service, or production mock recipes are included. Gemini calls use the personal HTTPS connection and shared exclusion validation; ingredient screening cannot guarantee allergy safety.
 
 ## Verification
 

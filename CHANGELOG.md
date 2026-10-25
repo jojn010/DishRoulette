@@ -1,3 +1,10 @@
+## v1.2.0
+
+- Publish the existing personal Gemini connection and interface improvements.
+- Store owner-supplied credentials encrypted with Android Keystore, outside backups.
+- Share recipe generation rules between Android and the optional Java backend.
+- Correct setup documentation to describe direct HTTPS generation without a laptop.
+
 # Changelog
 
 ## v1.1.0 — Two ways to cook

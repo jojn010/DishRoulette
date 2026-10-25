@@ -121,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
             currentRecipe = decodeRecipe(state.getString("recipe_json"));
             resultPantry = RecipeCatalog.parseIngredients(state.getString("result_pantry", ""));
         }
-        recipeApi = RecipeApi.create();
+        GeminiCredentials.importSetup(this);
+        recipeApi = RecipeApi.create(this);
         if(!simple){mechanicalSound = new MechanicalAudio(this);((WeaponInputView)loadout).setAudio(mechanicalSound);}
         if (state == null) {
             try {
@@ -329,10 +330,6 @@ public class MainActivity extends AppCompatActivity {
             showGenerationError(getString(R.string.uncertain_ingredients));
             return;
         }
-        if (!BuildConfig.DEBUG) {
-            showGenerationError(getString(R.string.service_not_deployed));
-            return;
-        }
         setSpinning(true);
         binding.cardMealResult.setVisibility(View.GONE);
         firingFinished = false;
@@ -418,8 +415,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showGenerationError(String message) {
-        new MaterialAlertDialogBuilder(this).setTitle(R.string.kitchen_error)
-                .setMessage(message).setPositiveButton(simple?R.string.home:R.string.loadout_back,(d,w)->loadout.inspect()).show();
+        MaterialAlertDialogBuilder dialog=new MaterialAlertDialogBuilder(this).setTitle(R.string.kitchen_error).setMessage(message)
+                .setPositiveButton(simple?R.string.home:R.string.loadout_back,(d,w)->loadout.inspect());
+        if(message.equals(getString(R.string.key_missing))||message.equals(getString(R.string.provider_configuration)))dialog.setNeutralButton(R.string.gemini_settings,(d,w)->showGeminiSettings());
+        dialog.show();
     }
     private void startWaiting(){
         if(simple)return;
@@ -543,12 +542,15 @@ public class MainActivity extends AppCompatActivity {
         binding.tvResultFooter.setVisibility(View.GONE);
         binding.btnCloseResult.setAllCaps(false);binding.btnRecipe.setAllCaps(false);binding.btnRecipe.setText(R.string.view_recipe);binding.btnRecipe.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));binding.btnLike.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));
         if(resultPreferences==null){resultPreferences=new androidx.appcompat.widget.AppCompatButton(this);resultPreferences.setText(R.string.edit_preferences);resultPreferences.setAllCaps(false);resultPreferences.setTextColor(UiColors.color(this,R.color.accent));resultPreferences.setBackgroundColor(UiColors.color(this,R.color.surface));resultPreferences.setMinHeight(Math.round(52*getResources().getDisplayMetrics().density));resultPreferences.setOnClickListener(v->{binding.cardMealResult.setVisibility(View.GONE);showFilters();});binding.resultActions.addView(resultPreferences,new LinearLayout.LayoutParams(-1,-2));}
+        UiIcons.button(binding.btnRecipe,R.drawable.ic_bowl);UiIcons.button(binding.btnLike,R.drawable.ic_bookmark);
         binding.simpleRecipeDetails.setVisibility(View.VISIBLE);binding.simpleRecipeDetails.removeAllViews();
         recipeDetailText(getString(R.string.ingredients_title),true);recipeDetailText(currentRecipe.ingredients,false);recipeDetailText(getString(R.string.method_title),true);recipeDetailText(currentRecipe.method,false);
     }
     private void recipeDetailText(String text,boolean title){
         TextView view=new TextView(this);view.setText(text);view.setTextSize(title?21:16);view.setTextColor(UiColors.color(this,title?R.color.ink:R.color.muted));view.setLineSpacing(6,1);androidx.core.view.ViewCompat.setAccessibilityHeading(view,title);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=Math.round(16*getResources().getDisplayMetrics().density);binding.simpleRecipeDetails.addView(view,lp);
     }
+    void refreshConnection(){if(simpleHome!=null)simpleHome.refresh();if(kitchenScreens!=null&&kitchenScreens.screen().equals("settings"))kitchenScreens.settings();}
+    void showGeminiSettings(){if(!spinning)GeminiSetupDialog.show(this);}
     void showSettings(){if(!spinning)kitchenScreens.settings();}
 
     private void updateSaveButton() {

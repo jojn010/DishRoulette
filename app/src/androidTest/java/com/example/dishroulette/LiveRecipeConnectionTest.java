@@ -18,8 +18,16 @@ public class LiveRecipeConnectionTest {
     private void verify(SpinProfile profile, Set<String> pantry) throws Exception {
         // Ordinary test runs must not make paid API calls.
         Assume.assumeTrue("true".equals(InstrumentationRegistry.getArguments().getString("liveRecipe")));
-        Response<RecipeSuggestion> response = RecipeApi.create().suggest(new RecipeApi.Request(
-                pantry, "Any meal", "", profile, Collections.emptyList())).execute();
+        java.util.concurrent.CountDownLatch done=new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.atomic.AtomicReference<Response<RecipeSuggestion>> result=new java.util.concurrent.atomic.AtomicReference<>();
+        java.util.concurrent.atomic.AtomicReference<Throwable> error=new java.util.concurrent.atomic.AtomicReference<>();
+        RecipeApi.create(InstrumentationRegistry.getInstrumentation().getTargetContext()).suggest(new RecipeApi.Request(
+                pantry,"Any meal","",profile,Collections.emptyList())).enqueue(new retrofit2.Callback<RecipeSuggestion>(){
+            public void onResponse(retrofit2.Call<RecipeSuggestion> call,Response<RecipeSuggestion> response){result.set(response);done.countDown();}
+            public void onFailure(retrofit2.Call<RecipeSuggestion> call,Throwable failure){error.set(failure);done.countDown();}
+        });
+        assertTrue(done.await(70,java.util.concurrent.TimeUnit.SECONDS));if(error.get()!=null)throw new AssertionError(error.get());
+        Response<RecipeSuggestion> response=result.get();assertNotNull(response);
         String failure = "HTTP " + response.code();
         if (response.errorBody() != null) {
             try (okhttp3.ResponseBody body = response.errorBody()) { failure += " " + body.string(); }

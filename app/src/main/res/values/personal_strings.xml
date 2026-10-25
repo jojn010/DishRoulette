@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gemini_settings">Gemini connection</string>
+    <string name="gemini_intro">Connect your own Gemini key once. Recipes then work over Wi-Fi or mobile data, with no laptop. Your key is encrypted on this phone and is not included in the app.</string>
+    <string name="gemini_key_hint">Paste your Gemini API key</string>
+    <string name="gemini_key_replace">Leave blank to keep the saved key</string>
+    <string name="gemini_model">Gemini model</string>
+    <string name="gemini_key_saved">Key encrypted on this phone</string>
+    <string name="gemini_not_connected">Connect your key to start cooking</string>
+    <string name="gemini_get_key">Get a key from Google AI Studio ↗</string>
+    <string name="gemini_connect">Check &amp; connect</string>
+    <string name="gemini_remove">Remove key</string>
+    <string name="gemini_removed">Gemini key removed from this phone</string>
+    <string name="gemini_checking">Checking your connection…</string>
+    <string name="gemini_connected">Connected! Recipes now work without your laptop.</string>
+    <string name="gemini_check_failed">Couldn’t connect. Check the key, model, internet connection and API access, then try again.</string>
+    <string name="gemini_storage_error">Couldn’t save securely. Please try again.</string>
+    <string name="gemini_invalid_key">Paste a valid Gemini API key</string>
+    <string name="gemini_invalid_model">Use a model name such as gemini-3.5-flash-lite</string>
+    <string name="food_photo_description">Fresh tomatoes, rice, eggs and herbs on a kitchen counter</string>
+    <string name="food_inspiration_description">Cooking inspiration: roasted vegetables and grains</string>
+    <string name="food_photo_caption">A little inspiration for your kitchen</string>
+    <string name="food_fresh_note">Fresh ideas, everyday ingredients</string>
+    <string name="connection_cta">Connect Gemini</string>
+</resources>

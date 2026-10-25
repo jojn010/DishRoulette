@@ -12,18 +12,13 @@ android {
         applicationId = "com.example.dishroulette"
         minSdk = 24
         targetSdk = 37
-        versionCode = 3
-        versionName = "1.1.0"
-        buildConfigField("String", "RECIPE_BASE_URL", "\"https://localhost/\"")
+        versionCode = 4
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        debug {
-            // adb reverse forwards this port on both USB devices and Android emulators.
-            buildConfigField("String", "RECIPE_BASE_URL", "\"http://127.0.0.1:8080/\"")
-        }
         release {
             optimization {
                 enable = true
@@ -37,15 +32,16 @@ android {
         buildConfig = true
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation(project(":recipe-core"))
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
