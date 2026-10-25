@@ -22,6 +22,8 @@ public final class RecipeCatalog {
         @SerializedName("method") public final String method;
         @SerializedName("minutes") public final int minutes;
         @SerializedName("servings") public final int servings;
+        @SerializedName("caloriesPerServing") public Integer caloriesPerServing;
+        @SerializedName("proteinGramsPerServing") public Double proteinGramsPerServing;
         @SerializedName("keys") public final List<String> keys;
         @SerializedName("language") public String language = "";
         @SerializedName("goal") public String goal = "";

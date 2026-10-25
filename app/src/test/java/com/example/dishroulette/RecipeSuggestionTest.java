@@ -36,4 +36,20 @@ public class RecipeSuggestionTest {
             assertEquals(meal,restored.meal);assertEquals("Cutting",restored.goal);
         }
     }
+    @Test public void nutritionSurvivesConversionAndSavingWithoutMultiplyingByServings() {
+        RecipeSuggestion result = suggestion();
+        result.servings = 2;
+        result.caloriesPerServing = 210;
+        result.proteinGramsPerServing = 12.5;
+        RecipeCatalog.Recipe recipe = result.toRecipe(RecipeCatalog.parseIngredients("eggs"));
+        RecipeCatalog.Recipe restored = gson.fromJson(gson.toJson(recipe), RecipeCatalog.Recipe.class);
+        assertEquals(Integer.valueOf(210), restored.caloriesPerServing);
+        assertEquals(12.5, restored.proteinGramsPerServing, 0.001);
+        assertNull(suggestion().toRecipe(RecipeCatalog.parseIngredients("eggs")).caloriesPerServing);
+    }
+    @Test(expected=IllegalArgumentException.class) public void rejectsPartialNutrition() {
+        RecipeSuggestion result = suggestion();
+        result.caloriesPerServing = 210;
+        result.toRecipe(RecipeCatalog.parseIngredients("eggs"));
+    }
 }

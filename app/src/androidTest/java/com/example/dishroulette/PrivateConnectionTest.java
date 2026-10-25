@@ -35,7 +35,9 @@ public class PrivateConnectionTest {
                     "Any meal", "", new SpinProfile(), Collections.emptyList(), "en");
             RecipeApi.create(context).suggest(request).enqueue(new Callback<RecipeSuggestion>() {
                 public void onResponse(Call<RecipeSuggestion> call, Response<RecipeSuggestion> response) {
-                    success.set(response.isSuccessful() && response.body() != null);
+                    success.set(response.isSuccessful() && response.body() != null
+                            && com.example.dishroulette.core.NutritionEstimate.valid(
+                                    response.body().caloriesPerServing, response.body().proteinGramsPerServing));
                     done.countDown();
                 }
                 public void onFailure(Call<RecipeSuggestion> call, Throwable failure) { done.countDown(); }

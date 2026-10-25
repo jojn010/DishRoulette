@@ -29,6 +29,24 @@ public class GeminiRecipesTest {
         assertEquals(recipe().get("pantryUsed"),
                 GeminiRecipes.validateRecipe(recipe(), request()).get("pantryUsed"));
     }
+    @Test public void validatesPerServingNutritionAndKeepsLegacyRecipesCompatible() throws Exception {
+        assertFalse(GeminiRecipes.validateRecipe(recipe(), request()).has("caloriesPerServing"));
+        JsonObject result = recipe();
+        result.addProperty("caloriesPerServing", 210);
+        result.addProperty("proteinGramsPerServing", 12.5);
+        JsonObject clean = GeminiRecipes.validateRecipe(result, request());
+        assertEquals(210, clean.get("caloriesPerServing").getAsInt());
+        assertEquals(12.5, clean.get("proteinGramsPerServing").getAsDouble(), 0.001);
+        for (String invalid : new String[]{"-1", "501", "\"12\"", "null"}) {
+            JsonObject bad = result.deepCopy();
+            bad.add("proteinGramsPerServing", JsonParser.parseString(invalid));
+            try { GeminiRecipes.validateRecipe(bad, request()); fail("Invalid protein accepted"); }
+            catch (GeminiRecipes.ApiFailure expected) { assertEquals("INVALID_RECIPE", expected.code); }
+        }
+        result.remove("proteinGramsPerServing");
+        try { GeminiRecipes.validateRecipe(result, request()); fail("Partial nutrition accepted"); }
+        catch (GeminiRecipes.ApiFailure expected) { assertEquals("INVALID_RECIPE", expected.code); }
+    }
     @Test public void rejectsMissingInputsAndOversizeValues() throws Exception {
         for (String body : new String[]{"{}", "{\"ingredients\":[],\"meal\":\"Breakfast\"}",
                 "{\"ingredients\":[\"eggs\"],\"meal\":\"anything\"}"}) {

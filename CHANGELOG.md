@@ -1,3 +1,10 @@
+## v1.2.7
+
+- Add estimated calories (kcal) and protein (grams) per serving to newly generated recipes.
+- Show localized estimates in recipe results, saved archive details, and cooking metadata; retain estimates when saving.
+- Keep old saved recipes readable with an explicit unavailable state rather than invented nutrition values.
+- Validate estimate types and ranges; add persistence, compatibility and invalid-value coverage.
+
 ## v1.2.6
 
 - Accept dotted Gemini keys in both encrypted storage and manual setup, fixing automatic private-build import for the existing owner connection.

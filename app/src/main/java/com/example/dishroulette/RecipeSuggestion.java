@@ -14,6 +14,8 @@ public final class RecipeSuggestion {
     @SerializedName("description") public String description;
     @SerializedName("minutes") public Integer minutes;
     @SerializedName("servings") public Integer servings;
+    @SerializedName("caloriesPerServing") public Integer caloriesPerServing;
+    @SerializedName("proteinGramsPerServing") public Double proteinGramsPerServing;
     @SerializedName("ingredients") public List<String> ingredients;
     @SerializedName("steps") public List<String> steps;
     @SerializedName("pantryUsed") public List<String> pantryUsed;
@@ -33,6 +35,10 @@ public final class RecipeSuggestion {
                 || !list(additionalIngredients, 0, profile.mode.equals("discover") ? 24 : 4, 200)) {
             throw new IllegalArgumentException("Invalid recipe response");
         }
+        if ((caloriesPerServing != null || proteinGramsPerServing != null)
+                && !com.example.dishroulette.core.NutritionEstimate.valid(caloriesPerServing, proteinGramsPerServing)) {
+            throw new IllegalArgumentException("Invalid nutrition estimate");
+        }
         StringBuilder method = new StringBuilder();
         for (int i = 0; i < steps.size(); i++) {
             if (i > 0) method.append("\n\n");
@@ -41,6 +47,8 @@ public final class RecipeSuggestion {
         RecipeCatalog.Recipe recipe = new RecipeCatalog.Recipe("ai_" + UUID.randomUUID(),
                 title, meal, minutes, servings, description, String.join(",", pantryUsed),
                 String.join("\n", ingredients), method.toString());
+        recipe.caloriesPerServing = caloriesPerServing;
+        recipe.proteinGramsPerServing = proteinGramsPerServing;
         recipe.goal = profile.goal;
         recipe.cuisine = cuisine == null ? "" : cuisine;
         recipe.whyThisDish = whyThisDish == null ? "" : whyThisDish;

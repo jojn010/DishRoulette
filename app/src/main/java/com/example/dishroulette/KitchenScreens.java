@@ -113,6 +113,13 @@ final class KitchenScreens {
         String value=context.getString(R.string.recipe_metadata,r.minutes,r.servings);
         if(r.cuisine!=null&&!r.cuisine.trim().isEmpty())value+="\n"+UiLabels.option(context,r.cuisine);
         if(r.goal!=null&&!r.goal.trim().isEmpty())value+=" · "+UiLabels.option(context,r.goal);
+        if (com.example.dishroulette.core.NutritionEstimate.valid(r.caloriesPerServing, r.proteinGramsPerServing)) {
+            java.text.NumberFormat numbers = java.text.NumberFormat.getNumberInstance(
+                    context.getResources().getConfiguration().getLocales().get(0));
+            numbers.setMaximumFractionDigits(1);
+            value += "\n" + context.getString(R.string.nutrition_estimate,
+                    numbers.format(r.caloriesPerServing), numbers.format(r.proteinGramsPerServing));
+        } else value += "\n" + context.getString(R.string.nutrition_unavailable);
         return value;
     }
     static List<String> steps(RecipeCatalog.Recipe recipe) {

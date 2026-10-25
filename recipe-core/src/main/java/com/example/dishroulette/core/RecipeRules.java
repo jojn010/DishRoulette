@@ -101,6 +101,12 @@ public final class RecipeRules {
             Bulking means a heartier balanced recipe with protein and starch where possible.
             These are recipe styles, not personal diet plans. Do not prescribe calories, weight goals,
             deficits, supplements, or health claims. Explain the style briefly in goalFit.
+            Estimate caloriesPerServing (integer kcal) and proteinGramsPerServing (grams, at most
+            one decimal place) from the quantified ingredients, including cooking oil and staples.
+            Divide totals by the stated servings: these fields are PER SERVING, not whole-recipe totals.
+            These are rough food-composition estimates, not measured or medically verified values.
+            Use realistic values: caloriesPerServing 1..5000, proteinGramsPerServing 0..500.
+            For possible=false use 1 and 0 respectively.
             likedDishes are taste examples: prefer similar flavor combinations, main ingredients,
             textures and cooking styles, while suggesting a different dish. Repeated ingredients
             across likes are stronger preferences. If the list is empty, do not claim to know the user's
@@ -181,6 +187,16 @@ public final class RecipeRules {
             clean.addProperty("description", string(result, "description", 600));
             clean.addProperty("minutes", integer(result, "minutes", 1, 240));
             clean.addProperty("servings", integer(result, "servings", 1, 12));
+            // Older clients/fixtures may omit both; never fabricate nutrition for historical recipes.
+            if (result.has("caloriesPerServing") || result.has("proteinGramsPerServing")) {
+                int calories = integer(result, "caloriesPerServing", 1, 5000);
+                JsonPrimitive proteinValue = result.getAsJsonPrimitive("proteinGramsPerServing");
+                if (!proteinValue.isNumber()) throw new IllegalArgumentException();
+                double protein = proteinValue.getAsDouble();
+                if (!NutritionEstimate.valid(calories, protein)) throw new IllegalArgumentException();
+                clean.addProperty("caloriesPerServing", calories);
+                clean.addProperty("proteinGramsPerServing", protein);
+            }
             clean.add("ingredients", GSON.toJsonTree(strings(result, "ingredients", 1, 24, 200)));
             clean.add("steps", GSON.toJsonTree(strings(result, "steps", 1, 12, 700)));
             clean.add("pantryUsed", GSON.toJsonTree(used));
@@ -211,6 +227,8 @@ public final class RecipeRules {
         java.util.List<String> outputCuisines=new java.util.ArrayList<>(SpinOptions.CUISINES);outputCuisines.remove("Any cuisine");outputCuisines.add("");
         properties.getAsJsonObject("cuisine").add("enum",GSON.toJsonTree(outputCuisines));
         for (String field : List.of("minutes", "servings")) properties.add(field, GSON.toJsonTree(Map.of("type", "integer")));
+        properties.add("caloriesPerServing", GSON.toJsonTree(Map.of("type", "integer", "minimum", 1, "maximum", 5000)));
+        properties.add("proteinGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 500)));
         for (String field : List.of("ingredients", "steps", "pantryUsed", "additionalIngredients")) {
             properties.add(field, GSON.toJsonTree(Map.of("type", "array", "items", Map.of("type", "string"))));
         }
