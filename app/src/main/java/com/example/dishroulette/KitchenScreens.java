@@ -123,9 +123,13 @@ final class KitchenScreens {
         return result;
     }
     static int suggestedMinutes(String step) {
-        Matcher m=Pattern.compile("(?i)([0-9٠-٩]{1,3})(?:\\s*[-–إلىto]+\\s*([0-9٠-٩]{1,3}))?\\s*(?:minutes?|mins?|دقيقة|دقائق)(?![\\p{L}])").matcher(step);
+        // Match complete durations so decimals and long numbers cannot become suffix timers.
+        Matcher m=Pattern.compile("(?i)(?<![\\p{L}\\p{N}.,٫])([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]+)?)(?:\\s*(?:[-–]|إلى|to)\\s*([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]+)?))?\\s*(?:minutes?|mins?|دقيقة|دقائق)(?![\\p{L}])").matcher(step);
         if(!m.find())return 0;
-        return Math.max(1,Math.min(240,Integer.parseInt(m.group(2)==null?m.group(1):m.group(2))));
+        String duration=m.group(2)==null?m.group(1):m.group(2);
+        StringBuilder normalized=new StringBuilder();
+        for(char c:duration.toCharArray())normalized.append(c=='.'||c=='٫'?'.':(char)('0'+Character.digit(c,10)));
+        return Math.max(1,(int)Math.min(240,Math.ceil(Double.parseDouble(normalized.toString()))));
     }
     void cook(RecipeCatalog.Recipe recipe) {
         screen="cooking";cooking=recipe;

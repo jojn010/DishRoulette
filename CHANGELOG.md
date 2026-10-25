@@ -1,3 +1,9 @@
+## v1.2.2
+
+- Correct cooking timers for fractional minutes: round up the full duration instead of reading only the decimal suffix.
+- Support Persian digits and Arabic decimal separators, explicit duration ranges, and safe clamping of long durations.
+- Add regression tests for localized durations and embedded-number rejection.
+
 ## v1.2.1
 
 - Reject unsupported generated cuisines and repeated recipe titles when requesting another dish.
