@@ -1,3 +1,8 @@
+## v1.2.11
+
+- Keep the screen awake while cooking instructions are open so you can follow a recipe hands-free.
+- Restore normal screen timeout when leaving cooking; backgrounding the app still allows the screen to sleep.
+
 ## v1.2.10
 
 - Give calories and protein separate nutrition rows in English and Arabic.

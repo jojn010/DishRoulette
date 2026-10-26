@@ -41,12 +41,12 @@ final class KitchenScreens {
     String screen() { return screen; }
     RecipeCatalog.Recipe cookingRecipe() { return cooking; }
     boolean isOpen() { return host.getVisibility()==View.VISIBLE; }
-    void close() { stopTick(); host.removeAllViews(); host.setVisibility(View.GONE); screen=""; }
-    void dispose() { stopTick(); }
+    void close() { host.setKeepScreenOn(false); stopTick(); host.removeAllViews(); host.setVisibility(View.GONE); screen=""; }
+    void dispose() { host.setKeepScreenOn(false); stopTick(); }
     private void stopTick() { if(timerTick!=null)handler.removeCallbacks(timerTick);timerTick=null; }
     private int dp(int n) { return Math.round(n*activity.getResources().getDisplayMetrics().density); }
     private void base(String label, String title, Runnable back) {
-        stopTick();host.removeAllViews();host.setVisibility(View.VISIBLE);
+        stopTick();host.setKeepScreenOn(false);host.removeAllViews();host.setVisibility(View.VISIBLE);
         ScrollView scroll=new ScrollView(activity);scroll.setFillViewport(true);
         body=new LinearLayout(activity);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(24),dp(16),dp(24),dp(28));
         // Limit long lines on tablets while allowing comfortable phone typography.
@@ -154,6 +154,8 @@ final class KitchenScreens {
         List<String> steps=steps(recipe);
         int selected=Math.max(0,Math.min(steps.size()-1,prefs.getInt("cook_step_"+recipe.id,0)));
         base(activity.getString(R.string.cook_label),recipe.title,this::close);
+        // Android only honors this while the cooking view is visible in the foreground.
+        host.setKeepScreenOn(true);
         text(body,meta(activity,recipe),12,R.color.accent,"monospace",8);
         LinearLayout checklist=new LinearLayout(activity);checklist.setOrientation(LinearLayout.VERTICAL);
         Button checklistToggle=button(body,activity.getString(R.string.checklist_closed),false,()->{});

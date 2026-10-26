@@ -1,6 +1,6 @@
 # DishRoulette
 
-**v1.2.10 — Clearer nutrition rows**
+**v1.2.11 — Screen stays awake while cooking**
 
 A native Android recipe app with a warm, lightweight Simple interface and the immersive 3D Advanced interface. Both share ingredients, preferences, saved recipes, cooking progress and the Gemini connection. Choose English or Arabic independently of the interface.
 
