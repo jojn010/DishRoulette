@@ -41,15 +41,32 @@ public class RecipeSuggestionTest {
         result.servings = 2;
         result.caloriesPerServing = 210;
         result.proteinGramsPerServing = 12.5;
+        result.carbohydratesGramsPerServing = 20.0;
+        result.fatGramsPerServing = 9.0;
+        result.fiberGramsPerServing = 2.0;
+        result.sugarGramsPerServing = 1.5;
+        result.sodiumMilligramsPerServing = 300.0;
         RecipeCatalog.Recipe recipe = result.toRecipe(RecipeCatalog.parseIngredients("eggs"));
         RecipeCatalog.Recipe restored = gson.fromJson(gson.toJson(recipe), RecipeCatalog.Recipe.class);
         assertEquals(Integer.valueOf(210), restored.caloriesPerServing);
         assertEquals(12.5, restored.proteinGramsPerServing, 0.001);
+        assertEquals(20.0, restored.carbohydratesGramsPerServing, 0.001);
+        assertEquals(9.0, restored.fatGramsPerServing, 0.001);
+        assertEquals(2.0, restored.fiberGramsPerServing, 0.001);
+        assertEquals(1.5, restored.sugarGramsPerServing, 0.001);
+        assertEquals(300.0, restored.sodiumMilligramsPerServing, 0.001);
         assertNull(suggestion().toRecipe(RecipeCatalog.parseIngredients("eggs")).caloriesPerServing);
     }
     @Test(expected=IllegalArgumentException.class) public void rejectsPartialNutrition() {
         RecipeSuggestion result = suggestion();
         result.caloriesPerServing = 210;
+        result.toRecipe(RecipeCatalog.parseIngredients("eggs"));
+    }
+    @Test(expected=IllegalArgumentException.class) public void rejectsInvalidAdditionalNutrient() {
+        RecipeSuggestion result = suggestion();
+        result.caloriesPerServing = 210;
+        result.proteinGramsPerServing = 12.5;
+        result.sodiumMilligramsPerServing = Double.NaN;
         result.toRecipe(RecipeCatalog.parseIngredients("eggs"));
     }
 }

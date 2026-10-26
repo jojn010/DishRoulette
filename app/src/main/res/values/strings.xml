@@ -71,5 +71,11 @@ LET DINNER DECIDE.</string><string name="hero_body">Choose your loadout in filte
 <string name="loadout_balanced">BALANCED</string><string name="loadout_cut">CUT</string><string name="loadout_bulk">BULK</string>
 <string name="previous_load">PREV LOAD</string><string name="next_load">NEXT LOAD</string><string name="clear_chamber">CLEAR</string>
 <string name="waiting_for_recipe">OVEN ACTIVE / WAITING FOR RECIPE…</string><string name="firing_recipe">FIRING / INPUT LOCKED</string><string name="shot_interrupted">SHOT INTERRUPTED / INGREDIENTS KEPT / FIRE AGAIN</string><string name="provider_unavailable">Gemini is temporarily unavailable. Your ingredients are still loaded. Please try again later.</string>    <string name="clear_all">Clear all</string>
-<string name="nutrition_estimate">Estimated per serving: %1$s kcal · %2$s g protein</string><string name="nutrition_unavailable">Nutrition estimate unavailable for this recipe</string>
+<string name="nutrition_estimate">Estimated per serving: ~~~ %1$s kcal · ~~~ %2$s g protein</string><string name="nutrition_unavailable">Nutrition estimate unavailable for this recipe</string>
+<string name="nutrition_carbohydratesGrams">Carbs: ~~~ %1$s g</string>
+<string name="nutrition_fatGrams">Fat: ~~~ %1$s g</string>
+<string name="nutrition_fiberGrams">Fiber: ~~~ %1$s g</string>
+<string name="nutrition_sugarGrams">Sugar: ~~~ %1$s g</string>
+<string name="nutrition_sodiumMilligrams">Sodium: ~~~ %1$s mg</string>
+<string name="nutrition_variation">~~~ means approximate, not exact. Actual amounts vary with ingredient size, brand, portions and preparation.</string>
 </resources>

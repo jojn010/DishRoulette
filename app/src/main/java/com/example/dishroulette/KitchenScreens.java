@@ -119,6 +119,17 @@ final class KitchenScreens {
             numbers.setMaximumFractionDigits(1);
             value += "\n" + context.getString(R.string.nutrition_estimate,
                     numbers.format(r.caloriesPerServing), numbers.format(r.proteinGramsPerServing));
+            if (com.example.dishroulette.core.NutritionEstimate.validNutrient(r.carbohydratesGramsPerServing, 1000))
+                value += "\n" + context.getString(R.string.nutrition_carbohydratesGrams, numbers.format(r.carbohydratesGramsPerServing));
+            if (com.example.dishroulette.core.NutritionEstimate.validNutrient(r.fatGramsPerServing, 500))
+                value += "\n" + context.getString(R.string.nutrition_fatGrams, numbers.format(r.fatGramsPerServing));
+            if (com.example.dishroulette.core.NutritionEstimate.validNutrient(r.fiberGramsPerServing, 200))
+                value += "\n" + context.getString(R.string.nutrition_fiberGrams, numbers.format(r.fiberGramsPerServing));
+            if (com.example.dishroulette.core.NutritionEstimate.validNutrient(r.sugarGramsPerServing, 1000))
+                value += "\n" + context.getString(R.string.nutrition_sugarGrams, numbers.format(r.sugarGramsPerServing));
+            if (com.example.dishroulette.core.NutritionEstimate.validNutrient(r.sodiumMilligramsPerServing, 20000))
+                value += "\n" + context.getString(R.string.nutrition_sodiumMilligrams, numbers.format(r.sodiumMilligramsPerServing));
+            value += "\n" + context.getString(R.string.nutrition_variation);
         } else value += "\n" + context.getString(R.string.nutrition_unavailable);
         return value;
     }

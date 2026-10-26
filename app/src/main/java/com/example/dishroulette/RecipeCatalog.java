@@ -24,6 +24,12 @@ public final class RecipeCatalog {
         @SerializedName("servings") public final int servings;
         @SerializedName("caloriesPerServing") public Integer caloriesPerServing;
         @SerializedName("proteinGramsPerServing") public Double proteinGramsPerServing;
+        @SerializedName("carbohydratesGramsPerServing") public Double carbohydratesGramsPerServing;
+        @SerializedName("fatGramsPerServing") public Double fatGramsPerServing;
+        @SerializedName("fiberGramsPerServing") public Double fiberGramsPerServing;
+        @SerializedName("sugarGramsPerServing") public Double sugarGramsPerServing;
+        @SerializedName("sodiumMilligramsPerServing") public Double sodiumMilligramsPerServing;
+
         @SerializedName("keys") public final List<String> keys;
         @SerializedName("language") public String language = "";
         @SerializedName("goal") public String goal = "";

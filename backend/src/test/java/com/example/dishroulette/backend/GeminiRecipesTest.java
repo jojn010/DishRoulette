@@ -47,6 +47,21 @@ public class GeminiRecipesTest {
         try { GeminiRecipes.validateRecipe(result, request()); fail("Partial nutrition accepted"); }
         catch (GeminiRecipes.ApiFailure expected) { assertEquals("INVALID_RECIPE", expected.code); }
     }
+    @Test public void additionalNutrientsHaveExplicitUnitsAndRejectInvalidValues() throws Exception {
+        for (String field : new String[]{"carbohydratesGramsPerServing", "fatGramsPerServing",
+                "fiberGramsPerServing", "sugarGramsPerServing", "sodiumMilligramsPerServing"}) {
+            JsonObject result = recipe();
+            result.addProperty("caloriesPerServing", 210);
+            result.addProperty("proteinGramsPerServing", 12.5);
+            result.addProperty(field, 0.0);
+            assertEquals(0.0, GeminiRecipes.validateRecipe(result, request()).get(field).getAsDouble(), 0.001);
+            for (String invalid : new String[]{"-1", "20001", "\"12\"", "null"}) {
+                result.add(field, JsonParser.parseString(invalid));
+                try { GeminiRecipes.validateRecipe(result, request()); fail("Invalid nutrient accepted"); }
+                catch (GeminiRecipes.ApiFailure expected) { assertEquals("INVALID_RECIPE", expected.code); }
+            }
+        }
+    }
     @Test public void rejectsMissingInputsAndOversizeValues() throws Exception {
         for (String body : new String[]{"{}", "{\"ingredients\":[],\"meal\":\"Breakfast\"}",
                 "{\"ingredients\":[\"eggs\"],\"meal\":\"anything\"}"}) {

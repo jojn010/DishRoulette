@@ -16,6 +16,12 @@ public final class RecipeSuggestion {
     @SerializedName("servings") public Integer servings;
     @SerializedName("caloriesPerServing") public Integer caloriesPerServing;
     @SerializedName("proteinGramsPerServing") public Double proteinGramsPerServing;
+    @SerializedName("carbohydratesGramsPerServing") public Double carbohydratesGramsPerServing;
+    @SerializedName("fatGramsPerServing") public Double fatGramsPerServing;
+    @SerializedName("fiberGramsPerServing") public Double fiberGramsPerServing;
+    @SerializedName("sugarGramsPerServing") public Double sugarGramsPerServing;
+    @SerializedName("sodiumMilligramsPerServing") public Double sodiumMilligramsPerServing;
+
     @SerializedName("ingredients") public List<String> ingredients;
     @SerializedName("steps") public List<String> steps;
     @SerializedName("pantryUsed") public List<String> pantryUsed;
@@ -39,6 +45,11 @@ public final class RecipeSuggestion {
                 && !com.example.dishroulette.core.NutritionEstimate.valid(caloriesPerServing, proteinGramsPerServing)) {
             throw new IllegalArgumentException("Invalid nutrition estimate");
         }
+        if (carbohydratesGramsPerServing != null && (!com.example.dishroulette.core.NutritionEstimate.validNutrient(carbohydratesGramsPerServing, 1000) || caloriesPerServing == null)) throw new IllegalArgumentException("Invalid nutrition estimate");
+        if (fatGramsPerServing != null && (!com.example.dishroulette.core.NutritionEstimate.validNutrient(fatGramsPerServing, 500) || caloriesPerServing == null)) throw new IllegalArgumentException("Invalid nutrition estimate");
+        if (fiberGramsPerServing != null && (!com.example.dishroulette.core.NutritionEstimate.validNutrient(fiberGramsPerServing, 200) || caloriesPerServing == null)) throw new IllegalArgumentException("Invalid nutrition estimate");
+        if (sugarGramsPerServing != null && (!com.example.dishroulette.core.NutritionEstimate.validNutrient(sugarGramsPerServing, 1000) || caloriesPerServing == null)) throw new IllegalArgumentException("Invalid nutrition estimate");
+        if (sodiumMilligramsPerServing != null && (!com.example.dishroulette.core.NutritionEstimate.validNutrient(sodiumMilligramsPerServing, 20000) || caloriesPerServing == null)) throw new IllegalArgumentException("Invalid nutrition estimate");
         StringBuilder method = new StringBuilder();
         for (int i = 0; i < steps.size(); i++) {
             if (i > 0) method.append("\n\n");
@@ -49,6 +60,12 @@ public final class RecipeSuggestion {
                 String.join("\n", ingredients), method.toString());
         recipe.caloriesPerServing = caloriesPerServing;
         recipe.proteinGramsPerServing = proteinGramsPerServing;
+        recipe.carbohydratesGramsPerServing = carbohydratesGramsPerServing;
+        recipe.fatGramsPerServing = fatGramsPerServing;
+        recipe.fiberGramsPerServing = fiberGramsPerServing;
+        recipe.sugarGramsPerServing = sugarGramsPerServing;
+        recipe.sodiumMilligramsPerServing = sodiumMilligramsPerServing;
+
         recipe.goal = profile.goal;
         recipe.cuisine = cuisine == null ? "" : cuisine;
         recipe.whyThisDish = whyThisDish == null ? "" : whyThisDish;

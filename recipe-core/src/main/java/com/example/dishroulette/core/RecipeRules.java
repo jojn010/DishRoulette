@@ -106,7 +106,11 @@ public final class RecipeRules {
             Divide totals by the stated servings: these fields are PER SERVING, not whole-recipe totals.
             These are rough food-composition estimates, not measured or medically verified values.
             Use realistic values: caloriesPerServing 1..5000, proteinGramsPerServing 0..500.
-            For possible=false use 1 and 0 respectively.
+            Also estimate carbohydratesGramsPerServing, fatGramsPerServing, fiberGramsPerServing,
+            sugarGramsPerServing (all grams) and sodiumMilligramsPerServing (milligrams), each per serving.
+            Include cooking oil, salt and all staples. Use at most one decimal place and realistic food
+            composition, not false precision. Ingredient sizes, brands and preparation cause variation.
+            For possible=false use 1 calorie and 0 for every nutrient.
             likedDishes are taste examples: prefer similar flavor combinations, main ingredients,
             textures and cooking styles, while suggesting a different dish. Repeated ingredients
             across likes are stronger preferences. If the list is empty, do not claim to know the user's
@@ -116,7 +120,8 @@ public final class RecipeRules {
             and sequential cooking steps in the selected language. Include fully cooked meat, poultry and egg
             instructions when applicable. Do not recommend raw meat or poultry. Do not repeat the
             excluded ingredients in recipe text, even in phrases such as 'without X'.
-            If no sensible dish satisfies constraints, possible=false, text/list fields empty, numbers=1.
+            If no sensible dish satisfies constraints, possible=false, text/list fields empty except cuisine, numbers=1.
+            Always set cuisine to a concrete canonical cuisine, including when possible=false.
             Otherwise possible=true. Output only the requested structured recipe.
             Language: if language=ar, write title, description, ingredients, steps, whyThisDish and
             goalFit in natural Arabic with correctly shaped Unicode text. If language=en, use English.
@@ -197,6 +202,16 @@ public final class RecipeRules {
                 clean.addProperty("caloriesPerServing", calories);
                 clean.addProperty("proteinGramsPerServing", protein);
             }
+            for (Map.Entry<String, Integer> nutrient : Map.of(
+                    "carbohydratesGramsPerServing", 1000, "fatGramsPerServing", 500,
+                    "fiberGramsPerServing", 200, "sugarGramsPerServing", 1000,
+                    "sodiumMilligramsPerServing", 20000).entrySet()) {
+                if (!result.has(nutrient.getKey())) continue; // Older recipes have no additional values.
+                JsonPrimitive raw = result.getAsJsonPrimitive(nutrient.getKey());
+                if (!raw.isNumber() || !NutritionEstimate.validNutrient(raw.getAsDouble(), nutrient.getValue())
+                        || !clean.has("caloriesPerServing")) throw new IllegalArgumentException();
+                clean.addProperty(nutrient.getKey(), raw.getAsDouble());
+            }
             clean.add("ingredients", GSON.toJsonTree(strings(result, "ingredients", 1, 24, 200)));
             clean.add("steps", GSON.toJsonTree(strings(result, "steps", 1, 12, 700)));
             clean.add("pantryUsed", GSON.toJsonTree(used));
@@ -224,9 +239,18 @@ public final class RecipeRules {
         JsonObject properties = new JsonObject();
         properties.add("possible", GSON.toJsonTree(Map.of("type", "boolean")));
         for (String field : List.of("title", "meal", "description", "cuisine", "whyThisDish", "goalFit")) properties.add(field, GSON.toJsonTree(Map.of("type", "string")));
-        java.util.List<String> outputCuisines=new java.util.ArrayList<>(SpinOptions.CUISINES);outputCuisines.remove("Any cuisine");outputCuisines.add("");
+        java.util.List<String> outputCuisines=new java.util.ArrayList<>(SpinOptions.CUISINES);outputCuisines.remove("Any cuisine");
+        if (!request.get("cuisine").getAsString().equals("Any cuisine")) {
+            outputCuisines.clear();
+            outputCuisines.add(request.get("cuisine").getAsString());
+        }
         properties.getAsJsonObject("cuisine").add("enum",GSON.toJsonTree(outputCuisines));
         for (String field : List.of("minutes", "servings")) properties.add(field, GSON.toJsonTree(Map.of("type", "integer")));
+        properties.add("carbohydratesGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 1000)));
+        properties.add("fatGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 500)));
+        properties.add("fiberGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 200)));
+        properties.add("sugarGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 1000)));
+        properties.add("sodiumMilligramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 20000)));
         properties.add("caloriesPerServing", GSON.toJsonTree(Map.of("type", "integer", "minimum", 1, "maximum", 5000)));
         properties.add("proteinGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 500)));
         for (String field : List.of("ingredients", "steps", "pantryUsed", "additionalIngredients")) {

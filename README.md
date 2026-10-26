@@ -1,6 +1,6 @@
 # DishRoulette
 
-**v1.2.7 — Calories and protein estimates**
+**v1.2.8 — Expanded approximate nutrition**
 
 A native Android recipe app with a warm, lightweight Simple interface and the immersive 3D Advanced interface. Both share ingredients, preferences, saved recipes, cooking progress and the Gemini connection. Choose English or Arabic independently of the interface.
 
@@ -14,7 +14,7 @@ The Android app calls Gemini directly over HTTPS. Once configured, recipe genera
 
 The `backend` module remains available as an optional local development service; see `backend/README.md`. It is not used by the current Android client. For USB setup of a debug installation, `tools/provision-personal.py --device SERIAL` imports the owner's existing local configuration without including it in the APK.
 
-New generated recipes include estimated calories (kcal) and protein (grams) **per serving**, shown in recipe details, saved recipe listings and cooking views. These are model estimates from ingredient quantities, not measured nutrition. Older saved recipes remain available and show that nutrition is unavailable.
+New generated recipes include estimated calories (kcal), protein, carbs, fat, fiber and sugar (grams), and sodium (milligrams) **per serving**, shown in recipe details, saved recipe listings and cooking views. Every estimate is marked `~~~`. Actual amounts vary with ingredient size, brand, portions and preparation; these are model estimates, not measured nutrition. Older recipes with only calories/protein keep those estimates without invented additional values. Older saved recipes remain available and show that nutrition is unavailable.
 
 ## Private preconfigured APK
 

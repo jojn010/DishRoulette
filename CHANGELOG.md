@@ -1,3 +1,11 @@
+## v1.2.8
+
+- Expand per-serving nutrition estimates with carbohydrates, fat, fiber, sugar (grams) and sodium (milligrams).
+- Mark every nutrition estimate with `~~~` and explain ingredient size, brand, portion and preparation differences in English and Arabic.
+- Preserve older recipes and their existing estimates without fabricating newly added nutrient values.
+- Validate and persist new nutrients, with regression and on-device localization coverage.
+- Constrain generated cuisine to actual supported values, preventing empty cuisine fields from invalidating otherwise complete recipes.
+
 ## v1.2.7
 
 - Add estimated calories (kcal) and protein (grams) per serving to newly generated recipes.
