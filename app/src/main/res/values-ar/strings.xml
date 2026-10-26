@@ -309,7 +309,7 @@
     <string name="option_pepper">فلفل</string>
     <string name="option_cooking_oil">زيت طبخ</string>
 <string name="option_mediterranean">متوسطي</string>
-<string name="nutrition_estimate">تقديري لكل حصة: ~~~ %1$s سعرة حرارية · ~~~ %2$s غ بروتين</string><string name="nutrition_unavailable">لا تتوفر تقديرات غذائية لهذه الوصفة</string>
+<string name="nutrition_estimate">تقديري لكل حصة\nالسعرات:\u00a0~~~\u00a0%1$s\u00a0سعرة\nالبروتين:\u00a0~~~\u00a0%2$s\u00a0غ</string><string name="nutrition_unavailable">لا تتوفر تقديرات غذائية لهذه الوصفة</string>
 <string name="nutrition_carbohydratesGrams">كربوهيدرات: ~~~ %1$s غ</string>
 <string name="nutrition_fatGrams">دهون: ~~~ %1$s غ</string>
 <string name="nutrition_fiberGrams">ألياف: ~~~ %1$s غ</string>

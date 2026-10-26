@@ -35,4 +35,23 @@ public class NutritionDisplayTest {
             assertFalse(KitchenScreens.meta(context, recipe).contains(context.getString(R.string.nutrition_unavailable)));
         }
     }
+    @Test public void proteinAmountAndUnitStayTogetherOnNarrowLayouts() {
+        Context base = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        for (String language : new String[]{"en", "ar"}) {
+            Configuration config = new Configuration(base.getResources().getConfiguration());
+            config.setLocale(Locale.forLanguageTag(language));
+            Context context = base.createConfigurationContext(config);
+            String calories = "210", protein = "12.5";
+            String text = context.getString(R.string.nutrition_estimate, calories, protein);
+            assertEquals(3, text.split("\n").length);
+            assertTrue(text.contains(protein + "\u00a0"));
+            android.text.TextPaint paint = new android.text.TextPaint();
+            paint.setTextSize(18 * base.getResources().getDisplayMetrics().scaledDensity);
+            int width = Math.round(240 * base.getResources().getDisplayMetrics().density);
+            android.text.StaticLayout layout = android.text.StaticLayout.Builder.obtain(text, 0, text.length(), paint, width).build();
+            int amount = text.indexOf(protein);
+            int unit = amount + protein.length() + 1;
+            assertEquals(layout.getLineForOffset(amount), layout.getLineForOffset(unit));
+        }
+    }
 }

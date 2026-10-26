@@ -1,3 +1,8 @@
+## v1.2.10
+
+- Give calories and protein separate nutrition rows in English and Arabic.
+- Keep each protein estimate and its grams unit together when text wraps; retain `~~~` and the ingredient-variation explanation.
+
 ## v1.2.9
 
 - Split Arabic and Persian numbered cooking instructions into individual steps, including indented lines and Windows line endings.
