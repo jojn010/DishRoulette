@@ -1,6 +1,6 @@
 # DishRoulette
 
-**v1.2.8 — Expanded approximate nutrition**
+**v1.2.9 — Clearer numbered cooking steps**
 
 A native Android recipe app with a warm, lightweight Simple interface and the immersive 3D Advanced interface. Both share ingredients, preferences, saved recipes, cooking progress and the Gemini connection. Choose English or Arabic independently of the interface.
 

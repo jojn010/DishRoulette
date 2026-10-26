@@ -135,8 +135,8 @@ final class KitchenScreens {
     }
     static List<String> steps(RecipeCatalog.Recipe recipe) {
         List<String> result=new ArrayList<>();
-        for(String s:recipe.method.split("\\n\\s*\\n|\\n(?=\\d+[.)]\\s)")){
-            String clean=s.trim().replaceFirst("^\\d+[.)]\\s*","");if(!clean.isEmpty())result.add(clean);
+        for(String s:recipe.method.split("\\r?\\n\\s*\\r?\\n|\\r?\\n(?=[\\t ]*\\p{Nd}+[.)]\\s)")){
+            String clean=s.trim().replaceFirst("^\\p{Nd}+[.)]\\s*","");if(!clean.isEmpty())result.add(clean);
         }
         return result;
     }

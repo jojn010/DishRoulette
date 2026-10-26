@@ -1,3 +1,8 @@
+## v1.2.9
+
+- Split Arabic and Persian numbered cooking instructions into individual steps, including indented lines and Windows line endings.
+- Preserve wrapped instruction text and decimal ingredient quantities; English numbered instructions continue to work.
+
 ## v1.2.8
 
 - Expand per-serving nutrition estimates with carbohydrates, fat, fiber, sugar (grams) and sodium (milligrams).
