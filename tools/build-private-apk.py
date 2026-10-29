@@ -13,6 +13,7 @@ import tempfile
 import zipfile
 
 root = Path(__file__).resolve().parents[1]
+gradle = str(root / ('gradlew.bat' if os.name == 'nt' else 'gradlew'))
 props = {}
 local = root / 'backend/local.properties'
 if local.exists():
@@ -36,7 +37,7 @@ with tempfile.TemporaryDirectory(prefix='dishroulette-private-') as private:
     setup.write_text(json.dumps({'key': key, 'model': model}))
     setup.chmod(0o600)
     try:
-        subprocess.run([str(root / 'gradlew'), ':app:assembleDebug', '--no-configuration-cache',
+        subprocess.run([gradle, ':app:assembleDebug', '--no-configuration-cache',
                         '-PprivateSetupAssetsDir=' + private], cwd=root, check=True)
         with zipfile.ZipFile(apk) as archive:
             data = json.loads(archive.read('assets/private-gemini-setup.json'))
@@ -47,7 +48,7 @@ with tempfile.TemporaryDirectory(prefix='dishroulette-private-') as private:
     finally:
         # Restore ordinary build output so release commands cannot pick up this private APK.
         apk.unlink(missing_ok=True)
-        subprocess.run([str(root / 'gradlew'), ':app:clean', ':app:assembleDebug',
+        subprocess.run([gradle, ':app:clean', ':app:assembleDebug',
                         '--no-configuration-cache'], cwd=root, check=True)
         with zipfile.ZipFile(apk) as archive:
             if 'assets/private-gemini-setup.json' in archive.namelist():

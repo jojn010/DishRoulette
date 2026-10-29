@@ -1,3 +1,11 @@
+## v1.5.0
+
+- Remove the Connect Gemini call to action from Home.
+- Add a Windows owner-build script that reads ignored local configuration and builds an automatically connected personal APK.
+- Restore credential-free public build output after the private build; private APKs and API keys remain local.
+- Make the existing Python build/provisioning tools select Windows Gradle and Android SDK executables correctly.
+- Keep encrypted connections across restarts and compatible updates, with Settings available for key replacement and recovery.
+
 ## v1.4.0
 
 - Add Scan ingredients: take a photo or choose one from the system picker, preview it, and ask Gemini to identify visible foods.

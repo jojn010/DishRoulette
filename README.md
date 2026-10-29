@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.4.0 — Ingredients from a photo**
+**v1.5.0 — Automatic owner connection**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -17,6 +17,14 @@ The `backend` module remains available as an optional local development service;
 New generated recipes include estimated calories (kcal), protein, carbs, fat, fiber and sugar (grams), and sodium (milligrams) **per serving**, shown in recipe details, saved recipe listings and cooking views. Every estimate is marked `~~~`. Actual amounts vary with ingredient size, brand, portions and preparation; these are model estimates, not measured nutrition. Older recipes with only calories/protein keep those estimates without invented additional values. Older saved recipes remain available and show that nutrition is unavailable.
 
 ## Private preconfigured APK
+
+On Windows, run `tools/build-private-apk.ps1` with `JAVA_HOME` and `ANDROID_HOME` configured.
+It reads the owner's ignored `backend/local.properties` (or Gemini environment variables), builds
+`work/private/Tabkha-personal.apk`, then restores credential-free public build output. The private
+APK imports the connection on first launch and keeps it encrypted across restarts and compatible
+updates. Home no longer displays a Connect Gemini button. Settings retains connection management
+for recovery or replacing a revoked key. A key cannot remain usable if the provider revokes it.
+Only the credential-free APK may be uploaded to GitHub; the auto-connected APK stays local.
 
 For the owner only, `python3 tools/build-private-apk.py` builds `work/private/DishRoulette-personal.apk` with the existing local Gemini key. Install this APK to connect automatically on first launch without typing an API key. The phone calls Gemini directly over the internet and needs no laptop connection. Existing saved credentials take precedence.
 

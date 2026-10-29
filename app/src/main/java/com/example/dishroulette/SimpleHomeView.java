@@ -28,7 +28,7 @@ final class SimpleHomeView extends LinearLayout {
     private final ScrollView scroll;
     private int editIndex;
     private final ImageView foodPhoto;
-    private final MaterialButton connect,scan;
+    private final MaterialButton scan;
     SimpleHomeView(MainActivity a,NativeIngredientLoadout loadout){
         super(a);activity=a;this.loadout=loadout;setOrientation(VERTICAL);setBackgroundColor(color(R.color.background));
         LinearLayout header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
@@ -44,7 +44,6 @@ final class SimpleHomeView extends LinearLayout {
         FrameLayout photoCard=new FrameLayout(a);android.graphics.drawable.GradientDrawable photoShape=panel(20,R.color.surface);photoCard.setBackground(photoShape);photoCard.setClipToOutline(true);LayoutParams photoLp=new LayoutParams(-1,dp(150));photoLp.topMargin=dp(18);page.addView(photoCard,photoLp);
         foodPhoto=new ImageView(a);foodPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);foodPhoto.setImageResource(R.drawable.pantry_photo);foodPhoto.setContentDescription(a.getString(R.string.food_photo_description));photoCard.addView(foodPhoto,new FrameLayout.LayoutParams(-1,-1));
         TextView photoCaption=new TextView(a);photoCaption.setText(R.string.food_photo_caption);photoCaption.setTextSize(11);photoCaption.setTextColor(0xff243a2c);photoCaption.setPadding(dp(12),dp(5),dp(12),dp(5));photoCaption.setBackgroundColor(0xeeFBF8F2);UiTypography.apply(photoCaption);FrameLayout.LayoutParams cap=new FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM|Gravity.START);cap.setMargins(dp(10),0,dp(10),dp(10));photoCard.addView(photoCaption,cap);
-        connect=button(page,a.getString(R.string.connection_cta),false,a::showGeminiSettings);UiIcons.button(connect,R.drawable.ic_connect);connect.setVisibility(new GeminiCredentials(a).configured()?GONE:VISIBLE);
         LinearLayout modeRail=row();LayoutParams modeLp=new LayoutParams(-1,-2);modeLp.topMargin=dp(24);page.addView(modeRail,modeLp);
         pantryMode=button(modeRail,a.getString(R.string.pantry_mode),false,()->a.chooseGenerationMode("pantry"));
         surpriseMode=button(modeRail,a.getString(R.string.discover_mode),false,()->a.chooseGenerationMode("discover"));
@@ -107,7 +106,7 @@ final class SimpleHomeView extends LinearLayout {
         summary.setText(discovery?activity.getString(R.string.simple_surprise_description):activity.getString(R.string.preferences_summary,UiLabels.option(activity,activity.meal()),UiLabels.option(activity,activity.profile().cuisine),UiLabels.option(activity,activity.profile().goal)));
         goals.removeAllViews();String[] values={"Balanced","Cutting","Bulking"};int[] descriptions={R.string.balanced_description,R.string.cut_description,R.string.bulk_description};
         for(int i=0;i<values.length;i++){final String goal=values[i];MaterialButton b=button(goals,UiLabels.option(activity,goal)+"\n"+activity.getString(descriptions[i]),goal.equals(activity.profile().goal),()->activity.chooseGoal(goal));UiIcons.button(b,i==0?R.drawable.ic_bowl:i==1?R.drawable.ic_leaf:R.drawable.ic_flame);b.setEnabled(!busy);}
-        UiIcons.button(generate,discovery?R.drawable.ic_sparkle:R.drawable.ic_bowl);connect.setVisibility(new GeminiCredentials(activity).configured()?GONE:VISIBLE);
+        UiIcons.button(generate,discovery?R.drawable.ic_sparkle:R.drawable.ic_bowl);
         generate.setText(busy?activity.getString(R.string.cancel_generation):activity.getString(discovery?R.string.surprise_action:R.string.find_recipe));
     }
     void setBusy(boolean value){busy=value;input.setEnabled(!value);add.setEnabled(!value);language.setEnabled(!value);pantryMode.setEnabled(!value);surpriseMode.setEnabled(!value);generate.setEnabled(true);loading.setVisibility(value?VISIBLE:GONE);if(value){if(Experience.reduced(activity))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);}refresh();}

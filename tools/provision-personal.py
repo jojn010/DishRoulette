@@ -13,7 +13,9 @@ import time
 
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--device',required=True,help='Explicit adb device serial')
-parser.add_argument('--adb',default=str(Path.home()/'Android/Sdk/platform-tools/adb'))
+default_adb = (Path(os.environ.get('LOCALAPPDATA', str(Path.home()/'AppData/Local'))) / 'Android/Sdk/platform-tools/adb.exe'
+               if os.name == 'nt' else Path.home()/'Android/Sdk/platform-tools/adb')
+parser.add_argument('--adb',default=str(default_adb))
 args=parser.parse_args()
 root=Path(__file__).resolve().parents[1]
 props={}
