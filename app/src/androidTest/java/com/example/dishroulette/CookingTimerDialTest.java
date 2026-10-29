@@ -47,6 +47,15 @@ public class CookingTimerDialTest {
                         "Salad", "tomato", "1 tomato", "Chop and serve.");
                 screens.cook(untimed);
                 assertEquals(View.GONE, a.findViewById(R.id.cookingTimerDial).getVisibility());
+                RecipeCatalog.Recipe arabicDual = new RecipeCatalog.Recipe("arabic_dual_timer", "بيض", "Dinner", 2, 1,
+                        "بيض", "eggs", "بيض", "اترك الخليط لمدة دقيقتين ثم قلّب.");
+                screens.cook(arabicDual);
+                dial = a.findViewById(R.id.cookingTimerDial);
+                assertEquals(View.VISIBLE, dial.getVisibility());
+                assertEquals(1f, dial.remainingFraction(), .001f);
+                a.findViewById(R.id.cookingTimerStart).performClick();
+                long remaining = prefs.getLong("cook_timer_arabic_dual_timer_0_end", 0) - System.currentTimeMillis();
+                assertTrue(remaining > 115000 && remaining <= 120000);
                 screens.close();prefs.edit().clear().apply();
             });
         }

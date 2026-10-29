@@ -139,8 +139,10 @@ final class KitchenScreens {
     }
     static int suggestedMinutes(String step) {
         // Match complete durations so decimals and long numbers cannot become suffix timers.
-        Matcher m=Pattern.compile("(?i)(?<![\\p{L}\\p{N}.,٫])([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]+)?)(?:\\s*(?:[-–]|إلى|to)\\s*([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]+)?))?\\s*(?:minutes?|mins?|دقيقة|دقائق)(?![\\p{L}])").matcher(step);
+        Matcher m=Pattern.compile("(?i)(?<![\\p{L}\\p{N}.,٫])(?:([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]+)?)(?:\\s*(?:[-–]|إلى|to)\\s*([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]+)?))?\\s*(?:minutes?|mins?|دقيقة|دقائق|دقيقتين|دقيقتان)|دقيقتين|دقيقتان)(?![\\p{L}])").matcher(step);
         if(!m.find())return 0;
+        // Arabic expresses two minutes with a dual noun, often without a numeral.
+        if(m.group(1)==null)return 2;
         String duration=m.group(2)==null?m.group(1):m.group(2);
         StringBuilder normalized=new StringBuilder();
         for(char c:duration.toCharArray())normalized.append(c=='.'||c=='٫'?'.':(char)('0'+Character.digit(c,10)));

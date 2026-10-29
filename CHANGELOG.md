@@ -1,3 +1,8 @@
+## Unreleased
+
+- Recognize Arabic dual minute forms (دقيقتين / دقيقتان) in cooking steps, so instructions such as "اترك الخليط لمدة دقيقتين" offer the correct two-minute timer without needing a separate numeral. Preserve the first duration when a step contains multiple durations.
+- Verified with a regression that failed before the fix, the full unit/build/lint checks, and the API 37 cooking-screen test including starting the Arabic two-minute countdown.
+
 ## v1.5.0
 
 - Remove the Connect Gemini call to action from Home.

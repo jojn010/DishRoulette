@@ -8,6 +8,13 @@ public class ArabicCookingTest {
   assertEquals(12,KitchenScreens.suggestedMinutes("Simmer for 10–12 minutes."));
   assertEquals(0,KitchenScreens.suggestedMinutes("اغسل المكونات جيدًا."));
  }
+ @Test public void arabicDualMinuteDurationsProduceTwoMinuteTimers(){
+  assertEquals(2,KitchenScreens.suggestedMinutes("اترك الخليط لمدة دقيقتين ثم قلّب."));
+  assertEquals(2,KitchenScreens.suggestedMinutes("مدة الانتظار دقيقتان."));
+  assertEquals(2,KitchenScreens.suggestedMinutes("اطبخ لمدة ٢ دقيقتين."));
+  assertEquals(0,KitchenScreens.suggestedMinutes("هذه كلمة دقيقتينغيرصحيحة."));
+  assertEquals(5,KitchenScreens.suggestedMinutes("اطبخ لمدة 5 دقائق ثم استرح دقيقتين."));
+ }
  @Test public void minuteTimersUseWholeDurationsAndRoundUpFractions(){
   assertEquals(2,KitchenScreens.suggestedMinutes("Simmer for 1.5 minutes."));
   assertEquals(3,KitchenScreens.suggestedMinutes("Simmer for 1.5 to 2.5 minutes."));
