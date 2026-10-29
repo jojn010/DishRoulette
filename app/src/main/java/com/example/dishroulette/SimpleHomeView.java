@@ -32,7 +32,7 @@ final class SimpleHomeView extends LinearLayout {
     SimpleHomeView(MainActivity a,NativeIngredientLoadout loadout){
         super(a);activity=a;this.loadout=loadout;setOrientation(VERTICAL);setBackgroundColor(color(R.color.background));
         LinearLayout header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
-        TextView logo=label(header,"DishRoulette",23,R.color.ink,0);logo.setTypeface(Typeface.create("serif",Typeface.BOLD));logo.setLayoutParams(new LayoutParams(0,-2,1));logo.setGravity(isArabic()?Gravity.RIGHT:Gravity.LEFT);UiIcons.text(logo,R.drawable.ic_bowl);
+        TextView logo=label(header,activity.getString(R.string.app_name),23,R.color.ink,0);logo.setTypeface(Typeface.create("serif",Typeface.BOLD));logo.setLayoutParams(new LayoutParams(0,-2,1));logo.setGravity(isArabic()?Gravity.RIGHT:Gravity.LEFT);UiIcons.text(logo,R.drawable.ic_bowl);
         language=button(header,InterfaceSettings.language(a).equals("ar")?"EN":"العربية",false,()->a.changeLanguage(InterfaceSettings.language(a).equals("ar")?"en":"ar"));language.setContentDescription(a.getString(R.string.language));language.setLayoutParams(new LayoutParams(-2,dp(48)));addView(header,new LayoutParams(-1,dp(64)));
         scroll=new ScrollView(a);scroll.setFillViewport(true);addView(scroll,new LayoutParams(-1,0,1));
         FrameLayout frame=new FrameLayout(a);scroll.addView(frame);
