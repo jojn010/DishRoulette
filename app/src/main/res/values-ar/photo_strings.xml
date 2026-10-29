@@ -1,0 +1,27 @@
+<resources>
+    <string name="photo_title">مكوّنات من صورة</string>
+    <string name="photo_scan">تعرّف على المكوّنات بالصورة</string>
+    <string name="photo_take">التقاط صورة</string>
+    <string name="photo_choose">اختيار صورة</string>
+    <string name="photo_preview">مراجعة الصورة</string>
+    <string name="photo_send_detail">أرسل هذه الصورة إلى Gemini للتعرّف على المكوّنات الظاهرة. يمكنك تعديل الاقتراحات قبل إضافتها إلى مكوّناتك.</string>
+    <string name="photo_analyze">التعرّف على المكوّنات</string>
+    <string name="photo_change">تغيير الصورة</string>
+    <string name="photo_preparing">جارٍ تجهيز الصورة…</string>
+    <string name="photo_analyzing">جارٍ التعرّف على المكوّنات…</string>
+    <string name="photo_review">مراجعة المكوّنات</string>
+    <string name="photo_review_detail">راجع الاقتراحات وعدّل الأسماء أو احذف أي مكوّن غير صحيح. اكتب مكوّناً واحداً في كل سطر. لا تكشف الصور المكوّنات المخفية أو مسبّبات الحساسية.</string>
+    <string name="photo_add">إضافة إلى مكوّناتي</string>
+    <string name="photo_added">تمت إضافة المكوّنات. اضغط على البحث عن وصفة لتحضير طبق.</string>
+    <string name="photo_review_empty">أدخل مكوّناً واحداً على الأقل، كل مكوّن في سطر.</string>
+    <string name="photo_connect_first">اربط Gemini من الإعدادات أولاً، ثم جرّب صورتك مجدداً.</string>
+    <string name="photo_interrupted">توقّف التحليل. اضغط على التعرّف على المكوّنات للمحاولة مجدداً.</string>
+    <string name="photo_empty">لم يتم العثور على مكوّنات واضحة. جرّب صورة بإضاءة جيدة لأطعمة منفصلة أو أدخل المكوّنات يدوياً.</string>
+    <string name="photo_read_error">تعذّرت قراءة الصورة. جرّب صورة أخرى.</string>
+    <string name="photo_network_error">تعذّر الاتصال بـ Gemini. تحقّق من اتصالك وحاول مجدداً.</string>
+    <string name="photo_model_error">تحقّق من مفتاح Gemini واختر نموذجاً يدعم الصور من الإعدادات.</string>
+    <string name="photo_rate_limit">تم بلوغ حد استخدام Gemini. انتظر قليلاً ثم حاول مجدداً.</string>
+    <string name="photo_response_error">لم يُرجع Gemini قائمة مكوّنات صالحة. حاول مجدداً أو اختر صورة أوضح.</string>
+    <string name="photo_no_camera">لا يوجد تطبيق كاميرا متاح. اختر صورة موجودة بدلاً من ذلك.</string>
+    <string name="photo_no_picker">لا يتوفّر منتقي صور على هذا الجهاز.</string>
+</resources>

@@ -1,3 +1,12 @@
+## v1.4.0
+
+- Add Scan ingredients: take a photo or choose one from the system picker, preview it, and ask Gemini to identify visible foods.
+- Review and edit detected ingredients in English or Arabic before adding them to the pantry and generating a dish.
+- Preserve existing pantry ingredients, skip duplicates, and retain recipe preferences and exclusion validation.
+- Resize and orient images locally, strip original metadata, and delete temporary images after completion or cancellation.
+- Handle unreadable photos, empty results, network/model/quota errors, cancellation and screen recreation without automatically repeating paid requests.
+- This workstation uses a different debug signing key from earlier builds. Existing installations with a different signature require a backed-up reinstall and Gemini reconnection.
+
 ## v1.3.1
 
 - Rename the app to Tabkha in English and طبخة in Arabic, including the home screen and launcher.

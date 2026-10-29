@@ -1,0 +1,29 @@
+<resources>
+    <item name="photoScan" type="id" />
+    <item name="photoIngredientReview" type="id" />
+    <string name="photo_title">Ingredients from a photo</string>
+    <string name="photo_scan">Scan ingredients</string>
+    <string name="photo_take">Take a photo</string>
+    <string name="photo_choose">Choose a photo</string>
+    <string name="photo_preview">Review your photo</string>
+    <string name="photo_send_detail">Send this photo to Gemini to identify visible ingredients. You can edit the suggestions before adding them to your pantry.</string>
+    <string name="photo_analyze">Identify ingredients</string>
+    <string name="photo_change">Change photo</string>
+    <string name="photo_preparing">Preparing your photo…</string>
+    <string name="photo_analyzing">Looking for ingredients…</string>
+    <string name="photo_review">Review ingredients</string>
+    <string name="photo_review_detail">Check these suggestions, edit names or remove anything incorrect. Use one ingredient per line. Photos cannot reveal hidden ingredients or allergens.</string>
+    <string name="photo_add">Add to pantry</string>
+    <string name="photo_added">Ingredients added. Tap Find a recipe to make a dish.</string>
+    <string name="photo_review_empty">Enter at least one ingredient, one per line.</string>
+    <string name="photo_connect_first">Connect Gemini in Settings first, then try your photo again.</string>
+    <string name="photo_interrupted">Analysis was interrupted. Tap Identify ingredients to retry.</string>
+    <string name="photo_empty">No clear ingredients found. Try a well-lit photo of individual foods or edit your pantry manually.</string>
+    <string name="photo_read_error">Could not read this photo. Please try another image.</string>
+    <string name="photo_network_error">Could not reach Gemini. Check your connection and try again.</string>
+    <string name="photo_model_error">Check your Gemini key and choose a model that supports images in Settings.</string>
+    <string name="photo_rate_limit">Gemini is at its usage limit. Wait a little and try again.</string>
+    <string name="photo_response_error">Gemini could not return a usable ingredient list. Try again or choose a clearer photo.</string>
+    <string name="photo_no_camera">No camera app is available. Choose an existing photo instead.</string>
+    <string name="photo_no_picker">No photo picker is available on this device.</string>
+</resources>

@@ -28,7 +28,7 @@ final class SimpleHomeView extends LinearLayout {
     private final ScrollView scroll;
     private int editIndex;
     private final ImageView foodPhoto;
-    private final MaterialButton connect;
+    private final MaterialButton connect,scan;
     SimpleHomeView(MainActivity a,NativeIngredientLoadout loadout){
         super(a);activity=a;this.loadout=loadout;setOrientation(VERTICAL);setBackgroundColor(color(R.color.background));
         LinearLayout header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
@@ -50,6 +50,7 @@ final class SimpleHomeView extends LinearLayout {
         surpriseMode=button(modeRail,a.getString(R.string.discover_mode),false,()->a.chooseGenerationMode("discover"));
         UiIcons.button(pantryMode,R.drawable.ic_bowl);UiIcons.button(surpriseMode,R.drawable.ic_shuffle);
         LayoutParams one=new LayoutParams(0,-2,1);one.setMarginEnd(dp(8));pantryMode.setLayoutParams(one);surpriseMode.setLayoutParams(new LayoutParams(0,-2,1));
+        scan=button(page,a.getString(R.string.photo_scan),false,a::scanIngredients);scan.setId(R.id.photoScan);UiIcons.button(scan,R.drawable.ic_camera);
         LinearLayout columns=new LinearLayout(a);boolean wide=a.getResources().getConfiguration().screenWidthDp>=840;columns.setOrientation(wide?HORIZONTAL:VERTICAL);page.addView(columns,new LayoutParams(-1,-2));
         LinearLayout left=column();columns.addView(left,new LayoutParams(wide?0:-1,-2,wide?1.4f:0));
         pantry=column();left.addView(pantry,new LayoutParams(-1,-2));
@@ -97,7 +98,7 @@ final class SimpleHomeView extends LinearLayout {
         m.commit();editing=false;setDraft("");add.setText(R.string.add);loadout.publish();return true;
     }
     void refresh(){
-        if(input==null)return;boolean discovery=activity.profile().mode.equals("discover");
+        if(input==null)return;scan.setEnabled(!busy);boolean discovery=activity.profile().mode.equals("discover");
         if(!Boolean.valueOf(discovery).equals(foodPhoto.getTag())){foodPhoto.setImageResource(discovery?R.drawable.inspiration_photo:R.drawable.pantry_photo);foodPhoto.setContentDescription(activity.getString(discovery?R.string.food_inspiration_description:R.string.food_photo_description));foodPhoto.setTag(discovery);}pantry.setVisibility(discovery?GONE:VISIBLE);
         pantryMode.setChecked(!discovery);surpriseMode.setChecked(discovery);pantryMode.setBackgroundTintList(ColorStateList.valueOf(color(!discovery?R.color.accent:R.color.surface)));pantryMode.setTextColor(color(!discovery?R.color.on_accent:R.color.ink));surpriseMode.setBackgroundTintList(ColorStateList.valueOf(color(discovery?R.color.accent:R.color.surface)));surpriseMode.setTextColor(color(discovery?R.color.on_accent:R.color.ink));
         ingredientCount.setText(activity.getString(R.string.ingredients_count,loadout.magazine().count()));empty.setVisibility(loadout.magazine().count()==0?VISIBLE:GONE);

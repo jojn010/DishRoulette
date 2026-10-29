@@ -44,6 +44,31 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private IngredientLoadout loadout;
     private SimpleHomeView simpleHome;
+    PhotoIngredientsController photoIngredients;
+    void scanIngredients() {
+        if (!spinning && simpleHome.commitPending()) photoIngredients.open();
+    }
+    String addPhotoIngredients(String text) {
+        List<String> additions = new ArrayList<>();
+        for (String line : text.split("\\r?\\n")) if (!line.trim().isEmpty()) additions.add(line.trim());
+        if (additions.isEmpty()) return getString(R.string.photo_review_empty);
+        IngredientMagazine candidate = new IngredientMagazine();
+        candidate.restore(loadout.magazine().save(), 0);
+        Set<String> seen = new HashSet<>(readPantry());
+        for (String name : additions) {
+            Set<String> parsed = RecipeCatalog.parseIngredients(name);
+            if (parsed.size() == 1 && seen.containsAll(parsed)) continue;
+            int slot = 0; List<String> slots = candidate.save();
+            while (slot < slots.size() && !slots.get(slot).trim().isEmpty()) slot++;
+            candidate.select(slot); candidate.edit(name);
+            String error = candidate.validationError();
+            if (error != null) return IngredientValidation.message(this, error);
+            seen.addAll(parsed);
+        }
+        loadout.restore(candidate.save(), 0);
+        chooseGenerationMode("pantry");
+        return null;
+    }
     private android.widget.Button resultPreferences;
     private final boolean simple = true;
     SpinProfile profile(){return profile;}
@@ -92,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         InterfaceSettings.simple(this);
         setTheme(R.style.Theme_DishRoulette_Simple);
         super.onCreate(state);
+        photoIngredients = new PhotoIngredientsController(this, state);
         EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -163,6 +189,11 @@ public class MainActivity extends AppCompatActivity {
             }
             if(!state.getBoolean("result_visible",true))binding.cardMealResult.setVisibility(View.GONE);
         }
+    }
+
+    @Override protected void onPostCreate(Bundle state) {
+        super.onPostCreate(state);
+        photoIngredients.restore();
     }
 
     private void createChips() {
@@ -738,6 +769,7 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onPause() { loadout.pause(); super.onPause(); }
 
     @Override protected void onSaveInstanceState(Bundle state) {
+        photoIngredients.save(state);
         state.putBoolean("was_firing", spinning);
         state.putBoolean("result_visible",binding.cardMealResult.getVisibility()==View.VISIBLE);
         state.putString("secondary_screen",kitchenScreens.screen());
@@ -751,6 +783,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override protected void onDestroy() {
+        photoIngredients.dispose();
         // Cancel delivery and release the Activity when leaving or rotating the screen.
         pendingReveal = null;
         stopWaiting();kitchenScreens.dispose();

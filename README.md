@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.3.1 — Tabkha branding and circular cooking timers**
+**v1.4.0 — Ingredients from a photo**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -23,6 +23,25 @@ For the owner only, `python3 tools/build-private-apk.py` builds `work/private/Di
 **This private APK contains an extractable API key. Keep it private; never upload it to GitHub or share it.** The script keeps the APK in ignored local output, removes the temporary setup file, and rebuilds ordinary output without credentials. Public release APKs still require personal connection setup. On the phone, the imported key is saved encrypted with Android Keystore; the bundled key remains extractable from the private APK. Settings can replace the saved connection.
 
 ## Interface and languages
+
+### Photo ingredients
+
+Tap **Scan ingredients** on Home, then take a photo or choose one from the system photo picker.
+Review the preview and tap **Identify ingredients** to send it to your configured Gemini model.
+The model must support image input. Edit the suggested list (one ingredient per line), remove
+incorrect items, and tap **Add to pantry**. Existing ingredients are retained and duplicates are
+skipped. Tap **Find my recipe** to generate a dish using your usual preferences and exclusions.
+
+Images are sampled to at most 1600 pixels on the longest edge, rotated to match camera orientation,
+and re-encoded as JPEG without original metadata before transmission. Temporary photos stay in
+the app cache and are deleted when the flow is completed or cancelled. No camera or broad storage
+permission is required: capture is delegated to the camera app and selection uses the system picker.
+Only the selected photo is sent, after tapping **Identify ingredients**; photos are not attached to
+the later recipe request. Recognition can miss or misidentify ingredients, especially hidden ingredients
+in prepared foods. Review suggestions before generating a dish. Empty results and connection errors
+allow retry; rotating during analysis returns to the preview without automatically repeating the request.
+
+### App interface
 
 All installations now use the Simple interface. Advanced mode and the interface selector have been removed. Upgrading migrates the old interface choice while preserving ingredients, recipe preferences, saved recipes, cooking progress and Gemini settings.
 
@@ -51,6 +70,7 @@ For emulator graphics compatibility, software ANGLE is available with `-gpu swan
 
 ## Version checkpoints
 
+- **v1.4.0** adds camera/gallery ingredient recognition with editable English/Arabic results.
 - **v1.3.0** removes Advanced mode and migrates all users to Simple.
 - **v1.0.0** preserves the original application.
 - **v1.0.1** preserves the Midnight Kitchen visual overhaul and cooking interface.
