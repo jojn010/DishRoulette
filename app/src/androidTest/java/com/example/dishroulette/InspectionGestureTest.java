@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
+@org.junit.Ignore("Advanced interface removed in v1.3.0; Simple flows are covered by DualInterfaceTest")
 public class InspectionGestureTest {
     private long downTime;
     private Object field(Object value,String name){try{Field f=value.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(value);}catch(Exception e){throw new AssertionError(e);}}

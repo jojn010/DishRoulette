@@ -1,8 +1,8 @@
 # DishRoulette
 
-**v1.2.11 — Screen stays awake while cooking**
+**v1.3.0 — Simple interface only**
 
-A native Android recipe app with a warm, lightweight Simple interface and the immersive 3D Advanced interface. Both share ingredients, preferences, saved recipes, cooking progress and the Gemini connection. Choose English or Arabic independently of the interface.
+A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
 ## Run locally
 
@@ -22,31 +22,15 @@ For the owner only, `python3 tools/build-private-apk.py` builds `work/private/Di
 
 **This private APK contains an extractable API key. Keep it private; never upload it to GitHub or share it.** The script keeps the APK in ignored local output, removes the temporary setup file, and rebuilds ordinary output without credentials. Public release APKs still require personal connection setup. On the phone, the imported key is saved encrypted with Android Keystore; the bundled key remains extractable from the private APK. Settings can replace the saved connection.
 
-## Interfaces and languages
+## Interface and languages
 
-New installs start in **Simple** mode. Existing installations keep their saved choice or the familiar Advanced interface. Open **Settings** from either interface to select Simple/Advanced and English/العربية independently. Choices persist across restarts.
+All installations now use the Simple interface. Advanced mode and the interface selector have been removed. Upgrading migrates the old interface choice while preserving ingredients, recipe preferences, saved recipes, cooking progress and Gemini settings.
 
-Pantry ingredients describe availability: a recipe may use one, some, or all when appropriate, without forcing unrelated ingredients together.
+Add or edit ingredient chips, choose Pantry or Surprise, select a goal and generate a recipe. Open Settings for language, Gemini connection and recipe preferences. Recipe details support saving and guided cooking with checklists, progress and contextual timers. Timers are visual in-app timers with no background alarm.
 
-Simple mode offers editable ingredient chips, Pantry/Surprise selection, goal cards, shared preferences, full recipe details, saved recipes and guided cooking. It does not instantiate the OpenGL renderer or mechanical audio. Advanced mode retains the 3D weapon, camera and firing experience.
+English and Arabic are supported, including bundled Cairo typography and right-to-left layout. Gemini receives the selected language. Saved recipes retain their original content and language.
 
-Arabic uses bundled Cairo typography and native Android RTL resources. Only the HUD is mirrored; the 3D scene and gestures retain their orientation. Gemini receives the selected language while schema keys and internal filter values remain stable. Saved recipes retain their original content and language. Common English/Arabic food aliases support pantry matching and exclusion checks; this bounded vocabulary is not a general translation service or an allergy guarantee.
-
-## Advanced controls
-
-- **From my pantry:** type one ingredient and press Next or **+ LOAD**. Tap a cartridge in the readable ingredient tray or the 3D scene to edit it. Remove affects only the selected cartridge; Clear all empties the loadout. Load navigation supports more than six ingredients, up to the service's 20-ingredient limit.
-- **Surprise me:** generates a dish and shopping ingredients without sending your pantry. Your pantry loadout is retained when switching back.
-- **Balanced / Cut / Bulk:** switches the revolver, precision rifle, and heavy pump-action silhouette, along with the recipe style.
-- **Settings → Recipe preferences:** meal, cuisine, allergies, exclusions, favorites inspiration, reduced motion, and mechanical sound. Snack and Dessert are supported end to end.
-- **Shoot:** reveals the oven during the firing sequence. A themed waiting scene continues while the real request runs. Cancel returns to the loadout; failures retain ingredients for another attempt.
-- **Let's cook:** ingredient checklists, numbered steps, progress, previous/next navigation, and contextual minute timers. Progress survives recreation/reopening. Timers are visual in-app timers with no background alarm.
-- **Saved:** full recipe archive with descriptions, timing, cuisine/goal, opening and removal. Existing favorites remain compatible and continue to inspire future requests.
-
-## Presentation and accessibility
-
-Original procedural steel/wood meshes and warm lighting use OpenGL ES 2.0; all recipe and ingredient text uses native accessible controls. Touch dragging, direct cylinder dragging, pinch zoom, mouse orbit/scroll and double-tap camera reset are supported. Reduced motion respects both the app setting and the system animator scale. Sound can be disabled separately. The scene stops continuous rendering when idle.
-
-Phones use a vertical loadout. Narrow/short phones and open keyboards use a compact layout: tap **Manage** to edit/remove loaded ingredients, and use **Setup** for goal selection. Android windows at least 840dp wide use side consoles around the central weapon. This is an Android app, not a separate desktop/web port.
+The app uses native Android controls and does not initialize the legacy OpenGL scene or mechanical audio.
 
 No fabricated dish images, image service, or production mock recipes are included. Gemini calls use the personal HTTPS connection and shared exclusion validation; ingredient screening cannot guarantee allergy safety.
 
@@ -67,6 +51,7 @@ For emulator graphics compatibility, software ANGLE is available with `-gpu swan
 
 ## Version checkpoints
 
+- **v1.3.0** removes Advanced mode and migrates all users to Simple.
 - **v1.0.0** preserves the original application.
 - **v1.0.1** preserves the Midnight Kitchen visual overhaul and cooking interface.
 - **v1.1.0** adds Simple/Advanced interfaces and English/Arabic support.

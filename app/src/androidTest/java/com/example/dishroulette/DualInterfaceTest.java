@@ -51,29 +51,27 @@ public class DualInterfaceTest {
             scenario.recreate();scenario.onActivity(a->{assertEquals("ar",InterfaceSettings.language(a));assertEquals("cooking",((KitchenScreens)field(a,"kitchenScreens")).screen());assertEquals(2,loadout(a).magazine().count());});
         }
     }
-    @Test public void settingsSwitchAllFourCombinationsAndKeepIngredientsAndFavorites()throws Exception{
+    @Test public void settingsChangeLanguageAndKeepIngredientsAndFavorites()throws Exception{
         final Set<String>[] saved=new Set[]{null};
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
-            scenario.onActivity(a->{add(a,"أرز");add(a,"Tomato");saved[0]=new HashSet<>(prefs().getStringSet("saved_recipes",Collections.emptySet()));a.showSettings();});capture("08-settings-en");
-            scenario.onActivity(a->a.findViewById(R.id.settingsAdvanced).performClick());Thread.sleep(1400);
-            scenario.onActivity(a->{assertFalse(a.isSimple());assertNotNull(a.findViewById(R.id.tabletop));assertEquals(2,loadout(a).magazine().count());a.getOnBackPressedDispatcher().onBackPressed();});Thread.sleep(800);capture("09-advanced-en");
-            scenario.onActivity(a->{a.showSettings();a.findViewById(R.id.settingsArabic).performClick();});Thread.sleep(1400);
-            scenario.onActivity(a->{assertFalse(a.isSimple());assertEquals(View.LAYOUT_DIRECTION_RTL,a.findViewById(R.id.main).getLayoutDirection());a.getOnBackPressedDispatcher().onBackPressed();loadout(a).select(0);});Thread.sleep(800);androidx.test.espresso.Espresso.onView(androidx.test.espresso.matcher.ViewMatchers.withId(R.id.ammunitionEditor)).check(androidx.test.espresso.assertion.ViewAssertions.matches(androidx.test.espresso.matcher.ViewMatchers.isDisplayed()));capture("10-advanced-ar");
-            scenario.onActivity(a->{a.showSettings();a.findViewById(R.id.settingsSimple).performClick();});Thread.sleep(1000);
-            scenario.onActivity(a->{assertTrue(a.isSimple());assertNull(a.findViewById(R.id.tabletop));assertEquals(2,loadout(a).magazine().count());assertEquals(saved[0],prefs().getStringSet("saved_recipes",Collections.emptySet()));});capture("11-settings-ar");
-            scenario.recreate();scenario.onActivity(a->{assertTrue(a.isSimple());assertEquals("ar",InterfaceSettings.language(a));a.findViewById(R.id.settingsEnglish).performClick();});Thread.sleep(900);
+            scenario.onActivity(a->{add(a,"أرز");add(a,"Tomato");saved[0]=new HashSet<>(prefs().getStringSet("saved_recipes",Collections.emptySet()));a.showSettings();
+                assertNull(a.findViewById(R.id.settingsAdvanced));assertNull(a.findViewById(R.id.settingsSimple));
+                a.findViewById(R.id.settingsArabic).performClick();});
+            Thread.sleep(1000);
+            scenario.onActivity(a->{assertTrue(a.isSimple());assertNull(a.findViewById(R.id.tabletop));assertEquals("ar",InterfaceSettings.language(a));assertEquals(2,loadout(a).magazine().count());assertEquals(saved[0],prefs().getStringSet("saved_recipes",Collections.emptySet()));});
+            scenario.recreate();scenario.onActivity(a->{assertTrue(a.isSimple());a.findViewById(R.id.settingsEnglish).performClick();});Thread.sleep(900);
             scenario.onActivity(a->{assertEquals("en",a.getResources().getConfiguration().getLocales().get(0).getLanguage());assertEquals(2,loadout(a).magazine().count());});
         }
     }
-    @Test public void newInstallDefaultsSimpleAndLegacyChoiceSurvives(){
+    @Test public void newInstallAndLegacyInstallsUseSimpleWithoutChangingLanguage(){
         android.content.Context base=InstrumentationRegistry.getInstrumentation().getTargetContext();
         android.content.Context clean=new android.content.ContextWrapper(base){@Override public SharedPreferences getSharedPreferences(String name,int mode){return base.getSharedPreferences("dual_interface_isolated_test",mode);}};
-        SharedPreferences p=clean.getSharedPreferences("",0);p.edit().clear().commit();assertTrue(InterfaceSettings.simple(clean));p.edit().putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"ar").commit();assertFalse(InterfaceSettings.simple(clean));assertEquals("ar",InterfaceSettings.language(clean));p.edit().clear().putString("spin_profile","{}").commit();assertFalse(InterfaceSettings.simple(clean));p.edit().clear().commit();
+        SharedPreferences p=clean.getSharedPreferences("",0);p.edit().clear().commit();assertTrue(InterfaceSettings.simple(clean));p.edit().putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"ar").commit();assertTrue(InterfaceSettings.simple(clean));assertEquals("ar",InterfaceSettings.language(clean));p.edit().clear().putString("spin_profile","{}").commit();assertTrue(InterfaceSettings.simple(clean));p.edit().clear().commit();
     }
-    @Test public void advancedArabicGenerationAndSimpleSurpriseShareTheService() throws Exception {
+    @Test public void legacyAdvancedChoiceMigratesAndSupportsArabicRecipesAndSurprise() throws Exception {
         prefs().edit().putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"ar").putBoolean("reduce_motion",true).commit();
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
-            scenario.onActivity(a->{loadout(a).restore(Arrays.asList("أرز","Tomato"),0);api(a,r->{assertEquals("ar",r.language);return new LocalReply(r);});a.findViewById(R.id.btnSpin).performClick();});Thread.sleep(1200);
+            scenario.onActivity(a->{loadout(a).restore(Arrays.asList("أرز","Tomato"),0);api(a,r->{assertEquals("ar",r.language);return new LocalReply(r);});assertTrue(a.isSimple());assertNull(a.findViewById(R.id.tabletop));a.findViewById(R.id.simpleGenerate).performClick();});Thread.sleep(1200);
             scenario.onActivity(a->{assertEquals(View.VISIBLE,a.findViewById(R.id.cardMealResult).getVisibility());assertEquals("أرز بالبندورة",((TextView)a.findViewById(R.id.tvMealTitle)).getText().toString());});capture("14-advanced-ar-recipe");
         }
         prefs().edit().putString(InterfaceSettings.MODE,"simple").commit();

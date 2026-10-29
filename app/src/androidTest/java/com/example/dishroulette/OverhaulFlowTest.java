@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 
 /** Real activity/GL capture, using deterministic responses only inside this test APK. */
 @RunWith(AndroidJUnit4.class)
+@org.junit.Ignore("Advanced interface removed in v1.3.0; Simple flows are covered by DualInterfaceTest")
 public class OverhaulFlowTest {
     private SharedPreferences prefs(){return InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0);}
     @Before public void defaults(){SharedPreferences.Editor fixture=prefs().edit();for(String key:prefs().getAll().keySet())if(key.startsWith("cook_")&&key.contains("overhaul_test_recipe"))fixture.remove(key);fixture.commit();prefs().edit().remove("loaded_ammunition").remove("loaded_chamber").putString("selected_meal","Any meal").putBoolean("reduce_motion",false).putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"en").putString("spin_profile","{}").commit();}

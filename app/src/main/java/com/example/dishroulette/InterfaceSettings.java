@@ -12,12 +12,11 @@ final class InterfaceSettings {
     static SharedPreferences prefs(Context c){return c.getSharedPreferences(STORE,0);}
     static boolean simple(Context c){
         SharedPreferences p=prefs(c);
-        if(!p.contains(MODE)){
-            // Existing installs retain their established game experience. New installs start light.
-            boolean existing=p.contains("spin_profile")||p.contains("loaded_ammunition")||p.contains("saved_recipes");
-            p.edit().putString(MODE,existing?"advanced":"simple").apply();
+        // Migrate legacy installations without changing recipes, ingredients or language.
+        if (!"simple".equals(p.getString(MODE,""))) {
+            p.edit().putString(MODE,"simple").apply();
         }
-        return !"advanced".equals(p.getString(MODE,"simple"));
+        return true;
     }
     static String language(Context c){
         String saved=prefs(c).getString(LANGUAGE,"");

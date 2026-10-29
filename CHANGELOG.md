@@ -1,3 +1,9 @@
+## v1.3.0
+
+- Remove Advanced mode and the interface selector from Settings.
+- Always open the native Simple interface, including after upgrading from Advanced.
+- Preserve ingredients, saved recipes, preferences, cooking progress, Gemini connection and English/Arabic support.
+
 ## v1.2.11
 
 - Keep the screen awake while cooking instructions are open so you can follow a recipe hands-free.

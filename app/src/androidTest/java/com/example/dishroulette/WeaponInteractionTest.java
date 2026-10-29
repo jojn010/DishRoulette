@@ -25,6 +25,7 @@ import retrofit2.Response;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
+@org.junit.Ignore("Advanced interface removed in v1.3.0; Simple flows are covered by DualInterfaceTest")
 public class WeaponInteractionTest {
     @Before public void cleanProfile() {
         InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("dishroulette_ui",0)

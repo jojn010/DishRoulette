@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private IngredientLoadout loadout;
     private SimpleHomeView simpleHome;
     private android.widget.Button resultPreferences;
-    private boolean simple;
+    private final boolean simple = true;
     SpinProfile profile(){return profile;}
     String meal(){return meal;}
     boolean isSimple(){return simple;}
@@ -53,11 +53,9 @@ public class MainActivity extends AppCompatActivity {
     void chooseGoal(String goal){selectGoal(goal);}
     void chooseGenerationMode(String mode){if(spinning)return;profile.mode=mode;profile.save(preferences,gson);updateMode();}
     void cancelGeneration(){if(pendingCall!=null){pendingCall.cancel();pendingCall=null;}pendingReveal=null;loadout.cancelFire();setSpinning(false);}
-    void changeLanguage(String language){changeInterface(simple?"simple":"advanced",language);}
-    void changeInterface(String mode,String language){
-        if(spinning)return;
-        if(mode.equals(simple?"simple":"advanced")&&language.equals(InterfaceSettings.language(this)))return;
-        preferences.edit().putString(InterfaceSettings.MODE,mode).putString(InterfaceSettings.LANGUAGE,language).apply();recreate();
+    void changeLanguage(String language){
+        if(spinning || language.equals(InterfaceSettings.language(this)))return;
+        preferences.edit().putString(InterfaceSettings.LANGUAGE,language).apply();recreate();
     }
     @Override protected void attachBaseContext(android.content.Context base){super.attachBaseContext(InterfaceSettings.localized(base));}
 
@@ -91,15 +89,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle state) {
-        simple=InterfaceSettings.simple(this);
-        setTheme(simple?R.style.Theme_DishRoulette_Simple:R.style.Theme_DishRoulette);
+        InterfaceSettings.simple(this);
+        setTheme(R.style.Theme_DishRoulette_Simple);
         super.onCreate(state);
         EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.getRoot().setLayoutDirection(InterfaceSettings.language(this).equals("ar")?View.LAYOUT_DIRECTION_RTL:View.LAYOUT_DIRECTION_LTR);
-        if(simple){loadout=new NativeIngredientLoadout();binding.advancedHome.setVisibility(View.GONE);binding.simpleHome.setVisibility(View.VISIBLE);}
-        else {WeaponInputView weapon=new WeaponInputView(this,null);weapon.setId(R.id.tabletop);binding.sceneHost.addView(weapon,new android.widget.FrameLayout.LayoutParams(-1,-1));loadout=weapon;}
+        loadout=new NativeIngredientLoadout();
+        binding.advancedHome.setVisibility(View.GONE);
+        binding.simpleHome.setVisibility(View.VISIBLE);
 
         androidx.core.view.WindowInsetsControllerCompat bars =
                 new androidx.core.view.WindowInsetsControllerCompat(getWindow(), binding.getRoot());
@@ -123,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
         }
         GeminiCredentials.importSetup(this);
         recipeApi = RecipeApi.create(this);
-        if(!simple){mechanicalSound = new MechanicalAudio(this);((WeaponInputView)loadout).setAudio(mechanicalSound);}
         if (state == null) {
             try {
                 String[] slots=gson.fromJson(preferences.getString("loaded_ammunition","[]"),String[].class);

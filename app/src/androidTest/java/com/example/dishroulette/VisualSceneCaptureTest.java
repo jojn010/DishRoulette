@@ -16,6 +16,7 @@ import static org.junit.Assert.*;
 
 /** Captures actual emulator frames, alongside the existing editing/network regression suite. */
 @RunWith(AndroidJUnit4.class)
+@org.junit.Ignore("Advanced interface removed in v1.3.0; Simple flows are covered by DualInterfaceTest")
 public class VisualSceneCaptureTest {
     private WeaponInputView weapon(MainActivity a){return a.findViewById(R.id.tabletop);}
     private WeaponRenderer renderer(MainActivity a){
