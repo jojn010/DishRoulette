@@ -1,3 +1,10 @@
+## v1.3.1
+
+- Rename the app to Tabkha in English and طبخة in Arabic, including the home screen and launcher.
+- Add the standalone cooking pot and spoon app icon.
+- Show timed cooking steps with a large circular countdown dial, clock marks and a shrinking remaining-time ring.
+- Preserve timer pause, resume, reset, completion and saved state.
+
 ## v1.3.0
 
 - Remove Advanced mode and the interface selector from Settings.

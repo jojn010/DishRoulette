@@ -1,6 +1,6 @@
-# DishRoulette
+# Tabkha / طبخة
 
-**v1.3.0 — Simple interface only**
+**v1.3.1 — Tabkha branding and circular cooking timers**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
