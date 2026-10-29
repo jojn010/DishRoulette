@@ -173,10 +173,13 @@ final class KitchenScreens {
         TextView stepNumber=text(body,"",32,R.color.accent,"serif",24);
         TextView instruction=text(body,"",21,R.color.ink,"sans",14);
         CheckBox done=new androidx.appcompat.widget.AppCompatCheckBox(activity);done.setText(activity.getString(R.string.step_complete));UiTypography.apply(done);done.setTextSize(16);done.setTextColor(UiColors.color(activity,R.color.ink));done.setMinHeight(dp(56));body.addView(done);
-        TextView timer=text(body,"",18,R.color.accent,"monospace",8);timer.setContentDescription(activity.getString(R.string.cooking_timer));
+        CookingTimerView timer=new CookingTimerView(activity);timer.setId(R.id.cookingTimerDial);
+        LinearLayout.LayoutParams timerLp=new LinearLayout.LayoutParams(Math.min(dp(260),Math.max(1,activity.getResources().getDisplayMetrics().widthPixels-dp(48))),dp(260));
+        timerLp.gravity=Gravity.CENTER_HORIZONTAL;timerLp.topMargin=dp(16);
+        body.addView(timer,timerLp);
         LinearLayout timerActions=new LinearLayout(activity);timerActions.setOrientation(LinearLayout.VERTICAL);body.addView(timerActions);
-        Button startTimer=button(timerActions,"",false,()->{});
-        Button resetTimer=button(timerActions,activity.getString(R.string.reset_timer),false,()->{});
+        Button startTimer=button(timerActions,"",false,()->{});startTimer.setId(R.id.cookingTimerStart);
+        Button resetTimer=button(timerActions,activity.getString(R.string.reset_timer),false,()->{});resetTimer.setId(R.id.cookingTimerReset);
         text(timerActions,activity.getString(R.string.timer_notice),12,R.color.muted,"sans",8);
         LinearLayout nav=new LinearLayout(activity);nav.setOrientation(LinearLayout.HORIZONTAL);body.addView(nav);
         Button previous=button(nav,activity.getString(R.string.previous_step),false,()->{}),next=button(nav,activity.getString(R.string.next_step),true,()->{});
@@ -202,7 +205,7 @@ final class KitchenScreens {
                 String prefix="cook_timer_"+recipe.id+"_"+step;
                 timerTick=new Runnable(){@Override public void run(){
                     long deadline=prefs.getLong(prefix+"_end",0),remaining=deadline>0?Math.max(0,deadline-System.currentTimeMillis()):prefs.getLong(prefix+"_left",minutes*60000L);
-                    timer.setText(activity.getString(R.string.timer_display,String.format(activity.getResources().getConfiguration().getLocales().get(0),"%02d:%02d",(remaining+999)/60000,((remaining+999)/1000)%60),deadline>0&&remaining==0?activity.getString(R.string.timer_ready):""));
+                    timer.update(remaining,minutes*60000L);
                     startTimer.setText(deadline>0&&remaining>0?activity.getString(R.string.pause_timer):remaining==0?activity.getString(R.string.restart_timer,minutes):activity.getString(R.string.start_timer));
                     if(deadline>0&&remaining==0)prefs.edit().putLong(prefix+"_end",0).putLong(prefix+"_left",0).apply();
                     handler.postDelayed(this,1000);

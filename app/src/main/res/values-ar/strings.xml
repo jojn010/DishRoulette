@@ -316,4 +316,4 @@
 <string name="nutrition_sugarGrams">سكريات: ~~~ %1$s غ</string>
 <string name="nutrition_sodiumMilligrams">صوديوم: ~~~ %1$s ملغ</string>
 <string name="nutrition_variation">~~~ تعني قيمة تقريبية وليست دقيقة. تختلف الكميات الفعلية حسب حجم المكونات ونوع المنتج والحصص وطريقة التحضير.</string>
-</resources>
+<string name="timer_finished">جاهز</string></resources>
