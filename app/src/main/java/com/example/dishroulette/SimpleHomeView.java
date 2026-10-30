@@ -26,25 +26,32 @@ final class SimpleHomeView extends LinearLayout {
     private final MaterialButton pantryMode,surpriseMode,generate,add,language;
     private boolean editing,busy,syncing;
     private final ScrollView scroll;
+    private final LinearLayout header,page,columns,left,right,entry,actionDock,navigation;
+    private final AdaptivePageFrame actionFrame,navigationFrame;
+    private boolean compactWindow,wideWindow,stackedNavigation,stackedEntry,stackedHeader,keyboardVisible;
     private int editIndex;
     private final ImageView foodPhoto;
+    private final View eyebrow,introduction;
+    private final TextView hero;
+    private final FrameLayout photoCard;
+    private boolean shortDecor;
     private final MaterialButton scan,clear;
     private final TextView editHint,peopleCount;
     private final MaterialButton fewerPeople,morePeople;
     private final com.google.android.material.slider.Slider peopleSlider;
     SimpleHomeView(MainActivity a,NativeIngredientLoadout loadout){
         super(a);activity=a;this.loadout=loadout;setOrientation(VERTICAL);setBackgroundColor(color(R.color.background));
-        LinearLayout header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
+        header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
         TextView logo=label(header,activity.getString(R.string.app_name),23,R.color.ink,0);logo.setTypeface(Typeface.create("serif",Typeface.BOLD));logo.setLayoutParams(new LayoutParams(0,-2,1));logo.setGravity(isArabic()?Gravity.RIGHT:Gravity.LEFT);UiIcons.text(logo,R.drawable.ic_bowl);
-        language=button(header,InterfaceSettings.language(a).equals("ar")?"EN":"العربية",false,()->a.changeLanguage(InterfaceSettings.language(a).equals("ar")?"en":"ar"));language.setContentDescription(a.getString(R.string.language));language.setLayoutParams(new LayoutParams(-2,dp(48)));addView(header,new LayoutParams(-1,dp(64)));
+        language=button(header,InterfaceSettings.language(a).equals("ar")?"EN":"العربية",false,()->a.changeLanguage(InterfaceSettings.language(a).equals("ar")?"en":"ar"));language.setContentDescription(a.getString(R.string.language));language.setMinHeight(dp(48));language.setLayoutParams(new LayoutParams(-2,-2));header.setMinimumHeight(dp(64));addView(header,new LayoutParams(-1,-2));
         scroll=new ScrollView(a);scroll.setFillViewport(true);addView(scroll,new LayoutParams(-1,0,1));
-        FrameLayout frame=new FrameLayout(a);scroll.addView(frame);
-        LinearLayout page=column();page.setPadding(dp(24),dp(16),dp(24),dp(28));
-        int max=Math.min(a.getResources().getDisplayMetrics().widthPixels,dp(1000));frame.addView(page,new FrameLayout.LayoutParams(max,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL));
-        label(page,a.getString(R.string.simple_eyebrow),11,R.color.accent,8);
-        TextView hero=label(page,a.getString(R.string.simple_hero),30,R.color.ink,12);hero.setTypeface(UiTypography.face(a,"serif",Typeface.NORMAL));androidx.core.view.ViewCompat.setAccessibilityHeading(hero,true);
-        label(page,a.getString(R.string.simple_intro),15,R.color.muted,10);
-        FrameLayout photoCard=new FrameLayout(a);android.graphics.drawable.GradientDrawable photoShape=panel(20,R.color.surface);photoCard.setBackground(photoShape);photoCard.setClipToOutline(true);LayoutParams photoLp=new LayoutParams(-1,dp(150));photoLp.topMargin=dp(18);page.addView(photoCard,photoLp);
+        AdaptivePageFrame frame=new AdaptivePageFrame(a,1000);scroll.addView(frame);
+        page=column();page.setPadding(dp(24),dp(16),dp(24),dp(28));
+        frame.addView(page,new FrameLayout.LayoutParams(-1,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL));
+        eyebrow=label(page,a.getString(R.string.simple_eyebrow),11,R.color.accent,8);
+        hero=label(page,a.getString(R.string.simple_hero),30,R.color.ink,12);hero.setTypeface(UiTypography.face(a,"serif",Typeface.NORMAL));androidx.core.view.ViewCompat.setAccessibilityHeading(hero,true);
+        introduction=label(page,a.getString(R.string.simple_intro),15,R.color.muted,10);
+        photoCard=new FrameLayout(a);android.graphics.drawable.GradientDrawable photoShape=panel(20,R.color.surface);photoCard.setBackground(photoShape);photoCard.setClipToOutline(true);LayoutParams photoLp=new LayoutParams(-1,dp(150));photoLp.topMargin=dp(18);page.addView(photoCard,photoLp);
         foodPhoto=new ImageView(a);foodPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);foodPhoto.setImageResource(R.drawable.pantry_photo);foodPhoto.setContentDescription(a.getString(R.string.food_photo_description));photoCard.addView(foodPhoto,new FrameLayout.LayoutParams(-1,-1));
         TextView photoCaption=new TextView(a);photoCaption.setText(R.string.food_photo_caption);photoCaption.setTextSize(11);photoCaption.setTextColor(color(R.color.ink));photoCaption.setPadding(dp(12),dp(5),dp(12),dp(5));photoCaption.setBackgroundColor(androidx.core.graphics.ColorUtils.setAlphaComponent(color(R.color.background),238));UiTypography.apply(photoCaption);FrameLayout.LayoutParams cap=new FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM|Gravity.START);cap.setMargins(dp(10),0,dp(10),dp(10));photoCard.addView(photoCaption,cap);
         LinearLayout modeRail=row();LayoutParams modeLp=new LayoutParams(-1,-2);modeLp.topMargin=dp(24);page.addView(modeRail,modeLp);
@@ -52,17 +59,17 @@ final class SimpleHomeView extends LinearLayout {
         surpriseMode=button(modeRail,a.getString(R.string.discover_mode),false,()->a.chooseGenerationMode("discover"));
         UiIcons.button(pantryMode,R.drawable.ic_bowl);UiIcons.button(surpriseMode,R.drawable.ic_shuffle);
         LayoutParams one=new LayoutParams(0,-2,1);one.setMarginEnd(dp(8));pantryMode.setLayoutParams(one);surpriseMode.setLayoutParams(new LayoutParams(0,-2,1));
-        LinearLayout columns=new LinearLayout(a);boolean wide=a.getResources().getConfiguration().screenWidthDp>=840;columns.setOrientation(wide?HORIZONTAL:VERTICAL);page.addView(columns,new LayoutParams(-1,-2));
-        LinearLayout left=column();columns.addView(left,new LayoutParams(wide?0:-1,-2,wide?1.4f:0));
+        columns=new LinearLayout(a);boolean wide=false;columns.setOrientation(VERTICAL);page.addView(columns,new LayoutParams(-1,-2));
+        left=column();columns.addView(left,new LayoutParams(wide?0:-1,-2,wide?1.4f:0));
         LinearLayout workspace=column();workspace.setPadding(dp(18),dp(18),dp(18),dp(14));workspace.setBackground(panel(22,R.color.surface));
         LayoutParams workspaceLp=new LayoutParams(-1,-2);workspaceLp.topMargin=dp(18);left.addView(workspace,workspaceLp);
         pantry=column();workspace.addView(pantry,new LayoutParams(-1,-2));
         ingredientCount=label(pantry,"",20,R.color.ink,0);ingredientCount.setTypeface(UiTypography.face(a,"sans-serif",Typeface.BOLD));
         androidx.core.view.ViewCompat.setAccessibilityHeading(ingredientCount,true);ingredientCount.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         label(pantry,a.getString(R.string.simple_pantry_description),14,R.color.muted,6);
-        LinearLayout entry=row();LayoutParams entryLp=new LayoutParams(-1,-2);entryLp.topMargin=dp(16);pantry.addView(entry,entryLp);
+        entry=row();LayoutParams entryLp=new LayoutParams(-1,-2);entryLp.topMargin=dp(16);pantry.addView(entry,entryLp);
         input=new androidx.appcompat.widget.AppCompatEditText(a);input.setId(R.id.simpleIngredientInput);input.setSingleLine();UiTypography.apply(input);input.setTextSize(16);input.setTextColor(color(R.color.ink));input.setHintTextColor(color(R.color.muted));input.setHint(R.string.ingredient_hint);input.setContentDescription(a.getString(R.string.add_ingredient));input.setPadding(dp(14),dp(8),dp(14),dp(8));input.setBackground(panel(12,R.color.background));input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(80)});input.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS|android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        entry.addView(input,new LayoutParams(0,dp(56),1));add=button(entry,a.getString(R.string.add),true,()->commitPending());LayoutParams addLp=new LayoutParams(-2,dp(56));addLp.setMarginStart(dp(8));add.setLayoutParams(addLp);
+        input.setMinHeight(dp(56));entry.addView(input,new LayoutParams(0,-2,1));add=button(entry,a.getString(R.string.add),true,()->commitPending());add.setMinHeight(dp(56));LayoutParams addLp=new LayoutParams(-2,-2);addLp.setMarginStart(dp(8));add.setLayoutParams(addLp);
         input.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int count,int after){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int before,int count){input.setError(null);if(!syncing)InterfaceSettings.prefs(a).edit().putString("simple_input_draft",s.toString()).apply();}});
         input.setOnEditorActionListener((v,action,event)->{if(action==EditorInfo.IME_ACTION_DONE||event!=null&&event.getKeyCode()==android.view.KeyEvent.KEYCODE_ENTER&&event.getAction()==android.view.KeyEvent.ACTION_DOWN){commitPending();return true;}return false;});
         ingredients=new ChipGroup(a);ingredients.setChipSpacingHorizontal(dp(6));ingredients.setChipSpacingVertical(dp(4));pantry.addView(ingredients,new LayoutParams(-1,-2));
@@ -72,7 +79,7 @@ final class SimpleHomeView extends LinearLayout {
         clear.setStrokeWidth(0);clear.setBackgroundTintList(ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
         scan=button(workspace,a.getString(R.string.photo_scan),false,a::scanIngredients);scan.setId(R.id.photoScan);UiIcons.button(scan,R.drawable.ic_camera);
         scan.setBackgroundTintList(ColorStateList.valueOf(color(R.color.background)));
-        LinearLayout right=column();right.setPadding(wide?dp(24):0,dp(24),0,0);columns.addView(right,new LayoutParams(wide?0:-1,-2,wide?1:0));
+        right=column();right.setPadding(wide?dp(24):0,dp(24),0,0);columns.addView(right,new LayoutParams(wide?0:-1,-2,wide?1:0));
         androidx.core.view.ViewCompat.setAccessibilityHeading(label(right,a.getString(R.string.recipe_preferences),21,R.color.ink,0),true);
         TextView peopleHeading=label(right,a.getString(R.string.people_heading),18,R.color.ink,18);
         androidx.core.view.ViewCompat.setAccessibilityHeading(peopleHeading,true);
@@ -92,14 +99,75 @@ final class SimpleHomeView extends LinearLayout {
         loading=column();loading.setPadding(dp(18),dp(18),dp(18),dp(18));loading.setBackground(panel(18,R.color.surface));LayoutParams waitLp=new LayoutParams(-1,-2);waitLp.topMargin=dp(16);page.addView(loading,waitLp);
         loadingTitle=label(loading,a.getString(R.string.generating),21,R.color.ink,0);loadingTitle.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);label(loading,a.getString(R.string.generating_detail),14,R.color.muted,8);
         ProgressBar progress=new ProgressBar(a,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);loading.addView(progress,new LayoutParams(-1,dp(8)));button(loading,a.getString(R.string.cancel_generation),false,a::cancelGeneration);loading.setVisibility(GONE);
-        page.removeView(generate);LinearLayout actionDock=row();actionDock.setPadding(dp(24),dp(10),dp(24),dp(4));actionDock.setBackgroundColor(color(R.color.background));generate.setMinHeight(dp(60));actionDock.addView(generate,new LayoutParams(-1,-2));addView(actionDock,new LayoutParams(-1,-2));
+        page.removeView(generate);actionDock=row();actionDock.setPadding(dp(24),dp(10),dp(24),dp(4));actionDock.setBackgroundColor(color(R.color.background));generate.setMinHeight(dp(60));actionDock.addView(generate,new LayoutParams(-1,-2));actionFrame=new AdaptivePageFrame(a,1000);actionFrame.addView(actionDock,new FrameLayout.LayoutParams(-1,-2));addView(actionFrame,new LayoutParams(-1,-2));
         page.removeView(loading);page.addView(loading,0);
-        LinearLayout navigation=row();navigation.setPadding(dp(20),dp(4),dp(20),dp(8));navigation.setBackgroundColor(color(R.color.background));addView(navigation,new LayoutParams(-1,-2));
+        navigation=row();navigation.setPadding(dp(20),dp(4),dp(20),dp(8));navigation.setBackgroundColor(color(R.color.background));navigationFrame=new AdaptivePageFrame(a,1000);navigationFrame.addView(navigation,new FrameLayout.LayoutParams(-1,-2));addView(navigationFrame,new LayoutParams(-1,-2));
         for(int index=0;index<3;index++){final int i=index;MaterialButton b=button(navigation,a.getString(index==0?R.string.home:index==1?R.string.saved:R.string.settings),false,()->{if(i==1)a.showSavedRecipes();else if(i==2)a.showSettings();else if(Experience.reduced(a))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);});UiIcons.button(b,index==0?R.drawable.ic_home:index==1?R.drawable.ic_bookmark:R.drawable.ic_settings);b.setIconGravity(MaterialButton.ICON_GRAVITY_TOP);b.setIconPadding(dp(2));b.setTextSize(12);b.setStrokeWidth(0);b.setCornerRadius(dp(22));b.setSelected(index==0);
             b.setBackgroundTintList(ColorStateList.valueOf(index==0?color(R.color.surface):android.graphics.Color.TRANSPARENT));
             if(index==0)b.setTypeface(UiTypography.face(a,"sans-serif",Typeface.BOLD));
             b.setPadding(dp(4),dp(6),dp(4),dp(6));b.setMinHeight(Math.round(dp(64)*Math.max(1f,getResources().getConfiguration().fontScale)));LayoutParams navLp=new LayoutParams(0,-2,1);navLp.setMarginStart(dp(3));navLp.setMarginEnd(dp(3));b.setLayoutParams(navLp);}
         input.setText(InterfaceSettings.prefs(a).getString("simple_input_draft",""));loadout.setFocusListener(this::editCurrent);refresh();setFocusableInTouchMode(true);requestFocus();
+    }
+    @Override protected void onMeasure(int widthSpec,int heightSpec){
+        float font=Math.max(1f,getResources().getConfiguration().fontScale);
+        boolean shortHeight=MeasureSpec.getMode(heightSpec)!=MeasureSpec.UNSPECIFIED&&MeasureSpec.getSize(heightSpec)<dp(480);
+        if(shortHeight!=shortDecor){
+            shortDecor=shortHeight;int visibility=shortHeight?GONE:VISIBLE;
+            eyebrow.setVisibility(visibility);hero.setVisibility(visibility);introduction.setVisibility(visibility);photoCard.setVisibility(visibility);
+        }
+        boolean wide=Math.min(MeasureSpec.getSize(widthSpec),dp(1000))>=dp(840)*font;
+        if(wide!=wideWindow){
+            wideWindow=wide;columns.setOrientation(wide?HORIZONTAL:VERTICAL);
+            left.setLayoutParams(new LayoutParams(wide?0:-1,-2,wide?1.4f:0));
+            right.setLayoutParams(new LayoutParams(wide?0:-1,-2,wide?1:0));
+            right.setPaddingRelative(wide?dp(24):0,dp(24),0,0);
+        }
+        int contentWidth=Math.max(0,Math.min(MeasureSpec.getSize(widthSpec),dp(1000))-dp(48));
+        boolean stackNav=contentWidth<dp(300)*font;
+        if(stackNav!=stackedNavigation){
+            stackedNavigation=stackNav;navigation.setOrientation(stackNav?VERTICAL:HORIZONTAL);
+            for(int i=0;i<navigation.getChildCount();i++){
+                MaterialButton b=(MaterialButton)navigation.getChildAt(i);b.setIconGravity(stackNav?MaterialButton.ICON_GRAVITY_TEXT_START:MaterialButton.ICON_GRAVITY_TOP);
+                b.setMinHeight(Math.round(dp(stackNav?52:64)*font));
+                LayoutParams lp=new LayoutParams(stackNav?-1:0,-2,stackNav?0:1);lp.setMarginStart(dp(3));lp.setMarginEnd(dp(3));b.setLayoutParams(lp);
+            }
+        }
+        boolean stackBrand=contentWidth<dp(200)*font;
+        if(stackBrand!=stackedHeader){
+            stackedHeader=stackBrand;header.setOrientation(stackBrand?VERTICAL:HORIZONTAL);
+            header.getChildAt(0).setLayoutParams(new LayoutParams(stackBrand?-1:0,-2,stackBrand?0:1));
+            LayoutParams languageLp=new LayoutParams(-2,-2);languageLp.gravity=Gravity.END;language.setLayoutParams(languageLp);
+        }
+        float entryWidth=(wide?contentWidth*1.4f/2.4f:contentWidth)-dp(36);
+        boolean stackInput=entryWidth<dp(260)*font;
+        if(stackInput!=stackedEntry){
+            stackedEntry=stackInput;entry.setOrientation(stackInput?VERTICAL:HORIZONTAL);
+            input.setLayoutParams(new LayoutParams(stackInput?-1:0,-2,stackInput?0:1));
+            LayoutParams lp=new LayoutParams(stackInput?-1:-2,-2);if(stackInput)lp.topMargin=dp(8);else lp.setMarginStart(dp(8));add.setLayoutParams(lp);
+        }
+        boolean compact=keyboardVisible||stackNav||(MeasureSpec.getMode(heightSpec)!=MeasureSpec.UNSPECIFIED&&MeasureSpec.getSize(heightSpec)<dp(480)*font);
+        if(compact!=compactWindow){
+            compactWindow=compact;
+            ((android.view.ViewGroup)header.getParent()).removeView(header);
+            ((android.view.ViewGroup)actionFrame.getParent()).removeView(actionFrame);
+            ((android.view.ViewGroup)navigationFrame.getParent()).removeView(navigationFrame);
+            header.setPadding(compact?0:dp(22),0,compact?0:dp(22),0);
+            actionDock.setPadding(compact?0:dp(24),dp(10),compact?0:dp(24),dp(4));
+            navigation.setPadding(compact?0:dp(20),dp(4),compact?0:dp(20),dp(8));
+            if(compact){page.addView(header,0,header.getLayoutParams());page.addView(actionFrame,actionFrame.getLayoutParams());page.addView(navigationFrame,navigationFrame.getLayoutParams());}
+            else {addView(header,0,header.getLayoutParams());addView(actionFrame,actionFrame.getLayoutParams());addView(navigationFrame,navigationFrame.getLayoutParams());}
+            if(keyboardVisible)post(this::showFocusedInput);
+        }
+        super.onMeasure(widthSpec,heightSpec);
+    }
+    @Override protected void onSizeChanged(int width,int height,int oldWidth,int oldHeight){
+        super.onSizeChanged(width,height,oldWidth,oldHeight);if(keyboardVisible)post(this::showFocusedInput);
+    }
+    void setKeyboardVisible(boolean visible){
+        if(keyboardVisible==visible)return;keyboardVisible=visible;requestLayout();if(visible)post(this::showFocusedInput);
+    }
+    private void showFocusedInput(){
+        if(keyboardVisible&&input.hasFocus()&&input.hasWindowFocus())input.requestRectangleOnScreen(new android.graphics.Rect(0,0,input.getWidth(),input.getHeight()),true);
     }
     private boolean isArabic(){return InterfaceSettings.language(activity).equals("ar");}
     private int color(int id){return UiColors.color(activity,id);}

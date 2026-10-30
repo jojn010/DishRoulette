@@ -1,3 +1,10 @@
+## v1.7.1
+
+- Adapt Home to the measured window and text size: keep tablet pantry/preferences columns, stack ingredient entry/navigation/branding when narrow, and let header/actions scroll in short windows and with the keyboard.
+- Collapse introductory artwork in short windows to prioritize ingredient entry. Keep the complete ingredient field visible while typing; allow native input/action heights to grow with text.
+- Center and bound recipe, Saved, Settings and cooking page widths inside actual available space. Size the cooking dial from its parent and use RTL-aware cooking navigation spacing.
+- Let import and photo-progress dialogs scroll, with window-filling dialogs and a compact code field when space or large text requires them. Explicitly support resizable/multiwindow activity layouts. Preserve recipes, sharing codes, servings, timers and personal connection/data.
+
 ## v1.7.0
 
 - Add offline recipe sharing: copy a self-contained Tabkha code or open Android’s share sheet from results and saved cards. Include the full dish, quantities, serving count, original language and available nutrition, without credentials or personal preference/taste data.

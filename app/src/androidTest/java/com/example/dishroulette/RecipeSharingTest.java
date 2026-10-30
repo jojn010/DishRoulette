@@ -23,8 +23,8 @@ public class RecipeSharingTest {
         try(FileOutputStream out=new FileOutputStream(new File(dir,name+".png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
     }
     private void pasteAndReview(String code){
-        onView(withId(R.id.importRecipe)).perform(click());
-        onView(withId(R.id.recipeCodeInput)).perform(replaceText(code),closeSoftKeyboard());
+        onView(withId(R.id.importRecipe)).perform(scrollTo(),click());
+        onView(withId(R.id.recipeCodeInput)).perform(scrollTo(),replaceText(code),closeSoftKeyboard());
         onView(withText(R.string.review_recipe)).perform(click());
     }
     @Test public void bilingualCopyReviewRotateSaveDeduplicateAndCookOffline()throws Exception{
@@ -61,12 +61,22 @@ public class RecipeSharingTest {
             scenario.onActivity(a->a.shareRecipe(RecipeCatalog.ALL.get(0)));
             InstrumentationRegistry.getInstrumentation().waitForIdleSync();Thread.sleep(250);
             android.app.UiAutomation ui=InstrumentationRegistry.getInstrumentation().getUiAutomation();
-            android.view.accessibility.AccessibilityNodeInfo dialog=ui.getRootInActiveWindow();assertNotNull(dialog);
-            boolean clicked=false;for(android.view.accessibility.AccessibilityNodeInfo node:dialog.findAccessibilityNodeInfosByText("Share recipe")){
-                if(node.isClickable()&&node.getClassName().toString().endsWith("Button")){clicked=node.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK);break;}
-            }assertTrue(clicked);Thread.sleep(700);
-            android.view.accessibility.AccessibilityNodeInfo root=InstrumentationRegistry.getInstrumentation().getUiAutomation().getRootInActiveWindow();assertNotNull(root);
-            assertTrue(root.getPackageName().toString().contains("intentresolver"));capture("android-share-sheet");
+            boolean clicked=false;
+            for(int attempt=0;attempt<30&&!clicked;attempt++){
+                android.view.accessibility.AccessibilityNodeInfo dialog=ui.getRootInActiveWindow();
+                if(dialog!=null)for(android.view.accessibility.AccessibilityNodeInfo node:dialog.findAccessibilityNodeInfosByText("Share recipe")){
+                    if(node.isClickable()&&node.getClassName().toString().endsWith("Button")){clicked=node.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK);break;}
+                }
+                if(!clicked)Thread.sleep(100);
+            }
+            assertTrue("Share action unavailable",clicked);
+            boolean chooser=false;
+            for(int attempt=0;attempt<30&&!chooser;attempt++){
+                android.view.accessibility.AccessibilityNodeInfo root=ui.getRootInActiveWindow();
+                chooser=root!=null&&root.getPackageName()!=null&&root.getPackageName().toString().contains("intentresolver");
+                if(!chooser)Thread.sleep(100);
+            }
+            assertTrue("Android share sheet unavailable",chooser);capture("android-share-sheet");
             InstrumentationRegistry.getInstrumentation().getUiAutomation().performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK);
         }
     }

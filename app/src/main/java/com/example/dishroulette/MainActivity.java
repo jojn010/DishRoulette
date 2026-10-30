@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         bars.setAppearanceLightNavigationBars(simple);
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (view, insets) -> {
             Insets padding = insets.getInsets(WindowInsetsCompat.Type.systemBars()
-                    | WindowInsetsCompat.Type.ime());
+                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
             view.setPadding(padding.left, padding.top, padding.right, padding.bottom);
             configureLayout(insets.isVisible(WindowInsetsCompat.Type.ime()));
             return insets;
@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         updateSpinCounter();
         if(simple){simpleHome=new SimpleHomeView(this,(NativeIngredientLoadout)loadout);binding.simpleHome.addView(simpleHome,new android.widget.FrameLayout.LayoutParams(-1,-1));}
         configureLayout(false);
+        ViewCompat.requestApplyInsets(binding.getRoot());
         UiTypography.apply(binding.getRoot());
         if (currentRecipe != null && (state == null || !state.getBoolean("was_firing"))) renderRecipe();
         if (state != null && state.getBoolean("was_firing"))
@@ -299,7 +300,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void configureLayout(boolean keyboardVisible) {
-        if(binding==null||simple)return;
+        if(binding==null)return;
+        if(simple){if(simpleHome!=null)simpleHome.setKeyboardVisible(keyboardVisible);return;}
         boolean phone=getResources().getConfiguration().screenWidthDp<840;
         compactLayout=phone&&(getResources().getConfiguration().screenHeightDp<680||keyboardVisible);
         binding.goalRail.setVisibility(compactLayout?View.GONE:View.VISIBLE);
@@ -566,7 +568,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String localizedNames(java.util.Collection<String> names){List<String> display=new ArrayList<>();for(String value:names)display.add(UiLabels.option(this,value));return android.text.TextUtils.join(", ",display);}
     private void styleSimpleResult(){
-        android.view.ViewGroup page=(android.view.ViewGroup)binding.cardMealResult.getChildAt(0);
+        android.view.ViewGroup page=(android.view.ViewGroup)binding.tvMealTitle.getParent();
         for(int i=0;i<page.getChildCount();i++){
             View v=page.getChildAt(i);
             if(v instanceof TextView){TextView t=(TextView)v;t.setLetterSpacing(0);t.setTypeface(android.graphics.Typeface.create("sans",android.graphics.Typeface.NORMAL));}
@@ -751,7 +753,7 @@ public class MainActivity extends AppCompatActivity {
         }
         etCustomExclusions.setText(android.text.TextUtils.join(", ", draft.customExclusions));
         AlertDialog dialog = new MaterialAlertDialogBuilder(this).setTitle(R.string.filter_title)
-                .setView(dialogView).setPositiveButton(R.string.apply_filters, null)
+                .setView(dialogView).setPositiveButton(AdaptiveDialogs.compact(this)?R.string.save_preferences_short:R.string.apply_filters, null)
                 .setNegativeButton(R.string.cancel, null).create();
         dialog.setOnDismissListener(unused -> {
             dialogContent.removeView(binding.settingsDrawer);
@@ -780,7 +782,7 @@ public class MainActivity extends AppCompatActivity {
             if (currentRecipe != null && binding.cardMealResult.getVisibility()==View.VISIBLE) renderRecipe();
             dialog.dismiss();
         }));
-        dialog.show();
+        dialog.show();dialog.getButton(AlertDialog.BUTTON_POSITIVE).setContentDescription(getString(R.string.apply_filters));AdaptiveDialogs.fit(this,dialog);
     }
 
     @Override protected void onResume() { super.onResume(); loadout.resume(); }

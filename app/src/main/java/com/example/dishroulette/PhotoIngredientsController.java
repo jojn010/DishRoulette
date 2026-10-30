@@ -73,6 +73,7 @@ final class PhotoIngredientsController {
                         catch (ActivityNotFoundException e) { clear(); message(R.string.photo_no_picker); }
                     }
                 }).setNegativeButton(R.string.cancel, null).show();
+        AdaptiveDialogs.fit(activity,dialog);
     }
 
     private void takePhoto() {
@@ -121,7 +122,7 @@ final class PhotoIngredientsController {
                 .setNeutralButton(R.string.photo_change, (d, w) -> { clear(); open(); }).create();
         dialog.setOnCancelListener(d -> clear());
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> analyze()));
-        dialog.show();
+        dialog.show();AdaptiveDialogs.fit(activity,dialog);
     }
 
     private void analyze() {
@@ -184,15 +185,15 @@ final class PhotoIngredientsController {
             if (error != null) { review.setError(error); return; }
             clear(); message(R.string.photo_added);
         }));
-        dialog.show();
+        dialog.show();AdaptiveDialogs.fit(activity,dialog);
     }
 
     private void showProgress(int text) {
         dismiss(); LinearLayout content = column(); label(content, text);
         content.addView(new ProgressBar(activity));
-        dialog = new MaterialAlertDialogBuilder(activity).setTitle(R.string.photo_title).setView(content)
+        dialog = new MaterialAlertDialogBuilder(activity).setTitle(R.string.photo_title).setView(scroll(content))
                 .setNegativeButton(R.string.cancel, (d, w) -> clear()).create();
-        dialog.setOnCancelListener(d -> clear()); dialog.show();
+        dialog.setOnCancelListener(d -> clear()); dialog.show();AdaptiveDialogs.fit(activity,dialog);
     }
     private LinearLayout column() { LinearLayout l = new LinearLayout(activity); l.setOrientation(LinearLayout.VERTICAL); l.setPadding(dp(24), dp(12), dp(24), dp(12)); return l; }
     private ScrollView scroll(View content) { ScrollView s = new ScrollView(activity); s.addView(content); return s; }

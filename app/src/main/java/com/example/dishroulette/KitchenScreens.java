@@ -50,8 +50,8 @@ final class KitchenScreens {
         ScrollView scroll=new ScrollView(activity);scroll.setFillViewport(true);
         body=new LinearLayout(activity);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(24),dp(16),dp(24),dp(28));
         // Limit long lines on tablets while allowing comfortable phone typography.
-        FrameLayout page=new FrameLayout(activity);
-        FrameLayout.LayoutParams width=new FrameLayout.LayoutParams(Math.min(activity.getResources().getDisplayMetrics().widthPixels,dp(720)),-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL);
+        AdaptivePageFrame page=new AdaptivePageFrame(activity,720);
+        FrameLayout.LayoutParams width=new FrameLayout.LayoutParams(-1,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL);
         page.addView(body,width);scroll.addView(page);host.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
         button(body,activity.getString(R.string.back),false,back);
         text(body,label,11,R.color.accent,"monospace",24);
@@ -231,7 +231,7 @@ final class KitchenScreens {
         TextView instruction=text(body,"",21,R.color.ink,"sans",14);
         CheckBox done=new androidx.appcompat.widget.AppCompatCheckBox(activity);done.setText(activity.getString(R.string.step_complete));UiTypography.apply(done);done.setTextSize(16);done.setTextColor(UiColors.color(activity,R.color.ink));done.setMinHeight(dp(56));body.addView(done);
         CookingTimerView timer=new CookingTimerView(activity);timer.setId(R.id.cookingTimerDial);
-        LinearLayout.LayoutParams timerLp=new LinearLayout.LayoutParams(Math.min(dp(260),Math.max(1,activity.getResources().getDisplayMetrics().widthPixels-dp(48))),dp(260));
+        LinearLayout.LayoutParams timerLp=new LinearLayout.LayoutParams(-2,-2);
         timerLp.gravity=Gravity.CENTER_HORIZONTAL;timerLp.topMargin=dp(16);
         body.addView(timer,timerLp);
         LinearLayout timerActions=new LinearLayout(activity);timerActions.setOrientation(LinearLayout.VERTICAL);body.addView(timerActions);
@@ -240,7 +240,7 @@ final class KitchenScreens {
         text(timerActions,activity.getString(R.string.timer_notice),12,R.color.muted,"sans",8);
         LinearLayout nav=new LinearLayout(activity);nav.setOrientation(LinearLayout.HORIZONTAL);body.addView(nav);
         Button previous=button(nav,activity.getString(R.string.previous_step),false,()->{}),next=button(nav,activity.getString(R.string.next_step),true,()->{});
-        LinearLayout.LayoutParams left=new LinearLayout.LayoutParams(0,-2,1);left.topMargin=dp(18);left.rightMargin=dp(6);previous.setLayoutParams(left);
+        LinearLayout.LayoutParams left=new LinearLayout.LayoutParams(0,-2,1);left.topMargin=dp(18);left.setMarginEnd(dp(6));previous.setLayoutParams(left);
         LinearLayout.LayoutParams right=new LinearLayout.LayoutParams(0,-2,1);right.topMargin=dp(18);next.setLayoutParams(right);
         TextView finish=text(body,"",19,R.color.accent,"serif",20);
         button(body,activity.getString(R.string.back_overview),false,this::close);

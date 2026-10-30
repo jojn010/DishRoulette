@@ -31,7 +31,7 @@ final class RecipeSharingController {
                 activity.startActivity(Intent.createChooser(send,activity.getString(R.string.share_recipe)));
             }).setNegativeButton(R.string.cancel,null).create();
         exporting=dialog;dialog.setOnDismissListener(d->{if(exporting==dialog)exporting=null;});
-        dialog.setOnShowListener(d->{dialog.getButton(AlertDialog.BUTTON_POSITIVE).setId(R.id.copyRecipeCode);UiTypography.apply(dialog.getWindow().getDecorView());});dialog.show();
+        dialog.setOnShowListener(d->{dialog.getButton(AlertDialog.BUTTON_POSITIVE).setId(R.id.copyRecipeCode);UiTypography.apply(dialog.getWindow().getDecorView());});dialog.show();AdaptiveDialogs.fit(activity,dialog);
     }
     void importCode(){edit("");}
     private void edit(String draft){
@@ -39,8 +39,9 @@ final class RecipeSharingController {
         LinearLayout page=new LinearLayout(activity);page.setOrientation(LinearLayout.VERTICAL);page.setPadding(dp(24),dp(8),dp(24),0);
         TextView help=new TextView(activity);help.setText(R.string.import_recipe_help);help.setTextSize(15);help.setTextColor(UiColors.color(activity,R.color.muted));page.addView(help);
         TextInputLayout field=new TextInputLayout(activity);field.setHint(activity.getString(R.string.recipe_code_label));page.addView(field,new LinearLayout.LayoutParams(-1,-2));
-        input=new TextInputEditText(activity);input.setId(R.id.recipeCodeInput);input.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);input.setTextDirection(View.TEXT_DIRECTION_LTR);input.setMinLines(3);input.setMaxLines(5);input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(RecipeShareCodec.MAX_CODE+1)});field.addView(input,new LinearLayout.LayoutParams(-1,-2));input.setText(draft);
-        AlertDialog editor=new MaterialAlertDialogBuilder(activity).setTitle(R.string.import_recipe).setView(page)
+        input=new TextInputEditText(activity);input.setId(R.id.recipeCodeInput);input.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);input.setTextDirection(View.TEXT_DIRECTION_LTR);input.setMinLines(3);input.setMaxLines(5);input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(RecipeShareCodec.MAX_CODE+1)});field.addView(input,new LinearLayout.LayoutParams(-1,-2));input.setText(draft);if(AdaptiveDialogs.compact(activity)){input.setMinLines(1);input.setSingleLine(true);}
+        ScrollView viewport=new ScrollView(activity);viewport.addView(page);
+        AlertDialog editor=new MaterialAlertDialogBuilder(activity).setTitle(R.string.import_recipe).setView(viewport)
             .setPositiveButton(R.string.review_recipe,null).setNegativeButton(R.string.cancel,null).create();
         importing=editor;
         editor.setOnDismissListener(d->{if(importing==editor){importing=null;input=null;}});
@@ -48,7 +49,7 @@ final class RecipeSharingController {
             String code=input.getText()==null?"":input.getText().toString();
             try{RecipeCatalog.Recipe recipe=RecipeShareCodec.decode(code);editor.dismiss();review(recipe,code.trim());}
             catch(RuntimeException e){field.setError(activity.getString(R.string.invalid_recipe_code));input.requestFocus();}
-        });});editor.show();
+        });});editor.show();AdaptiveDialogs.fit(activity,editor);
     }
     private void review(RecipeCatalog.Recipe recipe,String code){
         reviewCode=code;
@@ -60,7 +61,7 @@ final class RecipeSharingController {
         preview.setOnDismissListener(d->{if(importing==preview){importing=null;reviewCode=null;}});
         preview.setOnShowListener(d->{UiTypography.apply(preview.getWindow().getDecorView());preview.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
             if(activity.saveSharedRecipe(recipe))preview.dismiss();
-        });});preview.show();
+        });});preview.show();AdaptiveDialogs.fit(activity,preview);
     }
     void save(Bundle state){
         if(importing==null||!importing.isShowing())return;

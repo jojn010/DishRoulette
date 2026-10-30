@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.7.0 — Share a dish, slide to your group size**
+**v1.7.1 — Layouts that fit phones and tablets**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -31,6 +31,12 @@ For the owner only, `python3 tools/build-private-apk.py` builds `work/private/Di
 **This private APK contains an extractable API key. Keep it private; never upload it to GitHub or share it.** The script keeps the APK in ignored local output, removes the temporary setup file, and rebuilds ordinary output without credentials. Public release APKs still require personal connection setup. On the phone, the imported key is saved encrypted with Android Keystore; the bundled key remains extractable from the private APK. USB provisioning can replace the saved connection.
 
 ## Interface and languages
+
+### Phone, tablet and window sizes
+
+Layouts use the measured app window, including system-bar and keyboard space. Home keeps pantry and preferences side by side when there is enough width; narrow windows and larger fonts stack controls. In short windows the introductory artwork collapses to prioritize ingredients. In short windows or while typing, the header and bottom actions join the scrollable page so they cannot squeeze ingredient entry. Recipe results, Saved, Settings and cooking use centered reading widths; the timer fits its actual column. There is no orientation or fixed-aspect-ratio lock, and the activity supports resized/multiwindow layouts.
+
+Verified English/Arabic RTL on an API34 emulator at phone, short landscape, narrow-window, tablet portrait/landscape and foldable-width dimensions, with 130%/200% text and the keyboard. This covers representative sizes rather than every Android device or physical foldable hinge configuration. Android7/API24 remains the minimum supported system.
 
 ### Share and import recipes
 

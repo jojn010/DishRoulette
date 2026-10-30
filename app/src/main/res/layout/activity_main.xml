@@ -58,8 +58,9 @@
     </LinearLayout>
     <FrameLayout android:id="@+id/simpleHome" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone" />
     <ScrollView android:id="@+id/cardMealResult" android:layout_width="match_parent" android:layout_height="match_parent" android:background="?attr/kitchenBackground" android:visibility="gone" android:fillViewport="true">
+        <com.example.dishroulette.AdaptivePageFrame android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCloseResult" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/kitchen_back_to_loadout" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCloseResult" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/kitchen_back_to_loadout" />
             <TextView android:id="@+id/tvResultSection" style="@style/Instrument" android:layout_marginTop="32dp" android:text="@string/kitchen_02_fresh_from_the_kitchen" />
             <TextView android:id="@+id/tvResultEyebrow" style="@style/Instrument" android:layout_marginTop="12dp" android:text="@string/ai_result_eyebrow" android:textColor="?attr/kitchenMuted" />
             <TextView android:id="@+id/tvMealTitle" style="@style/SectionTitle" android:fontFamily="serif" android:textSize="38sp" android:layout_marginTop="14dp" android:accessibilityLiveRegion="polite" />
@@ -72,12 +73,13 @@
             <TextView android:id="@+id/tvAllergyWarning" style="@style/BodyText" android:layout_marginTop="16dp" android:textSize="12sp" android:visibility="gone" />
             <LinearLayout android:id="@+id/resultActions" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="28dp">
                 <com.google.android.material.button.MaterialButton android:id="@+id/btnRecipe" style="@style/ActionButton" android:text="@string/kitchen_let_s_cook" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/btnLike" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="10dp" android:text="@string/save_recipe" app:cornerRadius="2dp" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/btnDislike" style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent" android:layout_height="56dp" android:text="@string/another" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnLike" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="10dp" android:text="@string/save_recipe" app:cornerRadius="2dp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnDislike" style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:text="@string/another" />
             </LinearLayout>
             <LinearLayout android:id="@+id/simpleRecipeDetails" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="24dp" />
             <TextView android:id="@+id/tvResultFooter" style="@style/Instrument" android:text="@string/kitchen_dish_roulette_the_midnight_kitchen" android:textSize="10sp" android:textColor="?attr/kitchenMuted" android:layout_marginTop="28dp" />
         </LinearLayout>
+        </com.example.dishroulette.AdaptivePageFrame>
     </ScrollView>
     <FrameLayout android:id="@+id/secondaryScreen" android:layout_width="match_parent" android:layout_height="match_parent" android:background="?attr/kitchenBackground" android:visibility="gone" />
 </FrameLayout>
