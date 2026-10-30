@@ -11,6 +11,7 @@ public interface RecipeApi {
 
     final class Request {
         @SerializedName("ingredients") final List<String> ingredients;
+        @SerializedName("servings") final int servings;
         @SerializedName("meal") final String meal;
         @SerializedName("language") final String language;
         @SerializedName("avoidTitle") final String avoidTitle;
@@ -25,6 +26,7 @@ public interface RecipeApi {
         }
         Request(Set<String> ingredients,String meal,String avoidTitle,SpinProfile profile,List<Favorite> likedDishes,String language){
             this.language=language;
+            this.servings=profile.servings;
             this.ingredients = new ArrayList<>(ingredients);
             this.meal = meal;
             this.avoidTitle = avoidTitle;

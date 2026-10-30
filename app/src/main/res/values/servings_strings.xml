@@ -1,0 +1,7 @@
+<resources>
+<string name="people_heading">How many are eating?</string>
+<string name="people_help">Include yourself. New recipes scale ingredients for 1–12 people.</string>
+<string name="people_count">People: %1$d</string>
+<string name="fewer_people">Fewer people</string>
+<string name="more_people">More people</string>
+</resources>

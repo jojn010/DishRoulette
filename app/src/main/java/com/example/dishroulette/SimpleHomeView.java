@@ -29,7 +29,8 @@ final class SimpleHomeView extends LinearLayout {
     private int editIndex;
     private final ImageView foodPhoto;
     private final MaterialButton scan,clear;
-    private final TextView editHint;
+    private final TextView editHint,peopleCount;
+    private final MaterialButton fewerPeople,morePeople;
     SimpleHomeView(MainActivity a,NativeIngredientLoadout loadout){
         super(a);activity=a;this.loadout=loadout;setOrientation(VERTICAL);setBackgroundColor(color(R.color.background));
         LinearLayout header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
@@ -72,6 +73,13 @@ final class SimpleHomeView extends LinearLayout {
         scan.setBackgroundTintList(ColorStateList.valueOf(color(R.color.background)));
         LinearLayout right=column();right.setPadding(wide?dp(24):0,dp(24),0,0);columns.addView(right,new LayoutParams(wide?0:-1,-2,wide?1:0));
         androidx.core.view.ViewCompat.setAccessibilityHeading(label(right,a.getString(R.string.recipe_preferences),21,R.color.ink,0),true);
+        TextView peopleHeading=label(right,a.getString(R.string.people_heading),18,R.color.ink,18);
+        androidx.core.view.ViewCompat.setAccessibilityHeading(peopleHeading,true);
+        label(right,a.getString(R.string.people_help),14,R.color.muted,4);
+        LinearLayout people=row();people.setGravity(Gravity.CENTER_VERTICAL);right.addView(people,new LayoutParams(-1,-2));
+        fewerPeople=button(people,"−",false,()->a.chooseServings(a.profile().servings-1));fewerPeople.setId(R.id.fewerPeople);fewerPeople.setContentDescription(a.getString(R.string.fewer_people));fewerPeople.setLayoutParams(new LayoutParams(dp(56),-2));
+        peopleCount=label(people,"",18,R.color.ink,0);peopleCount.setId(R.id.peopleCount);peopleCount.setGravity(Gravity.CENTER);peopleCount.setLayoutParams(new LayoutParams(0,-2,1));peopleCount.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        morePeople=button(people,"+",false,()->a.chooseServings(a.profile().servings+1));morePeople.setId(R.id.morePeople);morePeople.setContentDescription(a.getString(R.string.more_people));morePeople.setLayoutParams(new LayoutParams(dp(56),-2));
         summary=label(right,"",14,R.color.muted,10);
         goals=column();right.addView(goals,new LayoutParams(-1,-2));
         button(right,a.getString(R.string.edit_preferences),false,a::showFilters);
@@ -113,6 +121,8 @@ final class SimpleHomeView extends LinearLayout {
         editHint.setVisibility(loadout.magazine().count()==0?GONE:VISIBLE);clear.setVisibility(loadout.magazine().count()==0?GONE:VISIBLE);clear.setEnabled(!busy);
         ingredients.removeAllViews();List<String> slots=loadout.magazine().save();
         for(int i=0;i<slots.size();i++){if(slots.get(i).trim().isEmpty())continue;final int slot=i;String name=slots.get(i);Chip chip=new Chip(activity);chip.setText(name);UiTypography.apply(chip);chip.setTextSize(15);chip.setChipIconResource(R.drawable.ic_leaf);chip.setChipIconVisible(true);chip.setChipIconTint(ColorStateList.valueOf(color(R.color.accent)));chip.setCloseIconVisible(true);chip.setChipBackgroundColor(ColorStateList.valueOf(color(R.color.background)));chip.setTextColor(color(R.color.ink));chip.setCloseIconContentDescription(activity.getString(R.string.remove_ingredient_a11y,name));chip.setContentDescription(activity.getString(R.string.edit_ingredient_a11y,name));chip.setOnClickListener(v->loadout.select(slot));chip.setOnCloseIconClickListener(v->{loadout.magazine().select(slot);loadout.clearChamber();if(editing&&editIndex==slot){editing=false;setDraft("");}});chip.setEnabled(!busy);ingredients.addView(chip);}
+        peopleCount.setText(activity.getString(R.string.people_count,activity.profile().servings));
+        fewerPeople.setEnabled(!busy&&activity.profile().servings>1);morePeople.setEnabled(!busy&&activity.profile().servings<12);
         summary.setText(discovery?activity.getString(R.string.simple_surprise_description):activity.getString(R.string.preferences_summary,UiLabels.option(activity,activity.meal()),UiLabels.option(activity,activity.profile().cuisine),UiLabels.option(activity,activity.profile().goal)));
         goals.removeAllViews();String[] values={"Balanced","Cutting","Bulking"};int[] descriptions={R.string.balanced_description,R.string.cut_description,R.string.bulk_description};
         for(int i=0;i<values.length;i++){final String goal=values[i];MaterialButton b=button(goals,UiLabels.option(activity,goal)+"\n"+activity.getString(descriptions[i]),goal.equals(activity.profile().goal),()->activity.chooseGoal(goal));UiIcons.button(b,i==0?R.drawable.ic_bowl:i==1?R.drawable.ic_leaf:R.drawable.ic_flame);b.setEnabled(!busy);}

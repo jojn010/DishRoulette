@@ -1,0 +1,7 @@
+<resources>
+<string name="people_heading">كم شخص رح ياكل؟</string>
+<string name="people_help">احسب حالك معهم. مقادير الوصفات الجديدة بتتناسب مع عدد من ١ إلى ١٢ شخص.</string>
+<string name="people_count">عدد الأشخاص: %1$d</string>
+<string name="fewer_people">تقليل عدد الأشخاص</string>
+<string name="more_people">زيادة عدد الأشخاص</string>
+</resources>

@@ -43,6 +43,10 @@ public final class RecipeRules {
             JsonObject clean = new JsonObject();
             clean.add("ingredients", GSON.toJsonTree(new LinkedHashSet<>(ingredients)));
             clean.addProperty("meal", meal);
+            if(input.has("servings")) {
+                try { clean.addProperty("servings",integer(input,"servings",1,12)); }
+                catch(RuntimeException e) { throw new ApiFailure(400,"INVALID_FILTERS"); }
+            }
             clean.addProperty("avoidTitle", avoid);
             clean.addProperty("mode", mode);
             clean.addProperty("language",language);
@@ -116,6 +120,11 @@ public final class RecipeRules {
             across likes are stronger preferences. If the list is empty, do not claim to know the user's
             taste. In whyThisDish, briefly explain the actual taste link or chosen cuisine/ingredients.
             Suggest a different dish than avoidTitle; return possible=false if no suitable alternative.
+            When request.servings is provided, it is the exact number of people eating, including the user.
+            Set output servings to that number. Scale ALL quantified ingredient amounts to feed that many
+            people with realistic portions; do not only change the servings label. Adapt cookware, batch
+            instructions and cooking time when necessary. Nutrition remains PER PERSON (per serving),
+            never multiplied by the group size. Preserve quantities and units in English and Arabic.
             Give a short title, description, realistic total minutes, servings, quantified ingredients,
             and sequential cooking steps in the selected language. Include fully cooked meat, poultry and egg
             instructions when applicable. Do not recommend raw meat or poultry. Do not repeat the
@@ -191,7 +200,9 @@ public final class RecipeRules {
             clean.addProperty("meal", meal);
             clean.addProperty("description", string(result, "description", 600));
             clean.addProperty("minutes", integer(result, "minutes", 1, 240));
-            clean.addProperty("servings", integer(result, "servings", 1, 12));
+            int servings=integer(result,"servings",1,12);
+            if(request.has("servings")&&servings!=integer(request,"servings",1,12))throw new IllegalArgumentException();
+            clean.addProperty("servings",servings);
             // Older clients/fixtures may omit both; never fabricate nutrition for historical recipes.
             if (result.has("caloriesPerServing") || result.has("proteinGramsPerServing")) {
                 int calories = integer(result, "caloriesPerServing", 1, 5000);
@@ -246,6 +257,7 @@ public final class RecipeRules {
         }
         properties.getAsJsonObject("cuisine").add("enum",GSON.toJsonTree(outputCuisines));
         for (String field : List.of("minutes", "servings")) properties.add(field, GSON.toJsonTree(Map.of("type", "integer")));
+        if(request.has("servings"))properties.getAsJsonObject("servings").add("enum",GSON.toJsonTree(List.of(request.get("servings").getAsInt())));
         properties.add("carbohydratesGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 1000)));
         properties.add("fatGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 500)));
         properties.add("fiberGramsPerServing", GSON.toJsonTree(Map.of("type", "number", "minimum", 0, "maximum", 200)));

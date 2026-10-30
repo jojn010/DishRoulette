@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     String meal(){return meal;}
     boolean isSimple(){return simple;}
     void generate(boolean another){spin(another);}
+    void chooseServings(int count){if(spinning)return;profile.servings=Math.max(1,Math.min(12,count));profile.save(preferences,gson);updateFilterSummary();}
     void chooseGoal(String goal){selectGoal(goal);}
     void chooseGenerationMode(String mode){if(spinning)return;profile.mode=mode;profile.save(preferences,gson);updateMode();}
     void cancelGeneration(){if(pendingCall!=null){pendingCall.cancel();pendingCall=null;}pendingReveal=null;loadout.cancelFire();setSpinning(false);}

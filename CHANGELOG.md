@@ -1,3 +1,9 @@
+## v1.6.0
+
+- Add an English/Arabic people selector to Home recipe preferences, from 1 to 12 including yourself, with accessible increase/decrease buttons and a saved count across restarts.
+- Send the selected count in pantry and Surprise requests; ask Gemini to scale all ingredient quantities and adjust batch instructions, cookware and timing where needed. Keep nutrition per serving.
+- Constrain generated servings in the response schema and reject mismatched yields. Preserve existing saved recipe quantities, dietary preferences and encrypted personal connections.
+
 ## v1.5.5
 
 - Make Saved easier to browse with distinct apricot recipe cards, bolder titles and ivory time/serving summaries.

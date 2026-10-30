@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.5.5 — A clearer saved recipe collection**
+**v1.6.0 — Recipes for everyone at the table**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -31,6 +31,10 @@ For the owner only, `python3 tools/build-private-apk.py` builds `work/private/Di
 **This private APK contains an extractable API key. Keep it private; never upload it to GitHub or share it.** The script keeps the APK in ignored local output, removes the temporary setup file, and rebuilds ordinary output without credentials. Public release APKs still require personal connection setup. On the phone, the imported key is saved encrypted with Android Keystore; the bundled key remains extractable from the private APK. USB provisioning can replace the saved connection.
 
 ## Interface and languages
+
+### People and portions
+
+On Home, under **Recipe preferences**, use **How many are eating?** to choose 1–12 people, including yourself. The app remembers your choice (default: 2), and both pantry and Surprise recipes request that many servings with ingredient quantities scaled for the group. Nutrition remains an estimate per serving. A provider response with a different yield is rejected. Existing saved recipes keep their original quantities and serving count; generate a new recipe to use a different group size.
 
 ### Photo ingredients
 

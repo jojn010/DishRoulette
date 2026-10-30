@@ -20,6 +20,22 @@ public class PreferenceRulesTest {
          "pantryUsed":[],"additionalIngredients":["chicken","rice","lemon"],
          "whyThisDish":"Uses lemon and chicken like a liked dish.","goalFit":"A balanced lighter preparation."}
         """); }
+    @Test public void selectedPeopleCountSurvivesValidationAndRejectsWrongYield() throws Exception {
+        for(int count:new int[]{1,6,12}) {
+            JsonObject input=request();input.addProperty("servings",count);
+            JsonObject clean=GeminiRecipes.validateRequest(input);assertEquals(count,clean.get("servings").getAsInt());
+            JsonObject output=recipe();output.addProperty("servings",count);
+            assertEquals(count,GeminiRecipes.validateRecipe(output,clean).get("servings").getAsInt());
+            output.addProperty("servings",count==1?2:1);
+            try{GeminiRecipes.validateRecipe(output,clean);fail("Wrong yield accepted");}
+            catch(GeminiRecipes.ApiFailure e){assertEquals("INVALID_RECIPE",e.code);}
+        }
+        for(String value:new String[]{"0","13","2.5","null","true","\"6\""}) {
+            JsonObject input=request();input.add("servings",JsonParser.parseString(value));
+            try{GeminiRecipes.validateRequest(input);fail("Invalid count: "+value);}
+            catch(GeminiRecipes.ApiFailure e){assertEquals("INVALID_FILTERS",e.code);}
+        }
+    }
     @Test public void discoveryNeedsNoPantryAndRemovesConflictingLikes() throws Exception {
         JsonObject request = GeminiRecipes.validateRequest(request());
         assertEquals("Cutting", request.get("goal").getAsString());

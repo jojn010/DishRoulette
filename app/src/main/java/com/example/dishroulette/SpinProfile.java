@@ -9,6 +9,7 @@ import java.util.*;
 
 /** Local user choices. No calorie target or inferred medical profile is stored. */
 public final class SpinProfile {
+    @SerializedName("servings") public int servings = 2;
     @SerializedName("mode") public String mode = "pantry";
     @SerializedName("goal") public String goal = "Balanced";
     @SerializedName("cuisine") public String cuisine = "Any cuisine";
@@ -25,6 +26,8 @@ public final class SpinProfile {
                     || !SpinOptions.GOALS.contains(p.goal) || !SpinOptions.CUISINES.contains(p.cuisine)
                     || p.allergies == null || !SpinOptions.ALLERGENS.containsAll(p.allergies)
                     || p.customExclusions == null) return invalidProfile();
+            // Recover only the new count; retain all existing dietary choices.
+            if (p.servings < 1 || p.servings > 12) p.servings = 2;
             p.customExclusions = IngredientExclusions.parseCustom(String.join(",", p.customExclusions));
             return p;
         } catch (RuntimeException ignored) { return invalidProfile(); }
