@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.5.1 — Logo-matched colors and smooth cooking countdowns**
+**v1.5.2 — Simpler settings**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -8,7 +8,7 @@ A native Android recipe app with a warm, lightweight interface, ingredient entry
 
 1. Open this folder in Android Studio and let Gradle sync. Use the project's configured Android SDK/JDK toolchain.
 2. Run the **app / debug** configuration in Android Studio, or install the debug APK from the GitHub release.
-3. Open **Settings → Gemini connection**, enter your own Gemini API key and model, and connect.
+3. Configure the owner connection using USB provisioning (`tools/provision-personal.py --device SERIAL`) or a private owner build. Settings contains language and recipe preferences; the Gemini connection entry has been removed.
 
 The Android app calls Gemini directly over HTTPS. Once configured, recipe generation does not require a running computer or local backend. The owner's key is encrypted using Android Keystore and stored outside Android backups; it is never packaged in the APK. Gemini usage is charged against the owner's provider account.
 
@@ -22,13 +22,13 @@ On Windows, run `tools/build-private-apk.ps1` with `JAVA_HOME` and `ANDROID_HOME
 It reads the owner's ignored `backend/local.properties` (or Gemini environment variables), builds
 `work/private/Tabkha-personal.apk`, then restores credential-free public build output. The private
 APK imports the connection on first launch and keeps it encrypted across restarts and compatible
-updates. Home no longer displays a Connect Gemini button. Settings retains connection management
+updates. Home no longer displays a Connect Gemini button. Settings now contains only language and recipe preferences; USB provisioning provides connection management
 for recovery or replacing a revoked key. A key cannot remain usable if the provider revokes it.
 Only the credential-free APK may be uploaded to GitHub; the auto-connected APK stays local.
 
 For the owner only, `python3 tools/build-private-apk.py` builds `work/private/DishRoulette-personal.apk` with the existing local Gemini key. Install this APK to connect automatically on first launch without typing an API key. The phone calls Gemini directly over the internet and needs no laptop connection. Existing saved credentials take precedence.
 
-**This private APK contains an extractable API key. Keep it private; never upload it to GitHub or share it.** The script keeps the APK in ignored local output, removes the temporary setup file, and rebuilds ordinary output without credentials. Public release APKs still require personal connection setup. On the phone, the imported key is saved encrypted with Android Keystore; the bundled key remains extractable from the private APK. Settings can replace the saved connection.
+**This private APK contains an extractable API key. Keep it private; never upload it to GitHub or share it.** The script keeps the APK in ignored local output, removes the temporary setup file, and rebuilds ordinary output without credentials. Public release APKs still require personal connection setup. On the phone, the imported key is saved encrypted with Android Keystore; the bundled key remains extractable from the private APK. USB provisioning can replace the saved connection.
 
 ## Interface and languages
 
@@ -53,7 +53,7 @@ allow retry; rotating during analysis returns to the preview without automatical
 
 All installations now use the Simple interface. Advanced mode and the interface selector have been removed. Upgrading migrates the old interface choice while preserving ingredients, recipe preferences, saved recipes, cooking progress and Gemini settings.
 
-Add or edit ingredient chips, choose Pantry or Surprise, select a goal and generate a recipe. Open Settings for language, Gemini connection and recipe preferences. Recipe details support saving and guided cooking with checklists, progress and contextual timers. Timers are visual in-app timers with no background alarm.
+Add or edit ingredient chips, choose Pantry or Surprise, select a goal and generate a recipe. Open Settings for language and recipe preferences. Recipe details support saving and guided cooking with checklists, progress and contextual timers. Timers are visual in-app timers with no background alarm.
 
 English and Arabic are supported, including bundled Cairo typography and right-to-left layout. Gemini receives the selected language. Saved recipes retain their original content and language.
 

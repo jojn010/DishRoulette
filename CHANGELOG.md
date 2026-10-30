@@ -1,3 +1,9 @@
+## v1.5.2
+
+- Remove the Gemini connection entry from Settings completely.
+- Update English and Arabic Settings descriptions to show the available language and recipe-preference controls.
+- Preserve existing encrypted connections and private USB provisioning.
+
 ## v1.5.1
 
 - Shorten the Arabic pantry selector to «من مكوناتي» to avoid an awkward two-line label on phones.

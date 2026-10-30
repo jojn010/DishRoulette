@@ -8,7 +8,7 @@
     <string name="simple_description">واجهة واضحة ومريحة لاكتشاف وجبتك القادمة.</string>
     <string name="advanced_description">تجربة طبخ تفاعلية ثلاثية الأبعاد بطابع الروليت.</string>
     <string name="appearance">على ذوقك</string>
-    <string name="settings_description">اختر لغتك وأدر اتصال Gemini واضبط تفضيلات الوصفات.</string>
+    <string name="settings_description">اختر لغتك واضبط تفضيلات الوصفات.</string>
     <string name="recipe_preferences">تفضيلات الوصفات</string>
     <string name="language_description">تُنشأ الوصفات الجديدة بهذه اللغة. تبقى نصوص الوصفات المحفوظة كما هي.</string>
     <string name="simple_hero">شو بدك تطبخ اليوم؟</string>

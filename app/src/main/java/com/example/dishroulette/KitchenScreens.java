@@ -97,7 +97,6 @@ final class KitchenScreens {
         screen="settings";cooking=null;
         base(activity.getString(R.string.settings),activity.getString(R.string.appearance),this::close);
         text(body,activity.getString(R.string.settings_description),16,R.color.muted,"sans",6);
-        Button connection=button(body,activity.getString(R.string.gemini_settings)+"\n"+activity.getString(new GeminiCredentials(activity).configured()?R.string.gemini_key_saved:R.string.gemini_not_connected),false,activity::showGeminiSettings);connection.setId(R.id.settingsGemini);
         text(body,activity.getString(R.string.language),21,R.color.ink,"sans",24);
         text(body,activity.getString(R.string.language_description),14,R.color.muted,"sans",8);
         Button english=button(body,"English",InterfaceSettings.language(activity).equals("en"),()->activity.changeLanguage("en"));english.setId(R.id.settingsEnglish);

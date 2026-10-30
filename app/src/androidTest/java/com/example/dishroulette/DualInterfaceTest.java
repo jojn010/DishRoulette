@@ -55,7 +55,7 @@ public class DualInterfaceTest {
         final Set<String>[] saved=new Set[]{null};
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             scenario.onActivity(a->{add(a,"أرز");add(a,"Tomato");saved[0]=new HashSet<>(prefs().getStringSet("saved_recipes",Collections.emptySet()));a.showSettings();
-                assertNull(a.findViewById(R.id.settingsAdvanced));assertNull(a.findViewById(R.id.settingsSimple));
+                assertNull(a.findViewById(R.id.settingsAdvanced));assertNull(a.findViewById(R.id.settingsSimple));assertNull(a.findViewById(R.id.settingsGemini));
                 a.findViewById(R.id.settingsArabic).performClick();});
             Thread.sleep(1000);
             scenario.onActivity(a->{assertTrue(a.isSimple());assertNull(a.findViewById(R.id.tabletop));assertEquals("ar",InterfaceSettings.language(a));assertEquals(2,loadout(a).magazine().count());assertEquals(saved[0],prefs().getStringSet("saved_recipes",Collections.emptySet()));});
