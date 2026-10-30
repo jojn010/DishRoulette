@@ -1,6 +1,9 @@
 package com.example.dishroulette;
 
 import android.content.Context;
+import android.animation.ValueAnimator;
+import android.provider.Settings;
+import android.view.animation.LinearInterpolator;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -12,6 +15,8 @@ import java.util.Locale;
 final class CookingTimerView extends View {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private long remaining, duration = 1;
+    private float displayedFraction;
+    private ValueAnimator sweep;
     private String time = "", status = "";
 
     CookingTimerView(Context context) {
@@ -19,7 +24,8 @@ final class CookingTimerView extends View {
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
     }
 
-    void update(long remainingMs, long durationMs) {
+    void update(long remainingMs, long durationMs, boolean running) {
+        stopSweep();
         remaining = Math.max(0, remainingMs);
         duration = Math.max(1, durationMs);
         long seconds = (remaining + 999) / 1000;
@@ -27,7 +33,37 @@ final class CookingTimerView extends View {
         time = String.format(locale, "%02d:%02d", seconds / 60, seconds % 60);
         status = getContext().getString(remaining == 0 ? R.string.timer_finished : R.string.cooking_timer);
         setContentDescription(status + ", " + time);
+        displayedFraction = remainingFraction();
+        boolean reduceMotion = InterfaceSettings.prefs(getContext()).getBoolean("reduce_motion", false);
+        float animationScale = Settings.Global.getFloat(getContext().getContentResolver(),
+                Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
+        if (running && remaining > 0 && !reduceMotion && animationScale > 0 && isAttachedToWindow() && isShown() && getWindowVisibility() == VISIBLE) {
+            // Interpolate only the dial; the persisted deadline remains the source of truth.
+            float next = Math.max(0f, (float)(remaining - 1000) / duration);
+            sweep = ValueAnimator.ofFloat(displayedFraction, next);
+            sweep.setDuration(1000);
+            sweep.setInterpolator(new LinearInterpolator());
+            sweep.addUpdateListener(value -> {
+                displayedFraction = (float)value.getAnimatedValue();
+                invalidate();
+            });
+            sweep.start();
+        }
         invalidate();
+    }
+
+    private void stopSweep() {
+        if (sweep != null) { sweep.cancel(); sweep = null; }
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        stopSweep();
+        super.onDetachedFromWindow();
+    }
+
+    @Override protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if (visibility != VISIBLE) stopSweep();
     }
 
     float remainingFraction() { return Math.min(1f, (float) remaining / duration); }
@@ -55,7 +91,7 @@ final class CookingTimerView extends View {
         paint.setColor(accent);
         paint.setStrokeCap(Paint.Cap.ROUND);
         RectF ring = new RectF(cx-radius, cy-radius, cx+radius, cy+radius);
-        canvas.drawArc(ring, -90, 360 * remainingFraction(), false, paint);
+        canvas.drawArc(ring, -90, 360 * displayedFraction, false, paint);
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStrokeWidth(size * .006f);
         for (int i = 0; i < 60; i++) {
@@ -67,7 +103,7 @@ final class CookingTimerView extends View {
                     cx+(float)Math.cos(angle)*outer, cy+(float)Math.sin(angle)*outer, paint);
         }
         if (remaining > 0) {
-            double angle = Math.toRadians(360 * remainingFraction() - 90);
+            double angle = Math.toRadians(360 * displayedFraction - 90);
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(accent);
             canvas.drawCircle(cx+(float)Math.cos(angle)*radius, cy+(float)Math.sin(angle)*radius, size*.028f, paint);

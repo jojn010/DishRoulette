@@ -3,4 +3,11 @@
 <color name="ink">#EEE5CE</color><color name="muted">#B5B7A6</color>
 <color name="accent">#D5AB68</color><color name="on_accent">#131610</color>
 <color name="line">#3A4237</color><color name="hero">#151A14</color>
-<color name="danger">#BA503A</color><color name="black">#000000</color><color name="white">#FFFFFF</color></resources>
+<color name="danger">#BA503A</color><color name="black">#000000</color><color name="white">#FFFFFF</color>
+<color name="tabkha_ivory">#FFF8EB</color>
+<color name="tabkha_apricot_surface">#FFE5CD</color>
+<color name="tabkha_aubergine">#4A173F</color>
+<color name="tabkha_ink">#35152E</color>
+<color name="tabkha_muted">#735C69</color>
+<color name="tabkha_outline">#DDBEA6</color>
+</resources>

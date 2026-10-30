@@ -8,6 +8,48 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CookingTimerDialTest {
+    @Test public void timerRespectsReducedMotionAndCancelsOnDetach() {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(a -> {
+                SharedPreferences prefs = InterfaceSettings.prefs(a);
+                boolean previous = prefs.getBoolean("reduce_motion", false);
+                android.widget.FrameLayout host = a.findViewById(R.id.secondaryScreen);
+                CookingTimerView dial = new CookingTimerView(a);
+                int previousVisibility = host.getVisibility();
+                host.setVisibility(View.VISIBLE);
+                host.addView(dial);
+                try {
+                    prefs.edit().putBoolean("reduce_motion", true).commit();
+                    dial.update(90000, 120000, true);
+                    assertNull(sweep(dial));
+                    prefs.edit().putBoolean("reduce_motion", false).commit();
+                    dial.update(90000, 120000, true);
+                    if (android.provider.Settings.Global.getFloat(a.getContentResolver(),
+                            android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0) {
+                        assertNotNull(sweep(dial));
+                    }
+                    dial.update(90000, 120000, false);
+                    assertNull(sweep(dial));
+                    dial.update(90000, 120000, true);
+                    host.removeView(dial);
+                    assertNull(sweep(dial));
+                } finally {
+                    host.removeView(dial);
+                    host.setVisibility(previousVisibility);
+                    prefs.edit().putBoolean("reduce_motion", previous).commit();
+                }
+            });
+        }
+    }
+
+    private Object sweep(CookingTimerView dial) {
+        try {
+            java.lang.reflect.Field field = CookingTimerView.class.getDeclaredField("sweep");
+            field.setAccessible(true);
+            return field.get(dial);
+        } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
+    }
+
     @Test public void dialTracksPauseResumeResetCompletionAndReopening() {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(a -> {

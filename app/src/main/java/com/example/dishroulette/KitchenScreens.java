@@ -207,7 +207,7 @@ final class KitchenScreens {
                 String prefix="cook_timer_"+recipe.id+"_"+step;
                 timerTick=new Runnable(){@Override public void run(){
                     long deadline=prefs.getLong(prefix+"_end",0),remaining=deadline>0?Math.max(0,deadline-System.currentTimeMillis()):prefs.getLong(prefix+"_left",minutes*60000L);
-                    timer.update(remaining,minutes*60000L);
+                    timer.update(remaining,minutes*60000L,deadline>0 && remaining>0);
                     startTimer.setText(deadline>0&&remaining>0?activity.getString(R.string.pause_timer):remaining==0?activity.getString(R.string.restart_timer,minutes):activity.getString(R.string.start_timer));
                     if(deadline>0&&remaining==0)prefs.edit().putLong(prefix+"_end",0).putLong(prefix+"_left",0).apply();
                     handler.postDelayed(this,1000);

@@ -214,7 +214,7 @@
     <string name="apply_filters">حفظ التفضيلات</string>
     <string name="cancel">إلغاء</string>
     <string name="custom_invalid">أدخل حتى 10 أسماء أطعمة تفصلها فواصل، وبحد أقصى 40 حرفًا للاسم.</string>
-    <string name="pantry_mode">من المكونات الموجودة عندي</string>
+    <string name="pantry_mode">من مكوناتي</string>
     <string name="discover_mode">فاجئني</string>
     <string name="discover_title">شو نفسك تاكل اليوم؟</string>
     <string name="discover_body">اختر المطبخ وسنقترح أكلة مع قائمة مشتريات، دون الحاجة إلى إضافة مكونات.</string>

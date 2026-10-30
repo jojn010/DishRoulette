@@ -1,4 +1,9 @@
-## Unreleased
+## v1.5.1
+
+- Shorten the Arabic pantry selector to «من مكوناتي» to avoid an awkward two-line label on phones.
+- Match the pot-and-spoon logo with ivory backgrounds, apricot surfaces and aubergine text, buttons and countdown rings. Photo captions now follow the theme.
+
+- Smooth the circular cooking timer ring between second ticks while running. Pausing and resetting stop the sweep immediately. Respect reduced-motion settings and the Android animation scale; cancel animation when leaving the timer.
 
 - Recognize Arabic dual minute forms (دقيقتين / دقيقتان) in cooking steps, so instructions such as "اترك الخليط لمدة دقيقتين" offer the correct two-minute timer without needing a separate numeral. Preserve the first duration when a step contains multiple durations.
 - Verified with a regression that failed before the fix, the full unit/build/lint checks, and the API 37 cooking-screen test including starting the Arabic two-minute countdown.
