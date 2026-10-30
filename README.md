@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.6.0 — Recipes for everyone at the table**
+**v1.7.0 — Share a dish, slide to your group size**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -32,9 +32,17 @@ For the owner only, `python3 tools/build-private-apk.py` builds `work/private/Di
 
 ## Interface and languages
 
+### Share and import recipes
+
+Tap **Share recipe** on a recipe result or saved card, then **Copy recipe code** or use the Android share sheet. Your friend opens **Saved → Import recipe**, pastes the complete `TABKHA1:` code, reviews it, and saves it. Both people need Tabkha v1.7.0 or later. Importing works offline without Gemini, a database, an account or a hosted service.
+
+The self-contained code includes the dish title, description, original language, ingredients, method, time, servings, cuisine and available per-serving nutrition. It excludes Gemini credentials, local recipe IDs, pantry contents, allergies, preferences and personal taste explanations. Because it contains the recipe itself, it is longer than a short database ID. Imported recipes keep the sender’s quantities and original language; your Home people count stays unchanged. Re-importing the same snapshot does not create another copy or overwrite an unrelated local recipe.
+
+Imports are labelled as shared recipes and reviewed before saving; the recipient’s exclusions still apply. Codes represent recipe content, not verified authorship. Malformed, damaged, oversized or unsupported codes are rejected. `TABKHA1:` uses a versioned, compressed JSON snapshot with bounded decoding and an explicit field allowlist; there are no web requests during import.
+
 ### People and portions
 
-On Home, under **Recipe preferences**, use **How many are eating?** to choose 1–12 people, including yourself. The app remembers your choice (default: 2), and both pantry and Surprise recipes request that many servings with ingredient quantities scaled for the group. Nutrition remains an estimate per serving. A provider response with a different yield is rejected. Existing saved recipes keep their original quantities and serving count; generate a new recipe to use a different group size.
+On Home, under **Recipe preferences**, drag the **How many are eating?** slider or use its − / + buttons to choose 1–12 people, including yourself. The app remembers your choice (default: 2), and both pantry and Surprise recipes request that many servings with ingredient quantities scaled for the group. Nutrition remains an estimate per serving. A provider response with a different yield is rejected. Existing saved recipes keep their original quantities and serving count; generate a new recipe to use a different group size.
 
 ### Photo ingredients
 

@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
         chooseGenerationMode("pantry");
         return null;
     }
+    private RecipeSharingController sharing;
+    private android.widget.Button resultShare;
     private android.widget.Button resultPreferences;
     private final boolean simple = true;
     SpinProfile profile(){return profile;}
@@ -162,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             public void open(RecipeCatalog.Recipe recipe){ currentRecipe=recipe;resultPantry=readPantry();renderRecipe(); }
             public void remove(RecipeCatalog.Recipe recipe){ savedIds.remove(recipe.id);persistSaved(recipe,true);updateSaveButton(); }
         });
+        sharing=new RecipeSharingController(this);
         getOnBackPressedDispatcher().addCallback(this,new androidx.activity.OnBackPressedCallback(true){
             @Override public void handleOnBackPressed(){
                 if(kitchenScreens.isOpen())kitchenScreens.close();
@@ -195,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onPostCreate(Bundle state) {
         super.onPostCreate(state);
         photoIngredients.restore();
+        sharing.restore(state);
     }
 
     private void createChips() {
@@ -524,6 +528,7 @@ public class MainActivity extends AppCompatActivity {
         loadout.inspect();
         binding.cardMealResult.scrollTo(0,0);
         binding.tvResultEyebrow.setText(currentRecipe.language==null||!currentRecipe.language.equals(InterfaceSettings.language(this))?R.string.saved_original_language:currentRecipe.aiGenerated?R.string.ai_result_eyebrow:R.string.result_eyebrow);
+        if(currentRecipe.shared)binding.tvResultEyebrow.setText(R.string.shared_recipe_label);
         binding.tvMealTitle.setText(currentRecipe.title);
         binding.tvMealDescription.setText(currentRecipe.description);
         binding.tvMealMeta.setText(UiLabels.option(this,currentRecipe.meal)+"  /  "+KitchenScreens.meta(this,currentRecipe));
@@ -543,6 +548,7 @@ public class MainActivity extends AppCompatActivity {
         binding.tvMealMeta.setVisibility(View.VISIBLE);
         binding.tvMatch.setVisibility(View.VISIBLE);
         binding.tvMissing.setVisibility(View.VISIBLE);
+        if(currentRecipe.shared){binding.tvMatch.setText(R.string.shared_recipe_note);binding.tvMissing.setVisibility(View.GONE);}
         binding.resultActions.setVisibility(View.VISIBLE);
         String explanation = currentRecipe.whyThisDish == null ? "" : currentRecipe.whyThisDish;
         String fit = currentRecipe.goalFit == null ? "" : currentRecipe.goalFit;
@@ -572,6 +578,7 @@ public class MainActivity extends AppCompatActivity {
         binding.tvResultFooter.setVisibility(View.GONE);
         binding.btnCloseResult.setAllCaps(false);binding.btnRecipe.setAllCaps(false);binding.btnRecipe.setText(R.string.view_recipe);binding.btnRecipe.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));binding.btnLike.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));
         if(resultPreferences==null){resultPreferences=new androidx.appcompat.widget.AppCompatButton(this);resultPreferences.setText(R.string.edit_preferences);resultPreferences.setAllCaps(false);resultPreferences.setTextColor(UiColors.color(this,R.color.accent));resultPreferences.setBackgroundColor(UiColors.color(this,R.color.surface));resultPreferences.setMinHeight(Math.round(52*getResources().getDisplayMetrics().density));resultPreferences.setOnClickListener(v->{binding.cardMealResult.setVisibility(View.GONE);showFilters();});binding.resultActions.addView(resultPreferences,new LinearLayout.LayoutParams(-1,-2));}
+        if(resultShare==null){resultShare=new androidx.appcompat.widget.AppCompatButton(this);resultShare.setId(R.id.shareRecipe);resultShare.setText(R.string.share_recipe);resultShare.setAllCaps(false);resultShare.setTextColor(UiColors.color(this,R.color.accent));resultShare.setBackgroundColor(UiColors.color(this,R.color.surface));resultShare.setMinHeight(Math.round(52*getResources().getDisplayMetrics().density));resultShare.setOnClickListener(v->shareRecipe(currentRecipe));binding.resultActions.addView(resultShare,new LinearLayout.LayoutParams(-1,-2));}
         UiIcons.button(binding.btnRecipe,R.drawable.ic_bowl);UiIcons.button(binding.btnLike,R.drawable.ic_bookmark);
         binding.simpleRecipeDetails.setVisibility(View.VISIBLE);binding.simpleRecipeDetails.removeAllViews();
         recipeDetailText(getString(R.string.ingredients_title),true);recipeDetailText(currentRecipe.ingredients,false);recipeDetailText(getString(R.string.method_title),true);recipeDetailText(currentRecipe.method,false);
@@ -596,6 +603,16 @@ public class MainActivity extends AppCompatActivity {
         }
         int count = preferences.getInt("spin_count", 0);
         binding.tvSpinCounter.setText(getResources().getQuantityString(R.plurals.spin_count, count, count));
+    }
+
+    void shareRecipe(RecipeCatalog.Recipe recipe){if(!spinning&&recipe!=null)sharing.share(recipe);}
+    void importRecipe(){if(!spinning)sharing.importCode();}
+    boolean saveSharedRecipe(RecipeCatalog.Recipe recipe){
+        if(profile.requiresReview||profile.blocks(recipe)){
+            new MaterialAlertDialogBuilder(this).setTitle(recipe.title).setMessage(profile.requiresReview?R.string.review_filters:R.string.allergy_rejected).setPositiveButton(R.string.close,null).show();return false;
+        }
+        savedIds.add(recipe.id);persistSaved(recipe,false);kitchenScreens.close();currentRecipe=recipe;resultPantry=java.util.Collections.emptySet();renderRecipe();
+        android.widget.Toast.makeText(this,R.string.import_saved,android.widget.Toast.LENGTH_SHORT).show();return true;
     }
 
     void showSavedRecipes() {
@@ -771,6 +788,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onSaveInstanceState(Bundle state) {
         photoIngredients.save(state);
+        sharing.save(state);
         state.putBoolean("was_firing", spinning);
         state.putBoolean("result_visible",binding.cardMealResult.getVisibility()==View.VISIBLE);
         state.putString("secondary_screen",kitchenScreens.screen());
@@ -785,6 +803,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onDestroy() {
         photoIngredients.dispose();
+        if(sharing!=null)sharing.dispose();
         // Cancel delivery and release the Activity when leaving or rotating the screen.
         pendingReveal = null;
         stopWaiting();kitchenScreens.dispose();

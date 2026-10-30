@@ -76,6 +76,7 @@ final class KitchenScreens {
     void saved(List<RecipeCatalog.Recipe> recipes) {
         screen="saved";cooking=null;
         base(activity.getString(R.string.archive_label,recipes.size()),activity.getString(R.string.archive_title),this::close);
+        Button importRecipe=button(body,activity.getString(R.string.import_recipe),false,activity::importRecipe);importRecipe.setId(R.id.importRecipe);
         if(recipes.isEmpty()){
             text(body,activity.getString(R.string.archive_empty_heading),22,R.color.ink,"sans-serif-condensed",28);
             text(body,activity.getString(R.string.archive_empty_detail),16,R.color.muted,"sans",12);
@@ -98,6 +99,7 @@ final class KitchenScreens {
             facts.setPadding(dp(12),dp(8),dp(12),dp(8));
             Button open=button(card,activity.getString(R.string.open_recipe),true,()->{close();actions.open(recipe);});open.setElevation(0);
             open.setContentDescription(open.getText()+", "+recipe.title);
+            Button share=button(card,activity.getString(R.string.share_recipe),false,()->activity.shareRecipe(recipe));quietAction(share);share.setContentDescription(share.getText()+", "+recipe.title);
             Button nutritionToggle=button(card,activity.getString(R.string.saved_show_nutrition),false,()->{});
             quietAction(nutritionToggle);nutritionToggle.setContentDescription(nutritionToggle.getText()+", "+recipe.title);
             TextView nutrition=text(card,nutrition(activity,recipe),14,R.color.muted,"sans",4);nutrition.setVisibility(View.GONE);

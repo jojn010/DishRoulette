@@ -1,0 +1,16 @@
+<resources>
+<string name="share_recipe">مشاركة الوصفة</string>
+<string name="share_recipe_help">شارك «%1$s» كرمز وصفة. صاحبك بيفتح المحفوظات ← استيراد وصفة في طبخة وبيلصق الرمز. الرمز فيه الوصفة فقط، بدون اتصال Gemini أو تفضيلاتك.</string>
+<string name="copy_recipe_code">نسخ رمز الوصفة</string>
+<string name="recipe_code_label">رمز وصفة طبخة</string>
+<string name="recipe_code_copied">تم نسخ رمز الوصفة</string>
+<string name="share_failed">تعذرت مشاركة هذه الوصفة.</string>
+<string name="import_recipe">استيراد وصفة</string>
+<string name="import_recipe_help">الصق رمز TABKHA1: كاملًا من صاحبك. ما بتحتاج إنترنت أو اتصال Gemini. بتقدر تراجع الوصفة قبل حفظها.</string>
+<string name="review_recipe">مراجعة الوصفة</string>
+<string name="invalid_recipe_code">الرمز ناقص أو تالف أو غير مدعوم. اطلب رمز وصفة طبخة كاملًا.</string>
+<string name="import_save">حفظ في وصفاتي</string>
+<string name="import_saved">تم حفظ الوصفة المشتركة</string>
+<string name="shared_recipe_label">وصفة مشتركة · بلغتها الأصلية</string>
+<string name="shared_recipe_note">وصفة مشتركة بلغتها الأصلية. راجع المكونات وطريقة التحضير قبل الطبخ.</string>
+</resources>

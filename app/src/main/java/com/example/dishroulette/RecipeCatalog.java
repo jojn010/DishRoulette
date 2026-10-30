@@ -37,6 +37,7 @@ public final class RecipeCatalog {
         @SerializedName("whyThisDish") public String whyThisDish = "";
         @SerializedName("goalFit") public String goalFit = "";
         @SerializedName("discovery") public boolean discovery;
+        @SerializedName("shared") public boolean shared;
         @SerializedName("aiGenerated") public boolean aiGenerated;
         @SerializedName("additionalIngredients") public List<String> additionalIngredients = new ArrayList<>();
 

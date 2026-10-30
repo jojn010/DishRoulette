@@ -1,3 +1,9 @@
+## v1.7.0
+
+- Add offline recipe sharing: copy a self-contained Tabkha code or open Android’s share sheet from results and saved cards. Include the full dish, quantities, serving count, original language and available nutrition, without credentials or personal preference/taste data.
+- Add Saved → Import recipe with paste, review and explicit save, rotation-safe import state, duplicate detection, shared-recipe labelling and existing exclusion checks. Reject damaged, oversized and unsupported codes; no database or Gemini connection is needed for import.
+- Replace the people counter with a discrete 1–12 slider flanked by − and + buttons. Keep native accessibility/RTL behavior, the persistent count and scaled generation requests.
+
 ## v1.6.0
 
 - Add an English/Arabic people selector to Home recipe preferences, from 1 to 12 including yourself, with accessible increase/decrease buttons and a saved count across restarts.

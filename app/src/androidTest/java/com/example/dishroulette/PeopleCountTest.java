@@ -36,8 +36,10 @@ public class PeopleCountTest {
                     for(int i=1;i<12;i++)a.findViewById(R.id.morePeople).performClick();
                     assertEquals(12,a.profile().servings);assertFalse(a.findViewById(R.id.morePeople).isEnabled());
                     for(int i=12;i>6;i--)a.findViewById(R.id.fewerPeople).performClick();
-                    View count=a.findViewById(R.id.peopleCount);View row=(View)count.getParent();row.requestRectangleOnScreen(new android.graphics.Rect(0,0,row.getWidth(),row.getHeight()),true);
+
                 });
+                InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+                scenario.onActivity(a->{View row=(View)a.findViewById(R.id.peopleSlider).getParent();row.requestRectangleOnScreen(new android.graphics.Rect(0,0,row.getWidth(),row.getHeight()),true);});
                 capture(language+"-six-people");
                 scenario.onActivity(a->{
                     readable(a.findViewById(R.id.peopleCount));
@@ -45,8 +47,11 @@ public class PeopleCountTest {
                         TextView b=a.findViewById(id);readable(b);assertTrue(b.getHeight()>=48*b.getResources().getDisplayMetrics().density);assertNotNull(b.getContentDescription());
                     }
                     assertEquals(language.equals("ar")?View.LAYOUT_DIRECTION_RTL:View.LAYOUT_DIRECTION_LTR,a.findViewById(R.id.peopleCount).getLayoutDirection());
+                    com.google.android.material.slider.Slider slider=a.findViewById(R.id.peopleSlider);assertEquals(6f,slider.getValue(),0f);assertTrue(slider.getHeight()>=48*a.getResources().getDisplayMetrics().density);
                     assertEquals(6,SpinProfile.load(p,new Gson()).servings);
                 });
+                androidx.test.espresso.Espresso.onView(androidx.test.espresso.matcher.ViewMatchers.withId(R.id.peopleSlider)).perform(language.equals("ar")?androidx.test.espresso.action.ViewActions.swipeLeft():androidx.test.espresso.action.ViewActions.swipeRight());
+                scenario.onActivity(a->{assertTrue("Slider gesture did not update count",a.profile().servings>=10);a.chooseServings(6);});
                 scenario.recreate();
                 scenario.onActivity(a->{
                     assertEquals(6,a.profile().servings);
