@@ -208,6 +208,10 @@ final class KitchenScreens {
         List<String> steps=steps(recipe);
         int selected=Math.max(0,Math.min(steps.size()-1,prefs.getInt("cook_step_"+recipe.id,0)));
         base(activity.getString(R.string.cook_label),recipe.title,this::close);
+        if (steps.isEmpty()) {
+            text(body,activity.getString(R.string.cooking_instructions_missing),18,R.color.muted,"sans",12);
+            return;
+        }
         // Android only honors this while the cooking view is visible in the foreground.
         host.setKeepScreenOn(true);
         text(body,meta(activity,recipe),12,R.color.accent,"monospace",8);

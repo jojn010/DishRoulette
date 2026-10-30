@@ -8,6 +8,26 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CookingTimerDialTest {
+    @Test public void missingInstructionsDoNotCrashOrKeepScreenAwake() {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(a -> {
+                FrameLayout host = a.findViewById(R.id.secondaryScreen);
+                KitchenScreens screens = new KitchenScreens(a, host, a.getSharedPreferences("empty_steps_test", 0),
+                        new KitchenScreens.Actions() {
+                            public void open(RecipeCatalog.Recipe r) { }
+                            public void remove(RecipeCatalog.Recipe r) { }
+                        });
+                for (String method : new String[]{"", "1. ", "١. "}) {
+                    screens.cook(new RecipeCatalog.Recipe("empty_steps", "Missing steps", "Dinner", 2, 1,
+                            "A saved recipe", "eggs", "1 egg", method));
+                    assertTrue(screens.isOpen());
+                    assertFalse(host.getKeepScreenOn());
+                    assertNull(host.findViewById(R.id.cookingTimerDial));
+                    screens.close();
+                }
+            });
+        }
+    }
     @Test public void timerRespectsReducedMotionAndCancelsOnDetach() {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(a -> {

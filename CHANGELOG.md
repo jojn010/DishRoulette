@@ -1,3 +1,7 @@
+## Unreleased
+
+- Prevent a cooking-screen crash when a saved/shared recipe has blank instructions or only an English/Arabic step number. Show a localized missing-instructions message and keep Back available without starting timers or keeping the screen awake.
+
 ## v1.7.1
 
 - Adapt Home to the measured window and text size: keep tablet pantry/preferences columns, stack ingredient entry/navigation/branding when narrow, and let header/actions scroll in short windows and with the keyboard.
