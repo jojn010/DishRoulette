@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.5.4 — A clearer Home workspace**
+**v1.5.5 — A clearer saved recipe collection**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -52,6 +52,8 @@ allow retry; rotating during analysis returns to the preview without automatical
 ### App interface
 
 All installations now use the Simple interface. Advanced mode and the interface selector have been removed. Upgrading migrates the old interface choice while preserving ingredients, recipe preferences, saved recipes, cooking progress and Gemini settings.
+
+Saved recipes use apricot cards with bold titles and ivory time/serving summaries. Open recipe stays prominent; expand Nutrition estimates to read all available values and their approximation note. Screen-reader action labels include the recipe title.
 
 Home groups ingredient entry and photo scanning in an apricot workspace with ivory controls. The bottom navigation marks Home with a selected pill and allows larger text to grow. Empty pantries hide edit/remove guidance and Clear all.
 

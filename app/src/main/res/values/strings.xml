@@ -78,4 +78,8 @@ LET DINNER DECIDE.</string><string name="hero_body">Choose your loadout in filte
 <string name="nutrition_sugarGrams">Sugar: ~~~ %1$s g</string>
 <string name="nutrition_sodiumMilligrams">Sodium: ~~~ %1$s mg</string>
 <string name="nutrition_variation">~~~ means approximate, not exact. Actual amounts vary with ingredient size, brand, portions and preparation.</string>
+<string name="saved_show_nutrition">Nutrition estimates +</string>
+<string name="saved_hide_nutrition">Hide nutrition estimates −</string>
+<string name="saved_nutrition_expanded">Expanded</string>
+<string name="saved_nutrition_collapsed">Collapsed</string>
 </resources>

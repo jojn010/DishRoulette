@@ -81,18 +81,47 @@ final class KitchenScreens {
             text(body,activity.getString(R.string.archive_empty_detail),16,R.color.muted,"sans",12);
             button(body,activity.getString(R.string.home),true,this::close);return;
         }
-        int index=0;
         for(RecipeCatalog.Recipe recipe:recipes){
-            text(body,String.format(Locale.ROOT,"%02d / %s",++index,UiLabels.option(activity,recipe.meal)),11,R.color.accent,"monospace",18);
-            text(body,recipe.title,25,R.color.ink,"sans-serif-condensed",8);
-            text(body,recipe.description,15,R.color.muted,"sans",8);
-            text(body,meta(activity,recipe),12,R.color.accent,"monospace",12);
-            button(body,activity.getString(R.string.open_recipe),true,()->{close();actions.open(recipe);});
-            button(body,activity.getString(R.string.remove_saved),false,()->{
+            LinearLayout card=new LinearLayout(activity);card.setOrientation(LinearLayout.VERTICAL);
+            card.setPadding(dp(18),dp(18),dp(18),dp(14));
+            android.graphics.drawable.GradientDrawable surface=new android.graphics.drawable.GradientDrawable();
+            surface.setColor(UiColors.color(activity,R.color.surface));surface.setCornerRadius(dp(24));
+            surface.setStroke(dp(1),UiColors.color(activity,R.color.line));card.setBackground(surface);
+            LinearLayout.LayoutParams cardLp=new LinearLayout.LayoutParams(-1,-2);cardLp.topMargin=dp(16);body.addView(card,cardLp);
+            text(card,UiLabels.option(activity,recipe.meal),12,R.color.accent,"sans",0);
+            TextView title=text(card,recipe.title,25,R.color.ink,"sans",4);
+            title.setTypeface(UiTypography.face(activity,"sans-serif",Typeface.BOLD));
+            text(card,recipe.description,15,R.color.muted,"sans",6);
+            TextView facts=text(card,overview(activity,recipe),14,R.color.accent,"sans",12);
+            android.graphics.drawable.GradientDrawable band=new android.graphics.drawable.GradientDrawable();
+            band.setColor(UiColors.color(activity,R.color.background));band.setCornerRadius(dp(12));facts.setBackground(band);
+            facts.setPadding(dp(12),dp(8),dp(12),dp(8));
+            Button open=button(card,activity.getString(R.string.open_recipe),true,()->{close();actions.open(recipe);});open.setElevation(0);
+            open.setContentDescription(open.getText()+", "+recipe.title);
+            Button nutritionToggle=button(card,activity.getString(R.string.saved_show_nutrition),false,()->{});
+            quietAction(nutritionToggle);nutritionToggle.setContentDescription(nutritionToggle.getText()+", "+recipe.title);
+            TextView nutrition=text(card,nutrition(activity,recipe),14,R.color.muted,"sans",4);nutrition.setVisibility(View.GONE);
+            nutritionToggle.setOnClickListener(v->{
+                boolean expanded=nutrition.getVisibility()!=View.VISIBLE;nutrition.setVisibility(expanded?View.VISIBLE:View.GONE);
+                nutritionToggle.setText(activity.getString(expanded?R.string.saved_hide_nutrition:R.string.saved_show_nutrition));
+                nutritionToggle.setContentDescription(nutritionToggle.getText()+", "+recipe.title);
+                androidx.core.view.ViewCompat.setStateDescription(nutritionToggle,activity.getString(expanded?R.string.saved_nutrition_expanded:R.string.saved_nutrition_collapsed));
+            });
+            androidx.core.view.ViewCompat.setStateDescription(nutritionToggle,activity.getString(R.string.saved_nutrition_collapsed));
+            Button remove=button(card,activity.getString(R.string.remove_saved),false,()->{
                 actions.remove(recipe);List<RecipeCatalog.Recipe> remaining=new ArrayList<>(recipes);remaining.remove(recipe);saved(remaining);
-            });line(body);
+            });quietAction(remove);remove.setContentDescription(remove.getText()+", "+recipe.title);
         }
     }
+    private void quietAction(Button button){
+        button.setElevation(0);
+        android.util.TypedValue feedback=new android.util.TypedValue();
+        activity.getTheme().resolveAttribute(android.R.attr.selectableItemBackground,feedback,true);
+        button.setBackgroundResource(feedback.resourceId);
+        button.setTextSize(14);button.setTypeface(UiTypography.face(activity,"sans-serif",Typeface.NORMAL));
+        ((LinearLayout.LayoutParams)button.getLayoutParams()).topMargin=0;
+    }
+
     void settings(){
         screen="settings";cooking=null;
         base(activity.getString(R.string.settings),activity.getString(R.string.appearance),this::close);
@@ -105,15 +134,22 @@ final class KitchenScreens {
         Button preferences=button(body,activity.getString(R.string.recipe_preferences),false,activity::showFilters);preferences.setId(R.id.settingsRecipePreferences);
     }
 
-    static String meta(android.content.Context context,RecipeCatalog.Recipe r) {
+    private static String overview(android.content.Context context,RecipeCatalog.Recipe r) {
         String value=context.getString(R.string.recipe_metadata,r.minutes,r.servings);
         if(r.cuisine!=null&&!r.cuisine.trim().isEmpty())value+="\n"+UiLabels.option(context,r.cuisine);
         if(r.goal!=null&&!r.goal.trim().isEmpty())value+=" · "+UiLabels.option(context,r.goal);
+        return value;
+    }
+    static String meta(android.content.Context context,RecipeCatalog.Recipe r) {
+        return overview(context,r)+"\n"+nutrition(context,r);
+    }
+    private static String nutrition(android.content.Context context,RecipeCatalog.Recipe r) {
+        String value;
         if (com.example.dishroulette.core.NutritionEstimate.valid(r.caloriesPerServing, r.proteinGramsPerServing)) {
             java.text.NumberFormat numbers = java.text.NumberFormat.getNumberInstance(
                     context.getResources().getConfiguration().getLocales().get(0));
             numbers.setMaximumFractionDigits(1);
-            value += "\n" + context.getString(R.string.nutrition_estimate,
+            value = context.getString(R.string.nutrition_estimate,
                     numbers.format(r.caloriesPerServing), numbers.format(r.proteinGramsPerServing));
             if (com.example.dishroulette.core.NutritionEstimate.validNutrient(r.carbohydratesGramsPerServing, 1000))
                 value += "\n" + context.getString(R.string.nutrition_carbohydratesGrams, numbers.format(r.carbohydratesGramsPerServing));
@@ -126,7 +162,7 @@ final class KitchenScreens {
             if (com.example.dishroulette.core.NutritionEstimate.validNutrient(r.sodiumMilligramsPerServing, 20000))
                 value += "\n" + context.getString(R.string.nutrition_sodiumMilligrams, numbers.format(r.sodiumMilligramsPerServing));
             value += "\n" + context.getString(R.string.nutrition_variation);
-        } else value += "\n" + context.getString(R.string.nutrition_unavailable);
+        } else value = context.getString(R.string.nutrition_unavailable);
         return value;
     }
     static List<String> steps(RecipeCatalog.Recipe recipe) {

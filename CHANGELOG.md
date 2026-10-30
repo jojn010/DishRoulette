@@ -1,3 +1,10 @@
+## v1.5.5
+
+- Make Saved easier to browse with distinct apricot recipe cards, bolder titles and ivory time/serving summaries.
+- Keep Open recipe prominent and use quieter, accessible nutrition and removal actions. Each action names its recipe for screen readers.
+- Expand nutrition on demand while preserving all available estimates, the `~~~` approximation explanation and historical unavailable values. Recipe details and cooking still show their full metadata.
+- Preserve bilingual RTL layouts, saved recipe data and encrypted personal connections; no new animation or sound.
+
 ## v1.5.4
 
 - Give Home ingredient entry a cohesive apricot workspace with a stronger count heading, ivory input/chips and an integrated photo-scanning action.
