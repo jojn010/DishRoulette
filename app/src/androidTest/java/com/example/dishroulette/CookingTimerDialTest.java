@@ -42,6 +42,47 @@ public class CookingTimerDialTest {
         }
     }
 
+    @Test public void hourAndMinuteTimersRenderAndPersistInEnglishAndArabic() {
+        android.content.Context context = androidx.test.core.app.ApplicationProvider.getApplicationContext();
+        SharedPreferences ui = InterfaceSettings.prefs(context);
+        String previousLanguage = ui.getString(InterfaceSettings.LANGUAGE, "en");
+        try {
+            for (String language : new String[]{"en", "ar"}) {
+                ui.edit().putString(InterfaceSettings.LANGUAGE, language).commit();
+                try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+                    scenario.onActivity(a -> {
+                        SharedPreferences prefs = a.getSharedPreferences("hour_timer_test", 0);
+                        prefs.edit().clear().commit();
+                        KitchenScreens screens = new KitchenScreens(a, (FrameLayout)a.findViewById(R.id.secondaryScreen), prefs,
+                                new KitchenScreens.Actions() {
+                                    public void open(RecipeCatalog.Recipe r) { }
+                                    public void remove(RecipeCatalog.Recipe r) { }
+                                });
+                        RecipeCatalog.Recipe recipe = new RecipeCatalog.Recipe("hours", "Roast", "Dinner", 90, 1,
+                                "", "", "", language.equals("ar") ? "اطبخ لمدة ساعة و٣٠ دقيقة." : "Bake for 1 hour and 30 minutes.");
+                        screens.cook(recipe);
+                        CookingTimerView dial = a.findViewById(R.id.cookingTimerDial);
+                        assertEquals(View.VISIBLE, dial.getVisibility());
+                        String time = String.format(a.getResources().getConfiguration().getLocales().get(0), "%02d:%02d", 90, 0);
+                        assertTrue(dial.getContentDescription().toString().contains(time));
+                        a.findViewById(R.id.cookingTimerStart).performClick();
+                        long left = prefs.getLong("cook_timer_hours_0_end", 0) - System.currentTimeMillis();
+                        assertTrue(left > 5395000 && left <= 5400000);
+                        a.findViewById(R.id.cookingTimerStart).performClick();
+                        screens.close();
+                        screens.cook(recipe);
+                        assertEquals(1f, ((CookingTimerView)a.findViewById(R.id.cookingTimerDial)).remainingFraction(), .002f);
+                        assertEquals(0, prefs.getLong("cook_timer_hours_0_end", -1));
+                        a.findViewById(R.id.cookingTimerReset).performClick();
+                        assertFalse(prefs.contains("cook_timer_hours_0_left"));
+                        screens.close();
+                        prefs.edit().clear().apply();
+                    });
+                }
+            }
+        } finally { ui.edit().putString(InterfaceSettings.LANGUAGE, previousLanguage).commit(); }
+    }
+
     private Object sweep(CookingTimerView dial) {
         try {
             java.lang.reflect.Field field = CookingTimerView.class.getDeclaredField("sweep");

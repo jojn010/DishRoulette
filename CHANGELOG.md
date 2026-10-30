@@ -1,3 +1,9 @@
+## v1.5.3
+
+- Fix hour-based cooking instructions: “1 hour 30 minutes” now starts a 90-minute timer instead of 30 minutes, and hour-only instructions now offer a timer.
+- Recognize English hour/hr forms and Arabic ساعة / ساعتين / ساعتان / ساعات, including Arabic/Persian digits, fractions and ranges. Combine only adjacent hour/minute durations; later separate instructions retain their own meaning.
+- Preserve timer pause/reset state, minute rounding, the existing four-hour limit, bilingual accessibility labels and reduced-motion behavior.
+
 ## v1.5.2
 
 - Remove the Gemini connection entry from Settings completely.

@@ -23,6 +23,27 @@ public class ArabicCookingTest {
   assertEquals(240,KitchenScreens.suggestedMinutes("Simmer for 1000 minutes."));
   assertEquals(0,KitchenScreens.suggestedMinutes("Wait item5 minutes."));
  }
+ @Test public void hourTimersIncludeAdjacentMinutesInBothLanguages(){
+  assertEquals(60,KitchenScreens.suggestedMinutes("Bake for 1 hour."));
+  assertEquals(90,KitchenScreens.suggestedMinutes("Bake for 1 hour 30 minutes."));
+  assertEquals(90,KitchenScreens.suggestedMinutes("Simmer for 1 hr and 30 mins."));
+  assertEquals(120,KitchenScreens.suggestedMinutes("Rest for 1–2 hours."));
+  assertEquals(90,KitchenScreens.suggestedMinutes("Bake for 1.5 hours."));
+  assertEquals(60,KitchenScreens.suggestedMinutes("اطبخ لمدة ساعة."));
+  assertEquals(90,KitchenScreens.suggestedMinutes("اطبخ لمدة ساعة و٣٠ دقيقة."));
+  assertEquals(120,KitchenScreens.suggestedMinutes("اطبخ لمدة ساعتين."));
+  assertEquals(135,KitchenScreens.suggestedMinutes("مدة الطهي ساعتان و١٥ دقيقة."));
+  assertEquals(90,KitchenScreens.suggestedMinutes("اطبخ لمدة ١٫٥ ساعة."));
+  assertEquals(180,KitchenScreens.suggestedMinutes("اطبخ لمدة ۲ إلى ۳ ساعات."));
+ }
+ @Test public void hourTimersKeepFirstSeparateDurationAndExistingBounds(){
+  assertEquals(60,KitchenScreens.suggestedMinutes("Bake for 1 hour, then rest for 10 minutes."));
+  assertEquals(5,KitchenScreens.suggestedMinutes("Stir for 5 minutes then bake for 1 hour."));
+  assertEquals(240,KitchenScreens.suggestedMinutes("Simmer for 1000 hours."));
+  assertEquals(240,KitchenScreens.suggestedMinutes("Bake for 4 hours and 30 minutes."));
+  assertEquals(0,KitchenScreens.suggestedMinutes("Wait item5 hours."));
+  assertEquals(0,KitchenScreens.suggestedMinutes("Use the hourly schedule."));
+ }
  @Test public void numberedInstructionsSplitAcrossLanguagesAndLineEndings(){
   assertSteps("١. اغسل الأرز.\n٢. اطبخ لمدة ١٥ دقيقة.", "اغسل الأرز.", "اطبخ لمدة ١٥ دقيقة.");
   assertSteps("۱) Wash rice.\r\n  ۲) Simmer.", "Wash rice.", "Simmer.");
