@@ -1,3 +1,10 @@
+## v1.5.4
+
+- Give Home ingredient entry a cohesive apricot workspace with a stronger count heading, ivory input/chips and an integrated photo-scanning action.
+- Simplify the bottom navigation with a selected Home pill and quieter Saved/Settings actions, keeping the aubergine recipe action prominent.
+- Let the recipe action and navigation grow with text size; improve Arabic navigation spacing at larger fonts. Hide edit/remove guidance and Clear all when the pantry is empty.
+- Preserve English/Arabic RTL, ingredient editing, photo review, saved recipes, cooking timers and reduced-motion behavior.
+
 ## v1.5.3
 
 - Fix hour-based cooking instructions: “1 hour 30 minutes” now starts a 90-minute timer instead of 30 minutes, and hour-only instructions now offer a timer.

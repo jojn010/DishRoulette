@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.5.3 — Complete cooking durations**
+**v1.5.4 — A clearer Home workspace**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -52,6 +52,8 @@ allow retry; rotating during analysis returns to the preview without automatical
 ### App interface
 
 All installations now use the Simple interface. Advanced mode and the interface selector have been removed. Upgrading migrates the old interface choice while preserving ingredients, recipe preferences, saved recipes, cooking progress and Gemini settings.
+
+Home groups ingredient entry and photo scanning in an apricot workspace with ivory controls. The bottom navigation marks Home with a selected pill and allows larger text to grow. Empty pantries hide edit/remove guidance and Clear all.
 
 Add or edit ingredient chips, choose Pantry or Surprise, select a goal and generate a recipe. Open Settings for language and recipe preferences. Recipe details support saving and guided cooking with checklists, progress and contextual timers. Timers recognize English and Arabic hours, minutes and adjacent combinations (such as “1 hour 30 minutes” or “ساعة و٣٠ دقيقة”), including numeric ranges and fractions. Durations round up to whole minutes and retain the existing four-hour limit. Timers are visual in-app timers with no background alarm.
 
