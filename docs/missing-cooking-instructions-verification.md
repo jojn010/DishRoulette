@@ -18,3 +18,7 @@ InputManager.getInstance method on API 37. This is a test-runtime limitation, no
 result for those flows. Local test logs and
 rendered screens stay under ignored work/heartbeat-2026-10-30. Recorded under Unreleased;
 the published v1.7.1 APK is unchanged.
+
+Follow-up: the API 37 test-runtime limitation was resolved by upgrading Espresso and AndroidX
+Test JUnit. All ten tests, including the three previously blocked interactions, now pass.
+See [UI test runtime verification](ui-test-runtime-verification.md).
