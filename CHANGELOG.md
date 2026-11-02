@@ -1,5 +1,6 @@
-## Unreleased
+## v1.7.2
 
+- Recover the photo chooser when Android evicts a cached photo preview before screen recreation. A missing image no longer leaves Scan ingredients unresponsive; outstanding camera and picker results are retained.
 - Upgrade the Android UI test framework to Espresso 3.7.0 and AndroidX Test JUnit 1.3.0, restoring API 37 interaction tests for English/Arabic recipe sharing and the people slider. All ten focused emulator tests now pass.
 - Prevent a cooking-screen crash when a saved/shared recipe has blank instructions or only an English/Arabic step number. Show a localized missing-instructions message and keep Back available without starting timers or keeping the screen awake.
 

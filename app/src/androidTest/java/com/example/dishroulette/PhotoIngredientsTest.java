@@ -17,6 +17,31 @@ import static org.junit.Assert.*;
 
 /** Deterministic emulator-only tests: no images or credentials leave the device. */
 public class PhotoIngredientsTest {
+    @Test public void evictedPreviewCanChooseAnotherPhotoAfterRecreation() throws Exception {
+        Context c = ApplicationProvider.getApplicationContext();
+        File source = File.createTempFile("evicted-preview-", ".jpg", c.getCacheDir());
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        try (OutputStream out = new FileOutputStream(source)) { bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out); }
+        bitmap.recycle();
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(a -> a.photoIngredients.acceptPhoto(Uri.fromFile(source)));
+            awaitButton(scenario, R.string.photo_analyze);
+            scenario.onActivity(a -> {
+                try {
+                    java.lang.reflect.Field field = PhotoIngredientsController.class.getDeclaredField("photo");
+                    field.setAccessible(true);
+                    assertTrue(((File)field.get(a.photoIngredients)).delete());
+                } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
+            });
+            scenario.recreate();
+            scenario.onActivity(a -> {
+                a.photoIngredients.open();
+                assertNotNull("Scan must recover when Android removes the cached preview", dialog(a));
+                assertNotNull(dialog(a).getListView());
+                assertEquals(2, dialog(a).getListView().getAdapter().getCount());
+            });
+        } finally { source.delete(); }
+    }
     @Before public void setup() throws Exception {
         Context c = ApplicationProvider.getApplicationContext();
         c.getSharedPreferences("dishroulette_ui", 0).edit().clear().putString(InterfaceSettings.LANGUAGE, "en").commit();

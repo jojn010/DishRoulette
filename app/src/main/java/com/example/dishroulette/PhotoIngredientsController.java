@@ -60,10 +60,13 @@ final class PhotoIngredientsController {
         if ("review".equals(stage) && reviewText != null) showReview(reviewText);
         else if (photo != null) showPreview("analyzing".equals(stage) ? R.string.photo_interrupted : 0);
         else if (preparing != null) acceptPhoto(preparing);
+        // Android may evict cache files while the Activity is in the background.
+        // Preserve outstanding external capture/picker results, but reset unusable previews.
+        else if (!"camera".equals(stage) && !"picker".equals(stage)) clear();
     }
 
     void open() {
-        if (!stage.isEmpty()) { restore(); return; }
+        if (!stage.isEmpty()) { restore(); if (!stage.isEmpty()) return; }
         dialog = new MaterialAlertDialogBuilder(activity).setTitle(R.string.photo_title)
                 .setItems(new String[]{activity.getString(R.string.photo_take), activity.getString(R.string.photo_choose)}, (d, which) -> {
                     if (which == 0) takePhoto();
