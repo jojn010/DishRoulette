@@ -140,6 +140,44 @@ public class PhotoIngredientsTest {
             try (InputStream in = c.getContentResolver().openInputStream(uri)) { assertTrue(in.read() >= 0); }
         } finally { original.delete(); prepared.delete(); }
     }
+    @Test public void allExifOrientationsPreserveTheExpectedCornerPositions() throws Exception {
+        Context context = ApplicationProvider.getApplicationContext();
+        int r = android.graphics.Color.RED, g = android.graphics.Color.GREEN;
+        int b = android.graphics.Color.BLUE, y = android.graphics.Color.YELLOW;
+        int[][] expected = {{r,g,b,y},{g,r,y,b},{y,b,g,r},{b,y,r,g},
+                {r,b,g,y},{b,r,y,g},{y,g,b,r},{g,y,r,b}};
+        for (int orientation = 1; orientation <= 8; orientation++) {
+            File source = File.createTempFile("exif-corners-", ".jpg", context.getCacheDir());
+            File prepared = null;
+            Bitmap original = Bitmap.createBitmap(160, 80, Bitmap.Config.ARGB_8888);
+            android.graphics.Canvas canvas = new android.graphics.Canvas(original);
+            android.graphics.Paint paint = new android.graphics.Paint();
+            for (int quadrant = 0; quadrant < 4; quadrant++) {
+                paint.setColor(expected[0][quadrant]);
+                int x = quadrant % 2 * 80, z = quadrant / 2 * 40;
+                canvas.drawRect(x, z, x + 80, z + 40, paint);
+            }
+            try {
+                try (OutputStream out = new FileOutputStream(source)) { original.compress(Bitmap.CompressFormat.JPEG, 100, out); }
+                androidx.exifinterface.media.ExifInterface exif = new androidx.exifinterface.media.ExifInterface(source);
+                exif.setAttribute(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, String.valueOf(orientation));
+                exif.saveAttributes();
+                prepared = IngredientPhoto.prepare(context, Uri.fromFile(source));
+                Bitmap result = android.graphics.BitmapFactory.decodeFile(prepared.getAbsolutePath());
+                try {
+                    assertEquals(orientation >= 5 ? 80 : 160, result.getWidth());
+                    assertEquals(orientation >= 5 ? 160 : 80, result.getHeight());
+                    for (int quadrant = 0; quadrant < 4; quadrant++) {
+                        int actual = result.getPixel(result.getWidth() * (quadrant % 2 * 2 + 1) / 4,
+                                result.getHeight() * (quadrant / 2 * 2 + 1) / 4);
+                        int wanted = expected[orientation - 1][quadrant];
+                        for (int shift : new int[]{0,8,16}) assertTrue("EXIF " + orientation + ", corner " + quadrant,
+                                Math.abs(((actual >> shift) & 255) - ((wanted >> shift) & 255)) < 40);
+                    }
+                } finally { result.recycle(); }
+            } finally { original.recycle(); source.delete(); if (prepared != null) prepared.delete(); }
+        }
+    }
     @Test public void localizedPhotoReviewRendersInBothLanguages() throws Exception {
         Context c = ApplicationProvider.getApplicationContext();
         for (String language : List.of("en", "ar")) {

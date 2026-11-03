@@ -25,8 +25,9 @@ final class IngredientPhoto {
             try (InputStream in = context.getContentResolver().openInputStream(source)) {
                 if (in != null) {
                     ExifInterface exif = new ExifInterface(in);
-                    matrix.postRotate(exif.getRotationDegrees());
+                    // ExifInterface defines rotation after the horizontal flip.
                     if (exif.isFlipped()) matrix.postScale(-1, 1);
+                    matrix.postRotate(exif.getRotationDegrees());
                 }
             } catch (IOException ignored) { /* Images without EXIF are valid. */ }
             if (!matrix.isIdentity()) {

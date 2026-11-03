@@ -1,3 +1,7 @@
+## Unreleased
+
+- Correct mirrored photo orientation for EXIF transpose/transverse images by applying the horizontal flip before rotation. Ingredient previews and the JPEG sent to Gemini now match the camera orientation; all eight EXIF orientations have pixel-position regression coverage.
+
 ## v1.7.2
 
 - Recover the photo chooser when Android evicts a cached photo preview before screen recreation. A missing image no longer leaves Scan ingredients unresponsive; outstanding camera and picker results are retained.
