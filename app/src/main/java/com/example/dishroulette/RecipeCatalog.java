@@ -14,6 +14,21 @@ public final class RecipeCatalog {
     private RecipeCatalog() { }
 
     public static final class Recipe {
+        @SerializedName("translations") public java.util.Map<String,com.example.dishroulette.core.RecipeTranslation> translations;
+        public boolean bilingual(){
+            try {com.example.dishroulette.core.RecipeTranslation.validate(translations);return true;}catch(RuntimeException e){return false;}
+        }
+        public Recipe forLanguage(String target){
+            if(!bilingual())return this;
+            com.example.dishroulette.core.RecipeTranslation t=translations.get(target);if(t==null)return this;
+            com.google.gson.Gson gson=new com.google.gson.Gson();
+            com.google.gson.JsonObject object=gson.toJsonTree(this).getAsJsonObject();
+            object.addProperty("title",t.title);object.addProperty("description",t.description);
+            object.addProperty("ingredients",String.join("\n",t.ingredients));object.addProperty("method",t.method());object.addProperty("language",target);
+            // Personal explanations are authored in the generation language; do not show them in another language.
+            if(!target.equals(language)){object.addProperty("whyThisDish", "");object.addProperty("goalFit", "");}
+            return gson.fromJson(object,Recipe.class);
+        }
         @SerializedName("id") public final String id;
         @SerializedName("title") public final String title;
         @SerializedName("meal") public final String meal;
@@ -101,6 +116,8 @@ public final class RecipeCatalog {
             "1 can chickpeas (400 g), drained and rinsed\n1 can chopped tomatoes (400 g)\n2 garlic cloves, minced\n1 tbsp olive oil\n1 tsp smoked paprika\nSalt and pepper",
             "1. Warm olive oil in a pan over medium heat. Stir in garlic for 30 seconds.\n\n2. Add paprika, tomatoes, and chickpeas.\n\n3. Simmer for 12–15 minutes, stirring occasionally. Add a splash of water if needed.\n\n4. Season with salt and pepper, and spoon into bowls.")
     ));
+
+    static { OfflineRecipeTranslations.apply(ALL); }
 
     public static Set<String> parseIngredients(String input) {
         Set<String> result = new LinkedHashSet<>();

@@ -14,10 +14,11 @@ import java.util.zip.GZIPOutputStream;
 /** Versioned, bounded offline recipe snapshots. Never serializes a profile, credential or local id. */
 final class RecipeShareCodec {
     static final String PREFIX="TABKHA1:";
-    static final int MAX_CODE=48000, MAX_JSON=32000;
+    static final int MAX_CODE=128000, MAX_JSON=96000;
     private static final Gson GSON=new GsonBuilder().disableHtmlEscaping().create();
     private RecipeShareCodec(){}
     private static JsonObject snapshot(RecipeCatalog.Recipe r){
+        if(r.bilingual())r=r.forLanguage("en");
         JsonObject o=new JsonObject();
         o.addProperty("title",r.title);o.addProperty("description",r.description);o.addProperty("meal",r.meal);
         o.addProperty("minutes",r.minutes);o.addProperty("servings",r.servings);
@@ -31,6 +32,7 @@ final class RecipeShareCodec {
         if(r.fiberGramsPerServing!=null)o.addProperty("fiberGramsPerServing",r.fiberGramsPerServing);
         if(r.sugarGramsPerServing!=null)o.addProperty("sugarGramsPerServing",r.sugarGramsPerServing);
         if(r.sodiumMilligramsPerServing!=null)o.addProperty("sodiumMilligramsPerServing",r.sodiumMilligramsPerServing);
+        if(r.translations!=null)o.add("translations",GSON.toJsonTree(com.example.dishroulette.core.RecipeTranslation.validate(r.translations)));
         return o;
     }
     static String encode(RecipeCatalog.Recipe r){
@@ -68,7 +70,7 @@ final class RecipeShareCodec {
             byte[] hash=MessageDigest.getInstance("SHA-256").digest(GSON.toJson(snapshot(r)).getBytes(StandardCharsets.UTF_8));
             StringBuilder id=new StringBuilder("shared_");for(byte b:hash)id.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
             RecipeCatalog.Recipe copy=new RecipeCatalog.Recipe(id.toString(),r.title,r.meal,r.minutes,r.servings,r.description,"",r.ingredients,r.method);
-            copy.language=r.language;copy.cuisine=r.cuisine;copy.aiGenerated=r.aiGenerated;copy.shared=true;copy.discovery=true;
+            copy.translations=r.translations;copy.language=r.language;copy.cuisine=r.cuisine;copy.aiGenerated=r.aiGenerated;copy.shared=true;copy.discovery=true;
             copy.caloriesPerServing=r.caloriesPerServing;copy.proteinGramsPerServing=r.proteinGramsPerServing;
             copy.carbohydratesGramsPerServing=r.carbohydratesGramsPerServing;copy.fatGramsPerServing=r.fatGramsPerServing;
             copy.fiberGramsPerServing=r.fiberGramsPerServing;copy.sugarGramsPerServing=r.sugarGramsPerServing;copy.sodiumMilligramsPerServing=r.sodiumMilligramsPerServing;
@@ -79,6 +81,12 @@ final class RecipeShareCodec {
         String meal=text(o,"meal",30,false);if(!SpinOptions.MEALS.contains(meal)||meal.equals("Any meal"))throw invalid();
         RecipeCatalog.Recipe r=new RecipeCatalog.Recipe("",text(o,"title",120,false),meal,integer(o,"minutes",1,240),integer(o,"servings",1,12),text(o,"description",600,false),"",text(o,"ingredients",6000,false),text(o,"method",12000,false));
         r.language=text(o,"language",2,true);if(!r.language.isEmpty()&&!r.language.equals("en")&&!r.language.equals("ar"))throw invalid();
+        if(o.has("translations")){
+            r.translations=com.example.dishroulette.core.RecipeTranslation.readPair(o.getAsJsonObject("translations"));
+            com.example.dishroulette.core.RecipeTranslation t=r.translations.get(r.language);
+            if(t==null||!r.title.equals(t.title)||!r.description.equals(t.description)
+                ||!r.ingredients.equals(String.join("\n",t.ingredients))||!r.method.equals(t.method()))throw invalid();
+        }
         r.cuisine=text(o,"cuisine",80,true);
         JsonPrimitive ai=o.getAsJsonPrimitive("aiGenerated");if(ai==null||!ai.isBoolean())throw invalid();r.aiGenerated=ai.getAsBoolean();
         if(o.has("caloriesPerServing")||o.has("proteinGramsPerServing")){

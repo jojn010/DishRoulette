@@ -37,6 +37,11 @@ public final class SpinProfile {
     }
     public boolean blocks(RecipeCatalog.Recipe recipe) {
         if (!hasExclusions()) return false;
+        if(recipe.bilingual())for(com.example.dishroulette.core.RecipeTranslation text:recipe.translations.values()){
+            java.util.List<String> check=new java.util.ArrayList<>(text.ingredients);check.addAll(text.steps);check.add(text.title);check.add(text.description);
+            if(!IngredientExclusions.conflicts(check,allergies,customExclusions).isEmpty()
+                ||IngredientExclusions.hasUncertainIngredients(text.ingredients))return true;
+        }
         return !IngredientExclusions.conflicts(Arrays.asList(recipe.title, recipe.ingredients, recipe.method), allergies, customExclusions).isEmpty()
                 || IngredientExclusions.hasUncertainIngredients(Collections.singletonList(recipe.ingredients));
     }

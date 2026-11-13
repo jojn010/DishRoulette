@@ -1,0 +1,5 @@
+<resources>
+<string name="translating_recipe">إضافة اللغتين</string>
+<string name="translating_recipe_detail">نترجم هذه الوصفة القديمة مرة واحدة إلى العربية والإنجليزية. يُرسل نص الوصفة إلى Gemini. رموز الوصفات الجديدة تعمل دون إنترنت.</string>
+<string name="recipe_translation_failed">تعذرت ترجمة هذه الوصفة القديمة. حاول مجددًا عند توفر اتصال Gemini، أو اطلب من المرسل رمزًا جديدًا باللغتين. لم تتغير الوصفة الأصلية.</string>
+</resources>

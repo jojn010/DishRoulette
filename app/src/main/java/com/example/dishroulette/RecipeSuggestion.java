@@ -9,6 +9,7 @@ import java.util.UUID;
 
 /** Typed, validated response from our backend; never accepts executable model output. */
 public final class RecipeSuggestion {
+    @SerializedName("translations") public java.util.Map<String,com.example.dishroulette.core.RecipeTranslation> translations;
     @SerializedName("title") public String title;
     @SerializedName("meal") public String meal;
     @SerializedName("description") public String description;
@@ -58,6 +59,7 @@ public final class RecipeSuggestion {
         RecipeCatalog.Recipe recipe = new RecipeCatalog.Recipe("ai_" + UUID.randomUUID(),
                 title, meal, minutes, servings, description, String.join(",", pantryUsed),
                 String.join("\n", ingredients), method.toString());
+        if(translations!=null)recipe.translations=com.example.dishroulette.core.RecipeTranslation.validate(translations);
         recipe.caloriesPerServing = caloriesPerServing;
         recipe.proteinGramsPerServing = proteinGramsPerServing;
         recipe.carbohydratesGramsPerServing = carbohydratesGramsPerServing;

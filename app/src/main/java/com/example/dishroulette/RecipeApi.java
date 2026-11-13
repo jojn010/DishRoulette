@@ -10,6 +10,7 @@ public interface RecipeApi {
     Call<RecipeSuggestion> suggest(Request request);
 
     final class Request {
+        @SerializedName("bilingual") final boolean bilingual = true;
         @SerializedName("ingredients") final List<String> ingredients;
         @SerializedName("servings") final int servings;
         @SerializedName("meal") final String meal;

@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.dishroulette"
         minSdk = 24
         targetSdk = 37
-        versionCode = 29
-        versionName = "1.7.3"
+        versionCode = 30
+        versionName = "1.7.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

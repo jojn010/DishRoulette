@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         loadout.setChangedListener(this::updateMagazineStatus);
 
         kitchenScreens = new KitchenScreens(this,binding.secondaryScreen,preferences,new KitchenScreens.Actions(){
-            public void open(RecipeCatalog.Recipe recipe){ currentRecipe=recipe;resultPantry=readPantry();renderRecipe(); }
+            public void open(RecipeCatalog.Recipe recipe){ sharing.prepare(recipe,translated->{currentRecipe=translated;resultPantry=readPantry();renderRecipe();},()->{currentRecipe=recipe;resultPantry=readPantry();renderRecipe();}); }
             public void remove(RecipeCatalog.Recipe recipe){ savedIds.remove(recipe.id);persistSaved(recipe,true);updateSaveButton(); }
         });
         sharing=new RecipeSharingController(this);
@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
             else if("saved".equals(state.getString("secondary_screen")))showSavedRecipes();
             else if("cooking".equals(state.getString("secondary_screen"))){
                 RecipeCatalog.Recipe cooking=decodeRecipe(state.getString("cooking_recipe"));
-                if(cooking!=null&&!profile.blocks(cooking)&&!profile.requiresReview)kitchenScreens.cook(cooking);
+                if(cooking!=null&&!profile.blocks(cooking)&&!profile.requiresReview)kitchenScreens.cook(cooking.forLanguage(InterfaceSettings.language(this)));
             }
             if(!state.getBoolean("result_visible",true))binding.cardMealResult.setVisibility(View.GONE);
         }
@@ -492,6 +492,10 @@ public class MainActivity extends AppCompatActivity {
                     || recipe.description == null || recipe.ingredients == null || recipe.method == null
                     || recipe.keys == null || recipe.keys.contains(null)
                     || recipe.minutes < 1 || recipe.servings < 1) return null;
+            RecipeCatalog.Recipe bundled=RecipeCatalog.find(recipe.id);
+            if(!recipe.bilingual()&&bundled!=null&&recipe.ingredients.equals(bundled.ingredients)&&recipe.method.equals(bundled.method)){
+                recipe.translations=bundled.translations;recipe.language="en";
+            }
             return recipe;
         } catch (RuntimeException ignored) { return null; }
     }
@@ -527,6 +531,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void renderRecipe() {
+        if(currentRecipe!=null)currentRecipe=currentRecipe.forLanguage(InterfaceSettings.language(this));
         binding.cardMealResult.setVisibility(View.VISIBLE);
         binding.btnCloseResult.setText(simple?R.string.back_home:R.string.kitchen_back_to_loadout);
         binding.btnDislike.setText(simple?R.string.try_another:R.string.another);
@@ -615,6 +620,10 @@ public class MainActivity extends AppCompatActivity {
         binding.tvSpinCounter.setText(getResources().getQuantityString(R.plurals.spin_count, count, count));
     }
 
+    void rememberBilingual(RecipeCatalog.Recipe recipe){
+        if(savedIds.contains(recipe.id))preferences.edit().putString("recipe_json_"+recipe.id,gson.toJson(recipe)).apply();
+        if(currentRecipe!=null && currentRecipe.id.equals(recipe.id))currentRecipe=recipe;
+    }
     void shareRecipe(RecipeCatalog.Recipe recipe){if(!spinning&&recipe!=null)sharing.share(recipe);}
     void importRecipe(){if(!spinning)sharing.importCode();}
     boolean saveSharedRecipe(RecipeCatalog.Recipe recipe){
@@ -630,7 +639,7 @@ public class MainActivity extends AppCompatActivity {
         for (String id : savedIds) {
             RecipeCatalog.Recipe recipe = decodeRecipe(preferences.getString("recipe_json_" + id, null));
             if (recipe == null) recipe = RecipeCatalog.find(id);
-            if (recipe != null) saved.add(recipe);
+            if (recipe != null) saved.add(recipe.forLanguage(InterfaceSettings.language(this)));
         }
         saved.sort((a, b) -> a.title.compareToIgnoreCase(b.title));
         kitchenScreens.saved(saved);
@@ -646,7 +655,7 @@ public class MainActivity extends AppCompatActivity {
             });
             blocked.show(); return;
         }
-        kitchenScreens.cook(recipe);
+        kitchenScreens.cook(recipe.forLanguage(InterfaceSettings.language(this)));
     }
 
     private Chip selectableChip(String label) {

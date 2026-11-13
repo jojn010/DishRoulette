@@ -1,17 +1,17 @@
 <resources>
 <string name="share_recipe">Share recipe</string>
-<string name="share_recipe_help">Share “%1$s” as a recipe code. Your friend can open Saved → Import recipe in Tabkha and paste it. The code contains the recipe, not your Gemini connection or preferences.</string>
+<string name="share_recipe_help">Share “%1$s” as a recipe code containing English and Arabic. Your friend can open Saved → Import recipe in Tabkha and paste it. Your Gemini connection and personal preferences are not included.</string>
 <string name="copy_recipe_code">Copy recipe code</string>
 <string name="recipe_code_label">Tabkha recipe code</string>
 <string name="recipe_code_copied">Recipe code copied</string>
 <string name="share_failed">This recipe could not be shared.</string>
 <string name="import_recipe">Import recipe</string>
-<string name="import_recipe_help">Paste the complete TABKHA1: code from your friend. No internet or Gemini connection is needed. You can review the recipe before saving.</string>
+<string name="import_recipe_help">Paste the full recipe code. New codes include English and Arabic and work offline. Older codes need an internet connection to translate once.</string>
 <string name="review_recipe">Review recipe</string>
 <string name="invalid_recipe_code">This code is incomplete, damaged or unsupported. Ask for the complete Tabkha recipe code.</string>
 <string name="import_save">Save to my recipes</string>
 <string name="import_saved">Shared recipe saved</string>
-<string name="shared_recipe_label">Shared recipe · original language</string>
-<string name="shared_recipe_note">Shared recipe in its original language. Review ingredients and preparation before cooking.</string>
+<string name="shared_recipe_label">Shared recipe</string>
+<string name="shared_recipe_note">Shared recipe. Review ingredients and preparation before cooking.</string>
 <string name="shared_recipe_review" translatable="false">%1$s\n\n%2$s\n\n%3$s\n\n%4$s\n%5$s\n\n%6$s\n%7$s</string>
 </resources>

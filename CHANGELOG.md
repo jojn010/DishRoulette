@@ -1,3 +1,9 @@
+## v1.7.4
+
+- Generate and store full English and Arabic recipe text together. Imported recipes, saved cards, recipe overviews and guided cooking use the selected app language while keeping servings, nutrition, IDs and cooking progress.
+- Share both translations in one offline code with a canonical identity independent of the sender’s selected language. Validate both languages, matching step/ingredient counts and exclusions; keep personal explanations and credentials outside shared codes.
+- Add reviewed Arabic text for all eight bundled recipes. Upgrade historical single-language recipes through a one-time text-only Gemini translation, preserving the original and offering a clear retry message when unavailable.
+
 ## v1.7.3
 
 - Center Home headings, navigation icon/label groups, recipe titles and screen headings; retain natural reading alignment for cooking instructions and ingredient entry in English and Arabic.

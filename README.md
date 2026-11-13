@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.7.3 — Centered layouts, Google icons and sound effects**
+**v1.7.4 — Every recipe in English and Arabic**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -119,3 +119,5 @@ When installing an older **debug** APK over a newer one, Android may require `ad
 Arabic font: Cairo by Mohamed Gaber and contributors, SIL Open Font License 1.1; bundled license in `app/src/main/assets/licenses/Cairo-OFL.txt`. This release targets Android phones, tablets and resizable Android windows; it does not create an iPhone or browser application.
 
 UI icons use Google Material Icons Round (Apache 2.0). Optional UI and foreground timer sounds use Kenney Interface Sounds (CC0); toggle Sound effects in Settings. See [asset credits](third_party/README.md).
+
+New recipes include complete English and Arabic text. Recipe codes carry both languages; recipients review and cook in the selected app language without a network request. Switching language keeps the recipe ID, cooking checklist and timers. Historical single-language recipes need a one-time Gemini translation when opened, shared or imported; the original remains intact if translation is unavailable. Bundled recipes already contain both languages.

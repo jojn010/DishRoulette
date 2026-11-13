@@ -50,6 +50,10 @@ public final class RecipeRules {
             clean.addProperty("avoidTitle", avoid);
             clean.addProperty("mode", mode);
             clean.addProperty("language",language);
+            if(input.has("bilingual")){
+                if(!input.get("bilingual").isJsonPrimitive()||!input.getAsJsonPrimitive("bilingual").isBoolean())throw new IllegalArgumentException();
+                clean.addProperty("bilingual",input.get("bilingual").getAsBoolean());
+            }
             clean.addProperty("goal", goal);
             clean.addProperty("cuisine", cuisine);
             clean.add("allergies", GSON.toJsonTree(allergies));
@@ -132,6 +136,13 @@ public final class RecipeRules {
             If no sensible dish satisfies constraints, possible=false, text/list fields empty except cuisine, numbers=1.
             Always set cuisine to a concrete canonical cuisine, including when possible=false.
             Otherwise possible=true. Output only the requested structured recipe.
+            When bilingual=true, translations.en and translations.ar must contain the SAME complete recipe
+            in English and natural Arabic: title, description, quantified ingredients and all steps.
+            Match ingredient and step ordering and counts exactly. Preserve every amount, unit, timing,
+            temperature, doneness and safety instruction. Translate, never invent a second dish.
+            Top-level title, description, ingredients and steps must exactly match translations[language].
+            Use Arabic food names in Arabic text. Do not translate canonical enum values.
+            For possible=false translations may use brief explanatory text, but retain the required shape.
             Language: if language=ar, write title, description, ingredients, steps, whyThisDish and
             goalFit in natural Arabic with correctly shaped Unicode text. If language=en, use English.
             Understand ingredient names, exclusions and favorites in either Arabic or English.
@@ -146,7 +157,7 @@ public final class RecipeRules {
         payload.add("systemInstruction", GSON.toJsonTree(Map.of("parts", List.of(Map.of("text", instructions)))));
         payload.add("contents", GSON.toJsonTree(List.of(Map.of("role", "user", "parts",
                 List.of(Map.of("text", GSON.toJson(request)))))));
-        payload.add("generationConfig", GSON.toJsonTree(Map.of("maxOutputTokens", 4096,
+        payload.add("generationConfig", GSON.toJsonTree(Map.of("maxOutputTokens", 8192,
                 "responseFormat", Map.of("text", Map.of("mimeType", "APPLICATION_JSON", "schema", schema(request))))));
         return payload;
     }
@@ -242,6 +253,20 @@ public final class RecipeRules {
                     && IngredientExclusions.hasUncertainIngredients(strings(result, "ingredients", 1, 24, 200))) {
                 throw new ApiFailure(422, "ALLERGY_REJECTED");
             }
+            if(result.has("translations")||request.has("bilingual")&&request.get("bilingual").getAsBoolean()){
+                Map<String,RecipeTranslation> pair=RecipeTranslation.readPair(result.getAsJsonObject("translations"));
+                RecipeTranslation primary=pair.get(request.get("language").getAsString());
+                if(!primary.title.equals(title)||!primary.description.equals(clean.get("description").getAsString())
+                    ||!primary.ingredients.equals(strings(result,"ingredients",1,24,200))
+                    ||!primary.steps.equals(strings(result,"steps",1,12,700)))throw new IllegalArgumentException();
+                for(RecipeTranslation translation:pair.values()){
+                    List<String> translated=new ArrayList<>(translation.ingredients);translated.addAll(translation.steps);
+                    translated.add(translation.title);translated.add(translation.description);
+                    if(!IngredientExclusions.conflicts(translated,allergies,custom).isEmpty())throw new ApiFailure(422,"ALLERGY_REJECTED");
+                    if((!allergies.isEmpty()||!custom.isEmpty())&&IngredientExclusions.hasUncertainIngredients(translation.ingredients))throw new ApiFailure(422,"ALLERGY_REJECTED");
+                }
+                clean.add("translations",GSON.toJsonTree(pair));
+            }
             return clean;
         } catch (RuntimeException e) { throw new ApiFailure(502, "INVALID_RECIPE"); }
     }
@@ -273,6 +298,7 @@ public final class RecipeRules {
             properties.getAsJsonObject("additionalIngredients").getAsJsonObject("items").add("enum",
                     GSON.toJsonTree(List.of("water", "salt", "pepper", "cooking oil")));
         } else properties.getAsJsonObject("pantryUsed").addProperty("maxItems", 0);
+        if(request.has("bilingual")&&request.get("bilingual").getAsBoolean())properties.add("translations",RecipeTranslation.pairSchema());
         JsonObject schema = new JsonObject();
         schema.addProperty("type", "object");
         schema.add("properties", properties);

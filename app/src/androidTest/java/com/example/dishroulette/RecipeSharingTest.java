@@ -33,6 +33,10 @@ public class RecipeSharingTest {
         for(String language:new String[]{"en","ar"}){
             prefs.edit().putString(InterfaceSettings.LANGUAGE,language).putString("spin_profile","{}").putBoolean("reduce_motion",true).commit();
             RecipeCatalog.Recipe recipe=new RecipeCatalog.Recipe("share-test",language.equals("ar")?"أرز للأصحاب":"Rice for friends","Dinner",25,6,language.equals("ar")?"وجبة بسيطة للمشاركة.":"A simple dish to share.","rice",language.equals("ar")?"٣ أكواب أرز\n٦ حبات بندورة":"3 cups rice\n6 tomatoes",language.equals("ar")?"١. اطبخ الأرز لمدة ١٥ دقيقة.\n\n٢. قدّمه دافئًا.":"1. Cook rice for 15 minutes.\n\n2. Serve warm.");recipe.language=language;
+            com.example.dishroulette.core.RecipeTranslation en=new com.example.dishroulette.core.RecipeTranslation(),ar=new com.example.dishroulette.core.RecipeTranslation();
+            en.title="Rice for friends";en.description="A simple dish to share.";en.ingredients=Arrays.asList("3 cups rice","6 tomatoes");en.steps=Arrays.asList("Cook rice for 15 minutes.","Serve warm.");
+            ar.title="أرز للأصحاب";ar.description="وجبة بسيطة للمشاركة.";ar.ingredients=Arrays.asList("٣ أكواب أرز","٦ حبات بندورة");ar.steps=Arrays.asList("اطبخ الأرز لمدة ١٥ دقيقة.","قدّمه دافئًا.");
+            recipe.translations=com.example.dishroulette.core.RecipeTranslation.validate(Map.of("en",en,"ar",ar));
             String[] copied={null};
             try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
                 scenario.onActivity(a->a.shareRecipe(recipe));capture(language+"-share");

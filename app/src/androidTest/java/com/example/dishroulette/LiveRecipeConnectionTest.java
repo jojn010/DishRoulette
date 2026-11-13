@@ -40,9 +40,24 @@ public class LiveRecipeConnectionTest {
             java.io.File file=new java.io.File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"six-person-validation.json");
             try(java.io.FileWriter writer=new java.io.FileWriter(file)){new com.google.gson.Gson().toJson(response.body(),writer);}
         }
-        assertFalse(response.body().toRecipe(pantry, profile).title.isEmpty());
+        RecipeCatalog.Recipe bilingual=response.body().toRecipe(pantry,profile);
+        assertFalse(bilingual.title.isEmpty());assertTrue("Generated recipe must carry both languages",bilingual.bilingual());
+        assertEquals("ar",bilingual.forLanguage("ar").language);assertEquals("en",bilingual.forLanguage("en").language);
     }
 
+    @Test public void legacyTranslation()throws Exception {
+        Assume.assumeTrue("true".equals(InstrumentationRegistry.getArguments().getString("liveRecipe")));
+        java.util.concurrent.CountDownLatch done=new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.atomic.AtomicReference<RecipeCatalog.Recipe> result=new java.util.concurrent.atomic.AtomicReference<>();
+        RecipeCatalog.Recipe original=new RecipeCatalog.Recipe("legacy-translation-check","Tomato rice","Dinner",20,2,"Warm tomato rice.","rice,tomato","1 cup rice\n2 tomatoes","1. Simmer for 15 minutes.\n\n2. Serve warm.");original.language="en";
+        new RecipeTranslationClient().translate(InstrumentationRegistry.getInstrumentation().getTargetContext(),original,new RecipeTranslationClient.Result(){
+            public void ready(RecipeCatalog.Recipe recipe){result.set(recipe);done.countDown();}public void failed(){done.countDown();}
+        });
+        assertTrue(done.await(70,java.util.concurrent.TimeUnit.SECONDS));assertNotNull("Legacy translation failed",result.get());
+        RecipeCatalog.Recipe translated=result.get();assertTrue(translated.bilingual());assertEquals(original.id,translated.id);
+        assertEquals(original.ingredients,translated.forLanguage("en").ingredients);assertEquals(original.method,translated.forLanguage("en").method);
+        assertEquals(original.servings,translated.servings);assertEquals(original.minutes,translated.minutes);
+    }
     @Test public void sixPeople() throws Exception {
         SpinProfile profile=new SpinProfile();profile.servings=6;
         verify(profile,new HashSet<>(Arrays.asList("rice","tomato","eggs")));

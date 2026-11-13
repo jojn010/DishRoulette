@@ -13,12 +13,31 @@ import com.google.android.material.textfield.TextInputLayout;
 /** Explicit clipboard/sharesheet export and review-before-save offline imports. */
 final class RecipeSharingController {
     private final MainActivity activity;
-    private AlertDialog importing,exporting;
+    private AlertDialog importing,exporting,translating;
+    private RecipeTranslationClient translator;
     private TextInputEditText input;
     private String reviewCode;
     RecipeSharingController(MainActivity activity){this.activity=activity;}
     private int dp(int n){return Math.round(n*activity.getResources().getDisplayMetrics().density);}
-    void share(RecipeCatalog.Recipe recipe){
+    void prepare(RecipeCatalog.Recipe recipe,java.util.function.Consumer<RecipeCatalog.Recipe> ready){
+        prepare(recipe,ready,()->{});
+    }
+    void prepare(RecipeCatalog.Recipe recipe,java.util.function.Consumer<RecipeCatalog.Recipe> ready,Runnable failed){
+        if(recipe.bilingual()){ready.accept(recipe.forLanguage(InterfaceSettings.language(activity)));return;}
+        if(translator!=null)return;
+        translator=new RecipeTranslationClient();
+        AlertDialog progress=new MaterialAlertDialogBuilder(activity).setTitle(R.string.translating_recipe)
+            .setMessage(R.string.translating_recipe_detail).setNegativeButton(R.string.cancel,(d,w)->cancelTranslation()).create();
+        translating=progress;progress.setOnCancelListener(d->cancelTranslation());progress.show();AdaptiveDialogs.fit(activity,progress);
+        translator.translate(activity,recipe,new RecipeTranslationClient.Result(){
+            public void ready(RecipeCatalog.Recipe bilingual){finishTranslation();activity.rememberBilingual(bilingual);ready.accept(bilingual);}
+            public void failed(){finishTranslation();message(R.string.recipe_translation_failed);failed.run();}
+        });
+    }
+    private void finishTranslation(){translator=null;if(translating!=null)translating.dismiss();translating=null;}
+    private void cancelTranslation(){if(translator!=null)translator.cancel();finishTranslation();}
+    void share(RecipeCatalog.Recipe recipe){prepare(recipe,this::shareReady);}
+    private void shareReady(RecipeCatalog.Recipe recipe){
         final String code;
         try{code=RecipeShareCodec.encode(recipe);}catch(RuntimeException e){message(R.string.share_failed);return;}
         AlertDialog dialog=new MaterialAlertDialogBuilder(activity).setTitle(R.string.share_recipe)
@@ -47,11 +66,17 @@ final class RecipeSharingController {
         editor.setOnDismissListener(d->{if(importing==editor){importing=null;input=null;}});
         editor.setOnShowListener(d->{UiTypography.apply(editor.getWindow().getDecorView());editor.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
             String code=input.getText()==null?"":input.getText().toString();
-            try{RecipeCatalog.Recipe recipe=RecipeShareCodec.decode(code);editor.dismiss();review(recipe,code.trim());}
-            catch(RuntimeException e){field.setError(activity.getString(R.string.invalid_recipe_code));input.requestFocus();}
+            final RecipeCatalog.Recipe recipe;
+            try{recipe=RecipeShareCodec.decode(code);}
+            catch(RuntimeException e){field.setError(activity.getString(R.string.invalid_recipe_code));input.requestFocus();return;}
+            editor.dismiss();prepareImport(recipe,code.trim());
         });});editor.show();AdaptiveDialogs.fit(activity,editor);
     }
-    private void review(RecipeCatalog.Recipe recipe,String code){
+    private void prepareImport(RecipeCatalog.Recipe recipe,String code){
+        reviewCode=code;prepare(recipe,translated->review(translated,RecipeShareCodec.encode(translated)),()->edit(code));
+    }
+    private void review(RecipeCatalog.Recipe original,String code){
+        RecipeCatalog.Recipe recipe=original.forLanguage(InterfaceSettings.language(activity));
         reviewCode=code;
         ScrollView scroll=new ScrollView(activity);TextView content=new TextView(activity);content.setPadding(dp(24),dp(8),dp(24),dp(16));content.setTextSize(16);content.setTextColor(UiColors.color(activity,R.color.ink));content.setTextIsSelectable(true);content.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
         content.setText(activity.getString(R.string.shared_recipe_review,activity.getString(R.string.shared_recipe_note),recipe.description,KitchenScreens.meta(activity,recipe),activity.getString(R.string.ingredients_title),recipe.ingredients,activity.getString(R.string.method_title),recipe.method));UiTypography.apply(content);scroll.addView(content);
@@ -64,16 +89,19 @@ final class RecipeSharingController {
         });});preview.show();AdaptiveDialogs.fit(activity,preview);
     }
     void save(Bundle state){
+        if(translator!=null&&reviewCode!=null){state.putString("shared_recipe_pending",reviewCode);return;}
         if(importing==null||!importing.isShowing())return;
         if(reviewCode!=null)state.putString("shared_recipe_review",reviewCode);
         else if(input!=null)state.putString("shared_recipe_draft",input.getText()==null?"":input.getText().toString());
     }
     void restore(Bundle state){
         if(state==null)return;
+        String pending=state.getString("shared_recipe_pending");
+        if(pending!=null){try{prepareImport(RecipeShareCodec.decode(pending),pending);}catch(RuntimeException e){edit(pending);}return;}
         String code=state.getString("shared_recipe_review");
         if(code!=null){try{review(RecipeShareCodec.decode(code),code);}catch(RuntimeException e){edit(code);}}
         else if(state.containsKey("shared_recipe_draft"))edit(state.getString("shared_recipe_draft",""));
     }
-    void dispose(){if(importing!=null)importing.dismiss();if(exporting!=null)exporting.dismiss();}
+    void dispose(){cancelTranslation();if(importing!=null)importing.dismiss();if(exporting!=null)exporting.dismiss();}
     private void message(int text){Toast.makeText(activity,text,Toast.LENGTH_SHORT).show();}
 }

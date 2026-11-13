@@ -1,0 +1,5 @@
+<resources>
+<string name="translating_recipe">Adding both languages</string>
+<string name="translating_recipe_detail">Translating this older recipe once into Arabic and English. The recipe text is sent to Gemini. New bilingual recipe codes work offline.</string>
+<string name="recipe_translation_failed">Could not translate this older recipe. Try again when Gemini is available, or ask the sender for a new bilingual code. The original is unchanged.</string>
+</resources>

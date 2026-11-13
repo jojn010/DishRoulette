@@ -36,13 +36,19 @@ public class PersonalConnectionTest {
                 okhttp3.Request r=chain.request();assertEquals("https",r.url().scheme());assertEquals("generativelanguage.googleapis.com",r.url().host());assertEquals(TEST_KEY,r.header("x-goog-api-key"));
                 okio.Buffer body=new okio.Buffer();r.body().writeTo(body);String json=body.readUtf8();assertFalse(json.contains(TEST_KEY));assertTrue(json.contains("\\\"language\\\":\\\""+language));
                 String recipe="{\"possible\":true,\"title\":\"Rice\",\"description\":\"Warm rice\",\"meal\":\"Dinner\",\"cuisine\":\"Italian\",\"whyThisDish\":\"Your rice\",\"goalFit\":\"Balanced\",\"minutes\":20,\"servings\":2,\"ingredients\":[\"1 cup rice\"],\"steps\":[\"Cook rice for 15 minutes.\"],\"pantryUsed\":[\"rice\"],\"additionalIngredients\":[]}";
+                JsonObject bilingual=com.google.gson.JsonParser.parseString(recipe).getAsJsonObject();
+                JsonObject en=new JsonObject();for(String field:Arrays.asList("title","description","ingredients","steps"))en.add(field,bilingual.get(field));
+                JsonObject ar=com.google.gson.JsonParser.parseString("{\"title\":\"أرز\",\"description\":\"أرز دافئ\",\"ingredients\":[\"1 كوب أرز\"],\"steps\":[\"اطبخ الأرز لمدة 15 دقيقة.\"]}").getAsJsonObject();
+                JsonObject translations=new JsonObject();translations.add("en",en);translations.add("ar",ar);bilingual.add("translations",translations);
+                if(language.equals("ar"))for(String field:Arrays.asList("title","description","ingredients","steps"))bilingual.add(field,ar.get(field));
+                recipe=bilingual.toString();
                 JsonObject part=new JsonObject();part.addProperty("text",recipe);JsonObject candidate=new JsonObject();candidate.addProperty("finishReason","STOP");JsonArray parts=new JsonArray();parts.add(part);JsonObject content=new JsonObject();content.add("parts",parts);candidate.add("content",content);JsonArray candidates=new JsonArray();candidates.add(candidate);JsonObject result=new JsonObject();result.add("candidates",candidates);
                 return new okhttp3.Response.Builder().request(r).protocol(Protocol.HTTP_1_1).code(200).message("OK").body(ResponseBody.create(MediaType.get("application/json"),result.toString())).build();
             }).build();
             new PersonalGeminiApi(context,client).suggest(request(language)).enqueue(new Callback<RecipeSuggestion>(){
                 public void onResponse(Call<RecipeSuggestion> c,Response<RecipeSuggestion> r){try{assertSame(Looper.getMainLooper(),Looper.myLooper());assertTrue(r.isSuccessful());title.set(r.body().title);}catch(Throwable t){error.set(t);}finally{latch.countDown();}}
                 public void onFailure(Call<RecipeSuggestion> c,Throwable t){error.set(t);latch.countDown();}
-            });assertTrue(latch.await(10,TimeUnit.SECONDS));if(error.get()!=null)throw new AssertionError(error.get());assertEquals("Rice",title.get());
+            });assertTrue(latch.await(10,TimeUnit.SECONDS));if(error.get()!=null)throw new AssertionError(error.get());assertEquals(language.equals("ar")?"أرز":"Rice",title.get());
         }
     }
     @Test public void missingKeyReturnsSetupCodeWithoutNetworking() throws Exception {
