@@ -78,7 +78,7 @@
             <TextView android:id="@+id/tvResultSection" style="@style/Instrument" android:layout_marginTop="32dp" android:text="@string/kitchen_02_fresh_from_the_kitchen" />
             <TextView android:id="@+id/tvResultEyebrow" style="@style/Instrument" android:layout_marginTop="12dp" android:text="@string/ai_result_eyebrow" android:textColor="?attr/kitchenMuted" />
             <TextView android:id="@+id/tvMealTitle" style="@style/SectionTitle" android:fontFamily="serif" android:textSize="38sp" android:layout_marginTop="14dp" android:accessibilityLiveRegion="polite" />
-            <View android:layout_width="64dp" android:layout_height="3dp" android:layout_marginTop="24dp" android:background="?attr/kitchenAccent" />
+            <View android:layout_gravity="center_horizontal" android:layout_width="64dp" android:layout_height="3dp" android:layout_marginTop="24dp" android:background="?attr/kitchenAccent" />
             <TextView android:id="@+id/tvMealDescription" style="@style/BodyText" android:textColor="?attr/kitchenInk" android:textSize="17sp" android:layout_marginTop="20dp" />
             <TextView android:id="@+id/tvMealMeta" style="@style/Instrument" android:textSize="12sp" android:padding="16dp" android:layout_marginTop="24dp" android:background="@drawable/console_panel" android:visibility="gone" />
             <TextView android:id="@+id/tvMatch" style="@style/Instrument" android:layout_marginTop="24dp" android:visibility="gone" />

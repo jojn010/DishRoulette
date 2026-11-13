@@ -1,0 +1,4 @@
+<resources>
+    <string name="ui_sounds">المؤثرات الصوتية</string>
+    <string name="ui_sounds_description">أصوات خفيفة للأزرار وخطوات الطبخ والمؤقت. تحترم الوضع الصامت.</string>
+</resources>

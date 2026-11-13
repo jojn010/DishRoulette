@@ -1,4 +1,7 @@
-## Unreleased
+## v1.7.3
+
+- Center Home headings, navigation icon/label groups, recipe titles and screen headings; retain natural reading alignment for cooking instructions and ingredient entry in English and Arabic.
+- Replace in-app symbols with official Google Material Icons Round vectors and add downloaded Kenney CC0 button, completion and foreground timer sounds. Sound effects can be disabled in Settings and respect silent/vibrate mode and system volume. Asset sources and licenses are included in third_party.
 
 - Correct mirrored photo orientation for EXIF transpose/transverse images by applying the horizontal flip before rotation. Ingredient previews and the JPEG sent to Gemini now match the camera orientation; all eight EXIF orientations have pixel-position regression coverage.
 

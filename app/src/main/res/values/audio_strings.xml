@@ -1,0 +1,4 @@
+<resources>
+    <string name="ui_sounds">Sound effects</string>
+    <string name="ui_sounds_description">Soft feedback for actions, cooking steps and the timer. Respects silent mode.</string>
+</resources>

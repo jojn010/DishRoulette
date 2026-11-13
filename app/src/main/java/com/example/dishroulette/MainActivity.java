@@ -99,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean firingFinished;
     private Runnable pendingReveal;
     private MechanicalAudio mechanicalSound;
+    private UiAudio uiAudio;
+    void playUiClick(){if(uiAudio!=null)uiAudio.click();}
+    void playUiConfirm(){if(uiAudio!=null)uiAudio.confirm();}
+    void playTimerComplete(){if(uiAudio!=null && hasWindowFocus())uiAudio.timerComplete();}
     private KitchenScreens kitchenScreens;
     private final android.os.Handler presentation = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable waitingTick;
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         InterfaceSettings.simple(this);
         setTheme(R.style.Theme_DishRoulette_Simple);
         super.onCreate(state);
+        uiAudio=new UiAudio(this);
         photoIngredients = new PhotoIngredientsController(this, state);
         EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -578,6 +583,9 @@ public class MainActivity extends AppCompatActivity {
         binding.tvResultEyebrow.setText(R.string.fresh_recipe);
         binding.tvResultSection.setText(R.string.recipe_ready);
         binding.tvResultFooter.setVisibility(View.GONE);
+        binding.tvMealTitle.setGravity(android.view.Gravity.CENTER);
+        binding.tvResultEyebrow.setGravity(android.view.Gravity.CENTER);
+        binding.tvResultSection.setGravity(android.view.Gravity.CENTER);
         binding.btnCloseResult.setAllCaps(false);binding.btnRecipe.setAllCaps(false);binding.btnRecipe.setText(R.string.view_recipe);binding.btnRecipe.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));binding.btnLike.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));
         if(resultPreferences==null){resultPreferences=new androidx.appcompat.widget.AppCompatButton(this);resultPreferences.setText(R.string.edit_preferences);resultPreferences.setAllCaps(false);resultPreferences.setTextColor(UiColors.color(this,R.color.accent));resultPreferences.setBackgroundColor(UiColors.color(this,R.color.surface));resultPreferences.setMinHeight(Math.round(52*getResources().getDisplayMetrics().density));resultPreferences.setOnClickListener(v->{binding.cardMealResult.setVisibility(View.GONE);showFilters();});binding.resultActions.addView(resultPreferences,new LinearLayout.LayoutParams(-1,-2));}
         if(resultShare==null){resultShare=new androidx.appcompat.widget.AppCompatButton(this);resultShare.setId(R.id.shareRecipe);resultShare.setText(R.string.share_recipe);resultShare.setAllCaps(false);resultShare.setTextColor(UiColors.color(this,R.color.accent));resultShare.setBackgroundColor(UiColors.color(this,R.color.surface));resultShare.setMinHeight(Math.round(52*getResources().getDisplayMetrics().density));resultShare.setOnClickListener(v->shareRecipe(currentRecipe));binding.resultActions.addView(resultShare,new LinearLayout.LayoutParams(-1,-2));}
@@ -811,6 +819,7 @@ public class MainActivity extends AppCompatActivity {
         stopWaiting();kitchenScreens.dispose();
         loadout.dispose();
         if (mechanicalSound != null) mechanicalSound.close();
+        if(uiAudio!=null)uiAudio.close();
         if (pendingCall != null) pendingCall.cancel();
         super.onDestroy();
     }

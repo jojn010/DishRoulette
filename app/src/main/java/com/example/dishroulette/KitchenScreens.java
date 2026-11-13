@@ -54,8 +54,8 @@ final class KitchenScreens {
         FrameLayout.LayoutParams width=new FrameLayout.LayoutParams(-1,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL);
         page.addView(body,width);scroll.addView(page);host.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
         button(body,activity.getString(R.string.back),false,back);
-        text(body,label,11,R.color.accent,"monospace",24);
-        text(body,title,34,R.color.ink,"serif",12);
+        text(body,label,11,R.color.accent,"monospace",24).setGravity(Gravity.CENTER);
+        text(body,title,34,R.color.ink,"serif",12).setGravity(Gravity.CENTER);
         line(body);
     }
     private void line(LinearLayout parent) { View v=new View(activity);v.setBackgroundColor(UiColors.color(activity,R.color.line));LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(1));lp.topMargin=dp(20);lp.bottomMargin=dp(12);parent.addView(v,lp); }
@@ -70,7 +70,7 @@ final class KitchenScreens {
             android.graphics.drawable.GradientDrawable shape=new android.graphics.drawable.GradientDrawable();shape.setColor(UiColors.color(activity,primary?R.color.accent:R.color.surface));shape.setCornerRadius(dp(14));shape.setStroke(dp(1),UiColors.color(activity,R.color.line));b.setBackground(shape);
         }
         if(primary)b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(UiColors.color(activity,R.color.accent)));
-        b.setMinHeight(dp(52));b.setPadding(dp(14),dp(8),dp(14),dp(8));b.setOnClickListener(v->click.run());
+        b.setMinHeight(dp(52));b.setPadding(dp(14),dp(8),dp(14),dp(8));b.setOnClickListener(v->{activity.playUiClick();click.run();});
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(10);UiTypography.apply(b);parent.addView(b,lp);return b;
     }
     void saved(List<RecipeCatalog.Recipe> recipes) {
@@ -128,11 +128,17 @@ final class KitchenScreens {
         screen="settings";cooking=null;
         base(activity.getString(R.string.settings),activity.getString(R.string.appearance),this::close);
         text(body,activity.getString(R.string.settings_description),16,R.color.muted,"sans",6);
-        text(body,activity.getString(R.string.language),21,R.color.ink,"sans",24);
+        text(body,activity.getString(R.string.language),21,R.color.ink,"sans",24).setGravity(Gravity.CENTER);
         text(body,activity.getString(R.string.language_description),14,R.color.muted,"sans",8);
         Button english=button(body,"English",InterfaceSettings.language(activity).equals("en"),()->activity.changeLanguage("en"));english.setId(R.id.settingsEnglish);
         Button arabic=button(body,"العربية",InterfaceSettings.language(activity).equals("ar"),()->activity.changeLanguage("ar"));arabic.setId(R.id.settingsArabic);
         line(body);
+        com.google.android.material.switchmaterial.SwitchMaterial sounds=new com.google.android.material.switchmaterial.SwitchMaterial(activity);
+        sounds.setText(R.string.ui_sounds);sounds.setTextColor(UiColors.color(activity,R.color.ink));UiTypography.apply(sounds);sounds.setMinHeight(dp(56));
+        sounds.setChecked(InterfaceSettings.prefs(activity).getBoolean("ui_sounds",true));
+        sounds.setOnCheckedChangeListener((v,on)->{InterfaceSettings.prefs(activity).edit().putBoolean("ui_sounds",on).apply();if(on)activity.playUiConfirm();});
+        body.addView(sounds,new LinearLayout.LayoutParams(-1,-2));
+        text(body,activity.getString(R.string.ui_sounds_description),14,R.color.muted,"sans",4);
         Button preferences=button(body,activity.getString(R.string.recipe_preferences),false,activity::showFilters);preferences.setId(R.id.settingsRecipePreferences);
     }
 
@@ -241,12 +247,12 @@ final class KitchenScreens {
         LinearLayout timerActions=new LinearLayout(activity);timerActions.setOrientation(LinearLayout.VERTICAL);body.addView(timerActions);
         Button startTimer=button(timerActions,"",false,()->{});startTimer.setId(R.id.cookingTimerStart);
         Button resetTimer=button(timerActions,activity.getString(R.string.reset_timer),false,()->{});resetTimer.setId(R.id.cookingTimerReset);
-        text(timerActions,activity.getString(R.string.timer_notice),12,R.color.muted,"sans",8);
+        text(timerActions,activity.getString(R.string.timer_notice),12,R.color.muted,"sans",8).setGravity(Gravity.CENTER);
         LinearLayout nav=new LinearLayout(activity);nav.setOrientation(LinearLayout.HORIZONTAL);body.addView(nav);
         Button previous=button(nav,activity.getString(R.string.previous_step),false,()->{}),next=button(nav,activity.getString(R.string.next_step),true,()->{});
         LinearLayout.LayoutParams left=new LinearLayout.LayoutParams(0,-2,1);left.topMargin=dp(18);left.setMarginEnd(dp(6));previous.setLayoutParams(left);
         LinearLayout.LayoutParams right=new LinearLayout.LayoutParams(0,-2,1);right.topMargin=dp(18);next.setLayoutParams(right);
-        TextView finish=text(body,"",19,R.color.accent,"serif",20);
+        TextView finish=text(body,"",19,R.color.accent,"serif",20);finish.setGravity(Gravity.CENTER);
         button(body,activity.getString(R.string.back_overview),false,this::close);
         final int[] current={selected};
         final Runnable[] render={null};
@@ -257,7 +263,7 @@ final class KitchenScreens {
             progress.setText(activity.getString(R.string.step_progress,step+1,steps.size(),completed));bar.setProgress(completed);
             stepNumber.setText(String.format(activity.getResources().getConfiguration().getLocales().get(0),"%02d /",step+1));instruction.setText(steps.get(step));
             done.setOnCheckedChangeListener(null);done.setChecked(prefs.getBoolean(completeKey,false));
-            done.setOnCheckedChangeListener((v,on)->{prefs.edit().putBoolean(completeKey,on).apply();render[0].run();});
+            done.setOnCheckedChangeListener((v,on)->{if(on)activity.playUiConfirm();prefs.edit().putBoolean(completeKey,on).apply();render[0].run();});
             previous.setEnabled(step>0);next.setEnabled(step<steps.size()-1);
             finish.setText(completed==steps.size()?activity.getString(R.string.enjoy_meal):"");
             int minutes=suggestedMinutes(steps.get(step));timerActions.setVisibility(minutes>0?View.VISIBLE:View.GONE);timer.setVisibility(minutes>0?View.VISIBLE:View.GONE);
@@ -268,14 +274,14 @@ final class KitchenScreens {
                     long deadline=prefs.getLong(prefix+"_end",0),remaining=deadline>0?Math.max(0,deadline-System.currentTimeMillis()):prefs.getLong(prefix+"_left",minutes*60000L);
                     timer.update(remaining,minutes*60000L,deadline>0 && remaining>0);
                     startTimer.setText(deadline>0&&remaining>0?activity.getString(R.string.pause_timer):remaining==0?activity.getString(R.string.restart_timer,minutes):activity.getString(R.string.start_timer));
-                    if(deadline>0&&remaining==0)prefs.edit().putLong(prefix+"_end",0).putLong(prefix+"_left",0).apply();
+                    if(deadline>0&&remaining==0){prefs.edit().putLong(prefix+"_end",0).putLong(prefix+"_left",0).apply();activity.playTimerComplete();}
                     handler.postDelayed(this,1000);
                 }};timerTick.run();
                 startTimer.setOnClickListener(v->{
                     long end=prefs.getLong(prefix+"_end",0);SharedPreferences.Editor e=prefs.edit();
                     if(end>System.currentTimeMillis())e.putLong(prefix+"_left",end-System.currentTimeMillis()).putLong(prefix+"_end",0);
                     else {long leftMs=prefs.getLong(prefix+"_left",minutes*60000L);if(leftMs<=0)leftMs=minutes*60000L;e.putLong(prefix+"_end",System.currentTimeMillis()+leftMs);}
-                    e.apply();render[0].run();
+                    e.apply();activity.playUiClick();render[0].run();
                 });
                 resetTimer.setOnClickListener(v->{prefs.edit().remove(prefix+"_end").remove(prefix+"_left").apply();render[0].run();});
             }
