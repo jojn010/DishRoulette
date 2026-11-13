@@ -20,6 +20,5 @@
     <string name="food_photo_description">طماطم طازجة وأرز وبيض وأعشاب على طاولة المطبخ</string>
     <string name="food_inspiration_description">إلهام للطبخ: خضار مشوية وحبوب</string>
     <string name="food_photo_caption">شوية إلهام لمطبخك</string>
-    <string name="food_fresh_note">أفكار جديدة، مكونات من كل يوم</string>
-    <string name="connection_cta">ربط Gemini</string>
+
 </resources>

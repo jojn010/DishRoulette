@@ -57,9 +57,9 @@ public class PeopleCountTest {
                     assertEquals(6,a.profile().servings);
                     try {
                         Field f=MainActivity.class.getDeclaredField("loadout");f.setAccessible(true);
-                        ((IngredientLoadout)f.get(a)).restore(Arrays.asList("Rice","Tomato"),0);
+                        ((NativeIngredientLoadout)f.get(a)).restore(Arrays.asList("Rice","Tomato"),0);
                         Field api=MainActivity.class.getDeclaredField("recipeApi");api.setAccessible(true);
-                        api.set(a,(RecipeApi)request->{assertEquals(6,request.servings);assertEquals(language,request.language);return new DualInterfaceTest.LocalReply(request);});
+                        api.set(a,(RecipeApi)request->{assertEquals(6,request.servings);assertEquals(language,request.language);return new NativeAppFlowTest.LocalReply(request);});
                     }catch(ReflectiveOperationException e){throw new AssertionError(e);}
                     a.findViewById(R.id.simpleGenerate).performClick();
                 });Thread.sleep(800);

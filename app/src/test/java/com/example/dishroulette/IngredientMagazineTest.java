@@ -3,10 +3,10 @@ import org.junit.Test;
 import java.util.Arrays;
 import static org.junit.Assert.*;
 public class IngredientMagazineTest {
-    @Test public void sixRoundsStartANewLoadWithoutLosingAnyIngredients() {
+    @Test public void moreThanSixEntriesRemainAvailable() {
         IngredientMagazine m=new IngredientMagazine();
         for(String s:Arrays.asList("Chicken","Rice","Tomato","Onion","Garlic","Lemon")){m.edit(s);assertTrue(m.commit());}
-        assertEquals(6,m.active());assertEquals(1,m.page());assertEquals(6,m.count());
+        assertEquals(6,m.active());assertEquals(6,m.count());
         assertFalse(m.commit());assertEquals(6,m.active());
         m.edit("Pepper");assertTrue(m.commit());assertEquals(7,m.count());
         m.select(0);assertEquals("Chicken",m.text());
@@ -24,7 +24,7 @@ public class IngredientMagazineTest {
         m.edit("");for(int i=1;i<=20;i++){m.edit("item"+i);m.select(i+1);}
         assertNotNull(m.validationError());assertEquals(21,m.count());
     }
-    @Test public void pastedIngredientListsCannotBypassSingleCartridgeValidation() {
+    @Test public void pastedIngredientListsCannotBypassSingleEntryValidation() {
         for (String separator : Arrays.asList("\n", "\r\n", "\r", ",", ";", "،", "؛")) {
             IngredientMagazine m = new IngredientMagazine();
             String pasted = "rice" + separator + "chicken";

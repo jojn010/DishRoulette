@@ -6,12 +6,11 @@
 <item name="android:textColorPrimary">?attr/kitchenInk</item><item name="android:textColorSecondary">?attr/kitchenMuted</item>
 <item name="android:colorBackground">?attr/kitchenBackground</item><item name="android:windowBackground">?attr/kitchenBackground</item>
 <item name="android:fontFamily">sans</item><item name="elevationOverlayEnabled">false</item>
-<item name="shapeAppearanceSmallComponent">@style/IndustrialShape</item><item name="shapeAppearanceMediumComponent">@style/IndustrialShape</item><item name="shapeAppearanceLargeComponent">@style/IndustrialShape</item>
+<item name="shapeAppearanceSmallComponent">@style/SoftShape</item><item name="shapeAppearanceMediumComponent">@style/SoftShape</item><item name="shapeAppearanceLargeComponent">@style/SoftShape</item>
 <item name="android:windowLightStatusBar">false</item><item name="android:colorAccent">?attr/kitchenAccent</item>
 <item name="materialAlertDialogTheme">@style/KitchenDialog</item></style>
-<style name="Theme.DishRoulette" parent="Base.Theme.DishRoulette"><item name="kitchenBackground">@color/background</item><item name="kitchenSurface">@color/surface</item><item name="kitchenInk">@color/ink</item><item name="kitchenMuted">@color/muted</item><item name="kitchenAccent">@color/accent</item><item name="kitchenOnAccent">@color/on_accent</item><item name="kitchenLine">@color/line</item></style>
-<style name="KitchenDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog"><item name="shapeAppearanceMediumComponent">@style/IndustrialShape</item><item name="colorSurface">?attr/kitchenSurface</item></style>
-<style name="IndustrialShape" parent="ShapeAppearance.Material3.Corner.None"><item name="cornerFamily">cut</item><item name="cornerSize">2dp</item></style>
+
+<style name="KitchenDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog"><item name="shapeAppearanceMediumComponent">@style/SoftShape</item><item name="colorSurface">?attr/kitchenSurface</item></style>
 <style name="BodyText"><item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item><item name="android:textColor">?attr/kitchenMuted</item><item name="android:textSize">15sp</item><item name="android:fontFamily">sans</item><item name="android:lineSpacingExtra">4dp</item></style>
 <style name="SectionTitle" parent="BodyText"><item name="android:textColor">?attr/kitchenInk</item><item name="android:textSize">24sp</item><item name="android:fontFamily">sans-serif-condensed</item><item name="android:textStyle">bold</item></style>
 <style name="Instrument" parent="BodyText"><item name="android:fontFamily">monospace</item><item name="android:textSize">10sp</item><item name="android:letterSpacing">0.08</item><item name="android:textColor">?attr/kitchenAccent</item></style>

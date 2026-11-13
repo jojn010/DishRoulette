@@ -1,3 +1,13 @@
+## v1.8.0
+
+- Remove the abandoned Advanced interface: renderer, gestures, mechanical audio, hidden views, duplicate tablet XML and no-op adapters. Remove the OpenGL device requirement and the unused ConstraintLayout dependency.
+- Remove over 120 unused resources, obsolete sounds/icons/text, redundant legacy colors, pre-API24 launcher raster fallbacks and placeholder tests. Keep the native Google icons, Kenney UI sounds, bilingual recipe library and owner setup tools.
+- Give preferences their own meal controls. Apply saves all changes together; Cancel no longer changes the selected meal.
+- Preserve the ingredient being edited across rotation so an update cannot become an accidental new ingredient. Ignore late generation callbacks after cancellation or replacement.
+- Integrate the preserved local cooking workspace: clear step card, readable progress, circular timer and expandable nutrition below cooking controls. Preserve current language, theme and timer fixes.
+- Correct outdated connection guidance and count labels in English/Arabic; reuse drawing objects in the animated timer.
+- Replace retired Advanced tests with native cancellation, rotation and preferences regressions. Update bilingual saved fixtures and stabilize import taps after keyboard dismissal.
+
 ## v1.7.9
 
 - Add Light, Dark and Use device theme choices in Settings, saved across restarts and applied throughout the app. System mode follows device changes, while explicit Light/Dark choices override them.

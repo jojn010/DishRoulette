@@ -1,7 +1,6 @@
 package com.example.dishroulette;
 
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.InputType;
 import android.view.View;
@@ -19,7 +18,7 @@ final class GeminiSetupDialog {
         GeminiCredentials store=new GeminiCredentials(activity);GeminiCredentials.Value saved=store.read();
         LinearLayout content=new LinearLayout(activity);content.setOrientation(LinearLayout.VERTICAL);int pad=dp(activity,24);content.setPadding(pad,dp(activity,8),pad,dp(activity,12));
         TextView intro=text(activity,content,activity.getString(R.string.gemini_intro));intro.setTextSize(15);
-        EditText key=new androidx.appcompat.widget.AppCompatEditText(activity);key.setId(R.id.geminiKey);key.setHint(saved==null?R.string.gemini_key_hint:R.string.gemini_key_replace);key.setContentDescription(activity.getString(R.string.gemini_key_hint));key.setSingleLine(true);key.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);key.setSaveEnabled(false);key.setTextDirection(View.TEXT_DIRECTION_LTR);key.setImeOptions(android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);if(android.os.Build.VERSION.SDK_INT>=26)key.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);content.addView(key,new LinearLayout.LayoutParams(-1,dp(activity,56)));
+        EditText key=new androidx.appcompat.widget.AppCompatEditText(activity);key.setId(R.id.geminiKey);key.setHint(saved==null?R.string.gemini_key_hint:R.string.gemini_key_replace);key.setContentDescription(activity.getString(R.string.gemini_key_hint));key.setSingleLine(true);key.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);key.setSaveEnabled(false);key.setTextDirection(View.TEXT_DIRECTION_LTR);if(android.os.Build.VERSION.SDK_INT>=26){key.setImeOptions(android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);key.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);}content.addView(key,new LinearLayout.LayoutParams(-1,dp(activity,56)));
         text(activity,content,activity.getString(R.string.gemini_model));
         EditText model=new androidx.appcompat.widget.AppCompatEditText(activity);model.setId(R.id.geminiModel);model.setSingleLine(true);model.setText(saved==null?GeminiCredentials.DEFAULT_MODEL:saved.model);model.setTextSize(14);model.setTextDirection(View.TEXT_DIRECTION_LTR);model.setContentDescription(activity.getString(R.string.gemini_model));content.addView(model,new LinearLayout.LayoutParams(-1,dp(activity,52)));
         TextView status=text(activity,content,activity.getString(saved==null?R.string.gemini_not_connected:R.string.gemini_key_saved));status.setId(R.id.geminiStatus);status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);

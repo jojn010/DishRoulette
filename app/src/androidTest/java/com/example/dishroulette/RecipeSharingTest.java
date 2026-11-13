@@ -22,10 +22,12 @@ public class RecipeSharingTest {
         File dir=InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir("recipe-sharing");
         try(FileOutputStream out=new FileOutputStream(new File(dir,name+".png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
     }
-    private void pasteAndReview(String code){
+    private void pasteAndReview(String code)throws Exception{
         onView(withId(R.id.importRecipe)).perform(scrollTo(),click());
         onView(withId(R.id.recipeCodeInput)).perform(scrollTo(),replaceText(code),closeSoftKeyboard());
-        onView(withText(R.string.review_recipe)).perform(click());
+        // Wait for the IME hide animation before tapping the dialog, which changes position.
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();Thread.sleep(400);
+        onView(withId(android.R.id.button1)).perform(click());
     }
     @Test public void bilingualCopyReviewRotateSaveDeduplicateAndCookOffline()throws Exception{
         Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -43,6 +45,12 @@ public class RecipeSharingTest {
                 onView(withId(R.id.copyRecipeCode)).perform(click());
                 scenario.onActivity(a->{copied[0]=((android.content.ClipboardManager)a.getSystemService(Context.CLIPBOARD_SERVICE)).getPrimaryClip().getItemAt(0).getText().toString();assertTrue(copied[0].startsWith("TABKHA1:"));a.showSavedRecipes();});
                 pasteAndReview(copied[0]);capture(language+"-review");
+                scenario.onActivity(a->{try{
+                    Field f=MainActivity.class.getDeclaredField("sharing");f.setAccessible(true);
+                    android.os.Bundle state=new android.os.Bundle();((RecipeSharingController)f.get(a)).save(state);
+                    assertTrue("Missing review state: "+new java.util.ArrayList<>(state.keySet()),state.containsKey("shared_recipe_review"));
+                    assertNotNull(RecipeShareCodec.decode(state.getString("shared_recipe_review")));
+                }catch(ReflectiveOperationException e){throw new AssertionError(e);}});
                 scenario.recreate();onView(withText(R.string.import_save)).perform(click());
                 String id=RecipeShareCodec.decode(copied[0]).id;
                 scenario.onActivity(a->{

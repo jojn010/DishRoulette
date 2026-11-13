@@ -14,6 +14,9 @@ import java.util.Locale;
 /** A remaining-time dial that scales down on narrow screens. */
 final class CookingTimerView extends View {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF ring = new RectF();
+    private final Typeface timeTypeface = Typeface.create("sans-serif", Typeface.BOLD);
+    private final Typeface statusTypeface = Typeface.create("sans-serif", Typeface.NORMAL);
     private long remaining, duration = 1;
     private float displayedFraction;
     private ValueAnimator sweep;
@@ -90,7 +93,7 @@ final class CookingTimerView extends View {
         canvas.drawCircle(cx, cy, radius, paint);
         paint.setColor(accent);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        RectF ring = new RectF(cx-radius, cy-radius, cx+radius, cy+radius);
+        ring.set(cx-radius, cy-radius, cx+radius, cy+radius);
         canvas.drawArc(ring, -90, 360 * displayedFraction, false, paint);
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStrokeWidth(size * .006f);
@@ -110,12 +113,12 @@ final class CookingTimerView extends View {
         }
         paint.setStyle(Paint.Style.FILL);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+        paint.setTypeface(timeTypeface);
         paint.setColor(UiColors.color(getContext(), R.color.ink));
         paint.setTextSize(size * .19f);
         if (paint.measureText(time) > size * .66f) paint.setTextSize(paint.getTextSize() * size * .66f / paint.measureText(time));
         canvas.drawText(time, cx, cy-(paint.ascent()+paint.descent())/2, paint);
-        paint.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        paint.setTypeface(statusTypeface);
         paint.setTextSize(size * .055f);
         if (paint.measureText(status) > size * .64f) paint.setTextSize(paint.getTextSize() * size * .64f / paint.measureText(status));
         paint.setColor(UiColors.color(getContext(), R.color.muted));

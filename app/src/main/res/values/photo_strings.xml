@@ -16,7 +16,7 @@
     <string name="photo_add">Add to pantry</string>
     <string name="photo_added">Ingredients added. Tap Find a recipe to make a dish.</string>
     <string name="photo_review_empty">Enter at least one ingredient, one per line.</string>
-    <string name="photo_connect_first">Connect Gemini in Settings first, then try your photo again.</string>
+    <string name="photo_connect_first">Set up your personal Gemini connection, then try your photo again.</string>
     <string name="photo_interrupted">Analysis was interrupted. Tap Identify ingredients to retry.</string>
     <string name="photo_empty">No clear ingredients found. Try a well-lit photo of individual foods or edit your pantry manually.</string>
     <string name="photo_read_error">Could not read this photo. Please try another image.</string>

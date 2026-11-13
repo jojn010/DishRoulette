@@ -33,13 +33,22 @@ public class SavedRecipeCardsTest {
         }
         if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++)readable(((ViewGroup)v).getChildAt(i));
     }
+    private void translations(RecipeCatalog.Recipe recipe,String enTitle,String arTitle){
+        com.example.dishroulette.core.RecipeTranslation en=new com.example.dishroulette.core.RecipeTranslation();
+        en.title=enTitle;en.description="A simple dish to share.";en.ingredients=java.util.List.of("1 can chickpeas");en.steps=java.util.List.of("Mix and serve.");
+        com.example.dishroulette.core.RecipeTranslation ar=new com.example.dishroulette.core.RecipeTranslation();
+        ar.title=arTitle;ar.description="وجبة بسيطة للمشاركة.";ar.ingredients=java.util.List.of("علبة حمص");ar.steps=java.util.List.of("اخلط المكونات وقدّمها.");
+        recipe.translations=java.util.Map.of("en",en,"ar",ar);
+    }
     @Test public void bilingualLibrary()throws Exception{
         for(String language:new String[]{"en","ar"}){
             boolean ar=language.equals("ar");
-            InterfaceSettings.prefs(InstrumentationRegistry.getInstrumentation().getTargetContext()).edit().putString(InterfaceSettings.LANGUAGE,language).putBoolean("reduce_motion",true).commit();
+            InterfaceSettings.prefs(InstrumentationRegistry.getInstrumentation().getTargetContext()).edit().putString(InterfaceSettings.LANGUAGE,language).putBoolean("reduce_motion",true).putString("spin_profile","{}").commit();
             RecipeCatalog.Recipe first=new RecipeCatalog.Recipe("card-first",ar?"أرز بالبندورة":"Tomato rice","Dinner",20,2,ar?"وجبة دافئة وبسيطة من الأرز والبندورة.":"A warm, simple tomato rice dish.","rice","1 cup rice","Cook rice for 15 minutes.");
             first.caloriesPerServing=320;first.proteinGramsPerServing=12.5;first.carbohydratesGramsPerServing=45.0;first.fatGramsPerServing=9.0;first.fiberGramsPerServing=4.0;first.sugarGramsPerServing=3.0;first.sodiumMilligramsPerServing=300.0;
             RecipeCatalog.Recipe second=new RecipeCatalog.Recipe("card-second",ar?"سلطة الحمص بالليمون":"Lemony chickpea salad","Lunch",15,2,ar?"خضار مقرمشة وحمص مع صلصة الليمون.":"Crisp vegetables, chickpeas and a bright lemon dressing.","chickpeas","1 can chickpeas","Mix and serve.");
+            first.language=language;second.language=language;
+            translations(second,"Lemony chickpea salad","سلطة الحمص بالليمون");
             try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
                 scenario.onActivity(a->screens(a).saved(Arrays.asList(first,second)));
                 capture(language+"-library");

@@ -15,7 +15,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import java.util.List;
 
-/** A native, lightweight recipe discovery home. It never references the renderer or 3D meshes. */
+/** Native recipe discovery, pantry editing and responsive navigation. */
 final class SimpleHomeView extends LinearLayout {
     private final MainActivity activity;
     private final NativeIngredientLoadout loadout;
@@ -42,7 +42,7 @@ final class SimpleHomeView extends LinearLayout {
     SimpleHomeView(MainActivity a,NativeIngredientLoadout loadout){
         super(a);activity=a;this.loadout=loadout;setOrientation(VERTICAL);setBackgroundColor(color(R.color.background));
         header=row();header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),0,dp(22),0);
-        TextView logo=label(header,activity.getString(R.string.app_name),23,R.color.ink,0);logo.setTypeface(Typeface.create("serif",Typeface.BOLD));logo.setLayoutParams(new LayoutParams(0,-2,1));logo.setGravity(isArabic()?Gravity.RIGHT:Gravity.LEFT);UiIcons.text(logo,R.drawable.ic_bowl);
+        TextView logo=label(header,activity.getString(R.string.app_name),23,R.color.ink,0);logo.setTypeface(Typeface.create("serif",Typeface.BOLD));logo.setLayoutParams(new LayoutParams(0,-2,1));logo.setGravity(Gravity.START);UiIcons.text(logo,R.drawable.ic_bowl);
         language=button(header,InterfaceSettings.language(a).equals("ar")?"EN":"العربية",false,()->a.changeLanguage(InterfaceSettings.language(a).equals("ar")?"en":"ar"));language.setContentDescription(a.getString(R.string.language));language.setMinHeight(dp(48));language.setLayoutParams(new LayoutParams(-2,-2));header.setMinimumHeight(dp(64));addView(header,new LayoutParams(-1,-2));
         scroll=new ScrollView(a);scroll.setFillViewport(true);addView(scroll,new LayoutParams(-1,0,1));
         AdaptivePageFrame frame=new AdaptivePageFrame(a,1000);scroll.addView(frame);
@@ -76,7 +76,7 @@ final class SimpleHomeView extends LinearLayout {
         input.setGravity(Gravity.CENTER_VERTICAL|Gravity.START);
         empty=label(pantry,a.getString(R.string.ingredients_empty)+"\n"+a.getString(R.string.ingredients_empty_detail),15,R.color.muted,16);
         editHint=label(pantry,a.getString(R.string.tap_to_edit),12,R.color.muted,8);
-        clear=button(pantry,a.getString(R.string.clear_all),false,()->{loadout.clearAll();editing=false;setDraft("");});
+        clear=button(pantry,a.getString(R.string.clear_all),false,()->{loadout.clearAll();finishEditing();});
         clear.setStrokeWidth(0);clear.setBackgroundTintList(ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
         scan=button(workspace,a.getString(R.string.photo_scan),false,a::scanIngredients);scan.setId(R.id.photoScan);UiIcons.button(scan,R.drawable.ic_camera);
         scan.setBackgroundTintList(ColorStateList.valueOf(color(R.color.background)));
@@ -110,7 +110,13 @@ final class SimpleHomeView extends LinearLayout {
                     ()->{if(i==1)a.showSavedRecipes();else if(i==2)a.showSettings();else if(Experience.reduced(a))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);});
             LayoutParams navLp=new LayoutParams(0,-2,1);navLp.setMarginStart(dp(3));navLp.setMarginEnd(dp(3));navigation.addView(button,navLp);
         }
-        input.setText(InterfaceSettings.prefs(a).getString("simple_input_draft",""));loadout.setFocusListener(this::editCurrent);refresh();setFocusableInTouchMode(true);requestFocus();
+        input.setText(InterfaceSettings.prefs(a).getString("simple_input_draft",""));
+        int savedEdit=InterfaceSettings.prefs(a).getInt("simple_input_edit_slot",-1);
+        List<String> slots=loadout.magazine().save();
+        if(savedEdit>=0&&savedEdit<slots.size()&&!slots.get(savedEdit).trim().isEmpty()){
+            editing=true;editIndex=savedEdit;add.setText(R.string.update_ingredient);
+        }else InterfaceSettings.prefs(a).edit().remove("simple_input_edit_slot").apply();
+        loadout.setFocusListener(this::editCurrent);refresh();setFocusableInTouchMode(true);requestFocus();
     }
     @Override protected void onMeasure(int widthSpec,int heightSpec){
         float font=Math.max(1f,getResources().getConfiguration().fontScale);
@@ -172,7 +178,6 @@ final class SimpleHomeView extends LinearLayout {
     private void showFocusedInput(){
         if(keyboardVisible&&input.hasFocus()&&input.hasWindowFocus())input.requestRectangleOnScreen(new android.graphics.Rect(0,0,input.getWidth(),input.getHeight()),true);
     }
-    private boolean isArabic(){return InterfaceSettings.language(activity).equals("ar");}
     private int color(int id){return UiColors.color(activity,id);}
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
     private LinearLayout row(){LinearLayout l=new LinearLayout(activity);l.setOrientation(HORIZONTAL);return l;}
@@ -181,13 +186,18 @@ final class SimpleHomeView extends LinearLayout {
     private TextView label(LinearLayout parent,String value,int size,int color,int top){TextView t=new TextView(activity);t.setText(value);t.setGravity(Gravity.CENTER);t.setTextSize(size);t.setTextColor(color(color));t.setLineSpacing(dp(3),1);t.setTextDirection(TEXT_DIRECTION_FIRST_STRONG);UiTypography.apply(t);LayoutParams lp=new LayoutParams(-1,-2);lp.topMargin=dp(top);parent.addView(t,lp);return t;}
     private MaterialButton button(LinearLayout parent,String text,boolean primary,Runnable action){MaterialButton b=new MaterialButton(activity);b.setText(text);b.setGravity(Gravity.CENTER);UiTypography.apply(b);b.setTextSize(14);b.setAllCaps(false);b.setCornerRadius(dp(14));b.setMinHeight(dp(52));b.setTextColor(color(primary?R.color.on_accent:R.color.accent));b.setBackgroundTintList(ColorStateList.valueOf(color(primary?R.color.accent:R.color.surface)));b.setStrokeColor(ColorStateList.valueOf(color(R.color.line)));b.setStrokeWidth(primary?0:dp(1));b.setPadding(dp(12),dp(6),dp(12),dp(6));b.setOnClickListener(v->{activity.playUiClick();action.run();});parent.addView(b,new LayoutParams(-1,-2));return b;}
     private void setDraft(String value){syncing=true;input.setText(value);syncing=false;InterfaceSettings.prefs(activity).edit().putString("simple_input_draft",value).apply();}
-    private void editCurrent(){editing=true;editIndex=loadout.magazine().active();setDraft(loadout.magazine().text());add.setText(R.string.update_ingredient);input.requestFocus();input.setSelection(input.length());((android.view.inputmethod.InputMethodManager)activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)).showSoftInput(input,android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);}
+    private void finishEditing(){
+        editing=false;
+        InterfaceSettings.prefs(activity).edit().remove("simple_input_edit_slot").apply();
+        setDraft("");add.setText(R.string.add);
+    }
+    private void editCurrent(){editing=true;editIndex=loadout.magazine().active();InterfaceSettings.prefs(activity).edit().putInt("simple_input_edit_slot",editIndex).apply();setDraft(loadout.magazine().text());add.setText(R.string.update_ingredient);input.requestFocus();input.setSelection(input.length());((android.view.inputmethod.InputMethodManager)activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)).showSoftInput(input,android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);}
     boolean commitPending(){
         if(busy)return false;String value=input.getText().toString().trim();if(value.isEmpty())return true;
         IngredientMagazine m=loadout.magazine();List<String> backup=m.save();int selected=m.active();int slot=editing?editIndex:0;
         if(!editing){while(slot<backup.size()&&!backup.get(slot).trim().isEmpty())slot++;}
         m.select(slot);m.edit(value);String error=m.validationError();if(error!=null){m.restore(backup,selected);input.setError(IngredientValidation.message(activity,error));return false;}
-        m.commit();editing=false;setDraft("");add.setText(R.string.add);loadout.publish();return true;
+        m.commit();finishEditing();loadout.publish();return true;
     }
     void refresh(){
         if(input==null)return;scan.setEnabled(!busy);boolean discovery=activity.profile().mode.equals("discover");
@@ -197,7 +207,7 @@ final class SimpleHomeView extends LinearLayout {
         ingredientCount.setText(activity.getString(R.string.ingredients_count,loadout.magazine().count()));empty.setVisibility(loadout.magazine().count()==0?VISIBLE:GONE);
         editHint.setVisibility(loadout.magazine().count()==0?GONE:VISIBLE);clear.setVisibility(loadout.magazine().count()==0?GONE:VISIBLE);clear.setEnabled(!busy);
         ingredients.removeAllViews();List<String> slots=loadout.magazine().save();
-        for(int i=0;i<slots.size();i++){if(slots.get(i).trim().isEmpty())continue;final int slot=i;String name=slots.get(i);Chip chip=new Chip(activity);chip.setText(name);UiTypography.apply(chip);chip.setTextSize(15);chip.setChipIconResource(R.drawable.ic_leaf);chip.setChipIconVisible(true);chip.setChipIconTint(ColorStateList.valueOf(color(R.color.accent)));chip.setCloseIconVisible(true);chip.setChipBackgroundColor(ColorStateList.valueOf(color(R.color.background)));chip.setTextColor(color(R.color.ink));chip.setCloseIconContentDescription(activity.getString(R.string.remove_ingredient_a11y,name));chip.setContentDescription(activity.getString(R.string.edit_ingredient_a11y,name));chip.setOnClickListener(v->loadout.select(slot));chip.setOnCloseIconClickListener(v->{loadout.magazine().select(slot);loadout.clearChamber();if(editing&&editIndex==slot){editing=false;setDraft("");}});chip.setEnabled(!busy);ingredients.addView(chip);}
+        for(int i=0;i<slots.size();i++){if(slots.get(i).trim().isEmpty())continue;final int slot=i;String name=slots.get(i);Chip chip=new Chip(activity);chip.setText(name);UiTypography.apply(chip);chip.setTextSize(15);chip.setChipIconResource(R.drawable.ic_leaf);chip.setChipIconVisible(true);chip.setChipIconTint(ColorStateList.valueOf(color(R.color.accent)));chip.setCloseIconVisible(true);chip.setChipBackgroundColor(ColorStateList.valueOf(color(R.color.background)));chip.setTextColor(color(R.color.ink));chip.setCloseIconContentDescription(activity.getString(R.string.remove_ingredient_a11y,name));chip.setContentDescription(activity.getString(R.string.edit_ingredient_a11y,name));chip.setOnClickListener(v->loadout.select(slot));chip.setOnCloseIconClickListener(v->{loadout.magazine().select(slot);loadout.clearChamber();if(editing&&editIndex==slot)finishEditing();});chip.setEnabled(!busy);ingredients.addView(chip);}
         peopleCount.setText(activity.getString(R.string.people_count,activity.profile().servings));
         peopleSlider.setValue(activity.profile().servings);peopleSlider.setEnabled(!busy);
         fewerPeople.setEnabled(!busy&&activity.profile().servings>1);morePeople.setEnabled(!busy&&activity.profile().servings<12);

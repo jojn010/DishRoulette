@@ -20,6 +20,5 @@
     <string name="food_photo_description">Fresh tomatoes, rice, eggs and herbs on a kitchen counter</string>
     <string name="food_inspiration_description">Cooking inspiration: roasted vegetables and grains</string>
     <string name="food_photo_caption">A little inspiration for your kitchen</string>
-    <string name="food_fresh_note">Fresh ideas, everyday ingredients</string>
-    <string name="connection_cta">Connect Gemini</string>
+
 </resources>

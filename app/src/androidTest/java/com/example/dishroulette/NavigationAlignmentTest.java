@@ -14,7 +14,7 @@ public class NavigationAlignmentTest {
         if(v instanceof TextView&&((TextView)v).getText().toString().equals(value))return (TextView)v;
         if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){TextView t=text(((ViewGroup)v).getChildAt(i),value);if(t!=null)return t;}return null;
     }
-    @Test public void labelsStayCenteredBelowTheirIconsAfterLanguageSwitches()throws Exception{
+    @Test public void iconLabelGroupsStayCenteredAfterLanguageSwitches()throws Exception{
         android.content.Context c=InstrumentationRegistry.getInstrumentation().getTargetContext();
         InterfaceSettings.prefs(c).edit().putString(InterfaceSettings.LANGUAGE,"ar").commit();
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
@@ -28,9 +28,17 @@ public class NavigationAlignmentTest {
                     int[] iconPosition=new int[2],labelPosition=new int[2];icon.getLocationOnScreen(iconPosition);label.getLocationOnScreen(labelPosition);
                     float iconCenter=iconPosition[0]+icon.getWidth()/2f;
                     float labelCenter=labelPosition[0]+label.getCompoundPaddingLeft()+(label.getLayout().getLineLeft(0)+label.getLayout().getLineRight(0))/2f;
-                    System.out.println(language+" "+label.getText()+" iconCenter="+iconCenter+" labelCenter="+labelCenter);
-                    assertEquals(label.getText().toString(),iconCenter,labelCenter,1f);
-                    assertTrue("Label must be below its icon",labelPosition[1]>=iconPosition[1]+icon.getHeight());
+                    if(button.getOrientation()==android.widget.LinearLayout.VERTICAL){
+                        assertEquals(label.getText().toString(),iconCenter,labelCenter,1f);
+                        assertTrue("Label must be below its icon",labelPosition[1]>=iconPosition[1]+icon.getHeight());
+                    }else{
+                        assertEquals("Row icon and label must align vertically",iconPosition[1]+icon.getHeight()/2f,labelPosition[1]+label.getHeight()/2f,1f);
+                        int[] position=new int[2];button.getLocationOnScreen(position);
+                        float left=Math.min(iconPosition[0],labelPosition[0]);
+                        float right=Math.max(iconPosition[0]+icon.getWidth(),labelPosition[0]+label.getWidth());
+                        assertEquals("Compact icon-label group must be centered",position[0]+button.getWidth()/2f,(left+right)/2f,1f);
+                        assertTrue(language.equals("ar")?iconPosition[0]>=labelPosition[0]+label.getWidth():labelPosition[0]>=iconPosition[0]+icon.getWidth());
+                    }
                 }});
                 Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
                 File file=new File(c.getExternalFilesDir(null),"navigation-"+language+".png");

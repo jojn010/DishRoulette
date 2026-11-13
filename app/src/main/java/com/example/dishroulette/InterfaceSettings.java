@@ -10,13 +10,12 @@ final class InterfaceSettings {
     static final String STORE="dishroulette_ui", MODE="interface_mode", LANGUAGE="interface_language";
     private InterfaceSettings() { }
     static SharedPreferences prefs(Context c){return c.getSharedPreferences(STORE,0);}
-    static boolean simple(Context c){
+    static void migrateLegacyMode(Context c){
         SharedPreferences p=prefs(c);
         // Migrate legacy installations without changing recipes, ingredients or language.
         if (!"simple".equals(p.getString(MODE,""))) {
             p.edit().putString(MODE,"simple").apply();
         }
-        return true;
     }
     static String language(Context c){
         String saved=prefs(c).getString(LANGUAGE,"");

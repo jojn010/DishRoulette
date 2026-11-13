@@ -1,6 +1,8 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
     <TextView style="@style/Instrument" android:text="@string/kitchen_03_kitchen_settings" android:layout_marginBottom="16dp"/>
+    <TextView style="@style/SectionTitle" android:text="@string/meal_label" />
+    <com.google.android.material.chip.ChipGroup android:id="@+id/mealChips" android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true" />
     <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/switchFavorites" android:textColor="?attr/kitchenInk" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/use_favorites"/>
     <TextView android:id="@+id/tvTasteSummary" style="@style/BodyText" android:text="@string/taste_empty"/>
     <TextView style="@style/SectionTitle" android:layout_marginTop="20dp" android:text="@string/goal_label"/>
@@ -20,6 +22,5 @@
 <TextView style="@style/SectionTitle" android:layout_marginTop="24dp" android:text="@string/kitchen_experience"/>
 <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/switchMotion" android:textColor="?attr/kitchenInk" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:text="@string/kitchen_reduce_motion"/>
 <TextView style="@style/BodyText" android:text="@string/kitchen_shorter_transitions_steady_camera_and_softer_firing_effects" android:textSize="12sp"/>
-<com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/switchSound" android:textColor="?attr/kitchenInk" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:text="@string/kitchen_mechanical_sound"/>
 </LinearLayout>
 </androidx.core.widget.NestedScrollView>

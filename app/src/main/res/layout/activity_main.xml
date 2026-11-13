@@ -1,67 +1,10 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent" android:background="?attr/kitchenBackground">
-    <LinearLayout android:id="@+id/advancedHome" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="60dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
-            <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
-                <TextView android:id="@+id/tvTitle" style="@style/SectionTitle" android:text="@string/kitchen_dish_roulette" android:textSize="22sp" />
-                <TextView android:id="@+id/tvBrandCaption" style="@style/Instrument" android:text="@string/kitchen_the_midnight_kitchen_01" android:textSize="10sp" />
-            </LinearLayout>
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnSaved" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/saved" />
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnFilters" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_marginStart="6dp" android:text="@string/table_settings" />
-        </LinearLayout>
-        <com.google.android.material.chip.ChipGroup android:id="@+id/modeChips" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="16dp" app:chipSpacingHorizontal="6dp" app:singleSelection="true" app:selectionRequired="true" />
-        <FrameLayout android:id="@+id/sceneFrame" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="160dp">
-            <FrameLayout android:id="@+id/sceneHost" android:layout_width="match_parent" android:layout_height="match_parent" />
-            <com.example.dishroulette.SceneHudView android:id="@+id/sceneHud" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" />
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp" android:clickable="false">
-                <TextView style="@style/Instrument" android:text="@string/kitchen_01_the_loadout" />
-                <TextView android:id="@+id/tvWeaponName" style="@style/SectionTitle" android:text="@string/kitchen_the_classic" android:textSize="30sp" />
-                <TextView android:id="@+id/tvWeaponDetail" style="@style/Instrument" android:text="@string/kitchen_six_chambers_endless_possibilities" android:textColor="?attr/kitchenMuted" android:textSize="10sp" />
-            </LinearLayout>
-            <LinearLayout android:id="@+id/cookingStatus" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="bottom" android:layout_marginBottom="68dp" android:orientation="vertical" android:gravity="center" android:padding="16dp" android:background="#DD101310">
-                <TextView style="@style/Instrument" android:text="@string/kitchen_the_kitchen_is_working" android:gravity="center" />
-                <TextView android:id="@+id/tvCookingStatus" style="@style/SectionTitle" android:text="@string/kitchen_preheating" android:textSize="28sp" android:gravity="center" />
-                <TextView style="@style/BodyText" android:text="@string/kitchen_your_recipe_is_being_generated" android:gravity="center" android:textSize="12sp" />
-                <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCancelGeneration" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_marginTop="16dp" android:text="@string/kitchen_cancel_return_to_loadout" />
-            </LinearLayout>
-        </FrameLayout>
-        <LinearLayout android:id="@+id/goalRail" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginHorizontal="16dp">
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnBalanced" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/kitchen_balanced" />
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCut" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/kitchen_cut" />
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnBulk" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/kitchen_bulk" />
-        </LinearLayout>
-        <LinearLayout android:id="@+id/ingredientConsole" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="16dp" android:paddingTop="10dp" android:background="?attr/kitchenBackground">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
-                <TextView android:id="@+id/tvMagazineStatus" style="@style/Instrument" android:layout_width="0dp" android:layout_weight="1" android:accessibilityLiveRegion="polite" />
-                <TextView android:id="@+id/tvLoadState" style="@style/Instrument" android:layout_width="wrap_content" android:text="@string/kitchen_empty" android:textColor="?attr/kitchenMuted" />
-            </LinearLayout>
-            <HorizontalScrollView android:id="@+id/ammoScroll" android:layout_width="match_parent" android:layout_height="52dp" android:scrollbars="none">
-                <LinearLayout android:id="@+id/ammoTray" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal" />
-            </HorizontalScrollView>
-            <TextView android:id="@+id/tvSceneHelp" style="@style/Instrument" android:text="@string/ammo_help" android:textSize="10sp" android:textColor="?attr/kitchenMuted" android:paddingBottom="8dp" />
-            <LinearLayout android:layout_width="match_parent" android:layout_height="48dp">
-                <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnPreviousLoad" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/kitchen_load" />
-                <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnClearChamber" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/kitchen_remove" />
-                <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnNextLoad" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/kitchen_load_label" />
-                <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnClearAll" style="@style/TableControl" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:text="@string/kitchen_clear_all" />
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout android:id="@+id/fireConsole" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="16dp" android:paddingTop="10dp" android:paddingBottom="8dp">
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnSpin" style="@style/TableControl" android:layout_width="match_parent" android:layout_height="56dp" android:background="@drawable/fire_control" android:text="@string/spin" android:textColor="?attr/kitchenInk" android:textSize="20sp" android:letterSpacing="0.16" />
-            <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/spinProgress" android:layout_width="match_parent" android:layout_height="2dp" android:visibility="gone" android:indeterminate="true" />
-            <TextView android:id="@+id/tvSpinCounter" style="@style/Instrument" android:textSize="10sp" android:textColor="?attr/kitchenMuted" android:paddingTop="6dp" android:gravity="center" />
-        </LinearLayout>
-        <LinearLayout android:id="@+id/settingsDrawer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
-            <TextView style="@style/Instrument" android:text="@string/kitchen_meal_what_are_you_craving" />
-            <com.google.android.material.chip.ChipGroup android:id="@+id/mealChips" android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true" />
-            <TextView android:id="@+id/tvFilterSummary" style="@style/BodyText" android:layout_marginBottom="16dp" android:textSize="12sp" />
-        </LinearLayout>
-    </LinearLayout>
-    <FrameLayout android:id="@+id/simpleHome" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent">
+    <FrameLayout android:id="@+id/simpleHome" android:layout_width="match_parent" android:layout_height="match_parent" />
     <ScrollView android:id="@+id/cardMealResult" android:layout_width="match_parent" android:layout_height="match_parent" android:background="?attr/kitchenBackground" android:visibility="gone" android:fillViewport="true">
         <com.example.dishroulette.AdaptivePageFrame android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
-            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCloseResult" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/kitchen_back_to_loadout" />
-            <TextView android:id="@+id/tvResultSection" style="@style/Instrument" android:layout_marginTop="32dp" android:text="@string/kitchen_02_fresh_from_the_kitchen" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btnCloseResult" style="@style/TableControl" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/back_home" />
+            <TextView android:id="@+id/tvResultSection" style="@style/Instrument" android:layout_marginTop="32dp" android:text="@string/recipe_ready" />
             <TextView android:id="@+id/tvResultEyebrow" style="@style/Instrument" android:layout_marginTop="12dp" android:text="@string/ai_result_eyebrow" android:textColor="?attr/kitchenMuted" />
             <TextView android:id="@+id/tvMealTitle" style="@style/SectionTitle" android:fontFamily="serif" android:textSize="38sp" android:layout_marginTop="14dp" android:accessibilityLiveRegion="polite" />
             <View android:layout_gravity="center_horizontal" android:layout_width="64dp" android:layout_height="3dp" android:layout_marginTop="24dp" android:background="?attr/kitchenAccent" />
@@ -72,12 +15,11 @@
             <TextView android:id="@+id/tvPersonalization" style="@style/BodyText" android:layout_marginTop="20dp" android:visibility="gone" />
             <TextView android:id="@+id/tvAllergyWarning" style="@style/BodyText" android:layout_marginTop="16dp" android:textSize="12sp" android:visibility="gone" />
             <LinearLayout android:id="@+id/resultActions" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="28dp">
-                <com.google.android.material.button.MaterialButton android:id="@+id/btnRecipe" style="@style/ActionButton" android:text="@string/kitchen_let_s_cook" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnRecipe" style="@style/ActionButton" android:text="@string/view_recipe" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/btnLike" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="10dp" android:text="@string/save_recipe" app:cornerRadius="2dp" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/btnDislike" style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:text="@string/another" />
             </LinearLayout>
             <LinearLayout android:id="@+id/simpleRecipeDetails" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="24dp" />
-            <TextView android:id="@+id/tvResultFooter" style="@style/Instrument" android:text="@string/kitchen_dish_roulette_the_midnight_kitchen" android:textSize="10sp" android:textColor="?attr/kitchenMuted" android:layout_marginTop="28dp" />
         </LinearLayout>
         </com.example.dishroulette.AdaptivePageFrame>
     </ScrollView>

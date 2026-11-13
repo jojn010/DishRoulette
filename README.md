@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.7.9 — Light, Dark and System themes**
+**v1.8.0 — Native app cleanup and reliable editing**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -10,7 +10,7 @@ A native Android recipe app with a warm, lightweight interface, ingredient entry
 2. Run the **app / debug** configuration in Android Studio, or install the debug APK from the GitHub release.
 3. Configure the owner connection using USB provisioning (`tools/provision-personal.py --device SERIAL`) or a private owner build. Settings contains language and recipe preferences; the Gemini connection entry has been removed.
 
-The Android app calls Gemini directly over HTTPS. Once configured, recipe generation does not require a running computer or local backend. The owner's key is encrypted using Android Keystore and stored outside Android backups; it is never packaged in the APK. Gemini usage is charged against the owner's provider account.
+The Android app calls Gemini directly over HTTPS. Once configured, recipe generation does not require a running computer or local backend. The owner's key is encrypted using Android Keystore and stored outside Android backups; ordinary APKs never contain it. Gemini usage is charged against the owner's provider account.
 
 The `backend` module remains available as an optional local development service; see `backend/README.md`. It is not used by the current Android client. For USB setup of a debug installation, `tools/provision-personal.py --device SERIAL` imports the owner's existing local configuration without including it in the APK.
 
@@ -69,7 +69,9 @@ allow retry; rotating during analysis returns to the preview without automatical
 
 ### App interface
 
-All installations now use the Simple interface. Advanced mode and the interface selector have been removed. Upgrading migrates the old interface choice while preserving ingredients, recipe preferences, saved recipes, cooking progress and Gemini settings.
+Your existing pantry, saved recipes, cooking progress, theme, language and encrypted Gemini connection remain compatible with this update.
+
+All installations use the native interface. Advanced mode, its OpenGL renderer, mechanical audio, hidden controls and obsolete assets have been removed. Upgrading migrates the old interface choice while preserving ingredients, recipe preferences, saved recipes, cooking progress and Gemini settings.
 
 Saved recipes use apricot cards with bold titles and ivory time/serving summaries. Open recipe stays prominent; expand Nutrition estimates to read all available values and their approximation note. Screen-reader action labels include the recipe title.
 
@@ -77,26 +79,26 @@ Home groups ingredient entry and photo scanning in an apricot workspace with ivo
 
 Add or edit ingredient chips, choose Pantry or Surprise, select a goal and generate a recipe. Open Settings for language and recipe preferences. Recipe details support saving and guided cooking with checklists, progress and contextual timers. Timers recognize English and Arabic hours, minutes and adjacent combinations (such as “1 hour 30 minutes” or “ساعة و٣٠ دقيقة”), including numeric ranges and fractions. Durations round up to whole minutes and retain the existing four-hour limit. Timers are visual in-app timers with no background alarm.
 
-English and Arabic are supported, including bundled Cairo typography and right-to-left layout. Gemini receives the selected language. Saved recipes retain their original content and language.
+English and Arabic are supported, including bundled Cairo typography and right-to-left layout. Gemini receives the selected language. Bilingual saved recipes display in the chosen language while preserving their ID, quantities and progress. Historical single-language recipes retain their original content until translated.
 
-The app uses native Android controls and does not initialize the legacy OpenGL scene or mechanical audio.
+The app uses native Android controls, one responsive layout and the Tabkha palette in Light, Dark and System modes. It no longer requires OpenGL hardware. Meal and dietary preferences save together when you tap Apply; Cancel leaves them unchanged. Editing an ingredient survives rotation and updates the original entry. Cooking prioritizes the current step in a readable card, with nutrition available below the cooking controls.
 
 No fabricated dish images, image service, or production mock recipes are included. Gemini calls use the personal HTTPS connection and shared exclusion validation; ingredient screening cannot guarantee allergy safety.
 
 ## Verification
 
 ```sh
-./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :backend:test :recipe-core:test
-./gradlew :app:connectedDebugAndroidTest
+./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug :backend:test :recipe-core:test
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
 ```
 
-Instrumentation tests use deterministic replies only inside the test APK. Live Gemini tests are opt-in and may use API quota:
+Run instrumentation against a dedicated emulator: fixtures modify preferences, saved recipes and connection setup. Deterministic replies live only inside the test APK. Live Gemini tests are opt-in and may use API quota:
 
 ```sh
-./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.liveRecipe=true
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.liveRecipe=true
 ```
 
-For emulator graphics compatibility, software ANGLE is available with `-gpu swangle`. Verification artifacts and emulator logs are local, ignored files under `work/v1.1.0/`.
+Use Android Studio Device Manager to start an emulator. Verification notes for this cleanup are in `docs/v1.8.0-verification.md`; generated test reports and captures remain local build artifacts.
 
 ## Version checkpoints
 

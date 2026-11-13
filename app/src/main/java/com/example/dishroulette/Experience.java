@@ -3,7 +3,7 @@ package com.example.dishroulette;
 import android.content.Context;
 import android.provider.Settings;
 
-/** One motion policy for native transitions and the OpenGL scene. */
+/** One motion policy for native transitions. */
 final class Experience {
     private Experience() { }
     static boolean reduced(Context context) {

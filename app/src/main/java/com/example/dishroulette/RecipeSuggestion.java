@@ -2,8 +2,6 @@ package com.example.dishroulette;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
-import com.example.dishroulette.core.IngredientExclusions;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 

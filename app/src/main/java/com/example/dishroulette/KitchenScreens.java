@@ -54,21 +54,18 @@ final class KitchenScreens {
         FrameLayout.LayoutParams width=new FrameLayout.LayoutParams(-1,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL);
         page.addView(body,width);scroll.addView(page);host.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
         button(body,activity.getString(R.string.back),false,back);
-        text(body,label,11,R.color.accent,"monospace",24).setGravity(Gravity.CENTER);
-        text(body,title,34,R.color.ink,"serif",12).setGravity(Gravity.CENTER);
+        text(body,label,11,R.color.accent,24).setGravity(Gravity.CENTER);
+        text(body,title,34,R.color.ink,12).setGravity(Gravity.CENTER);
         line(body);
     }
     private void line(LinearLayout parent) { View v=new View(activity);v.setBackgroundColor(UiColors.color(activity,R.color.line));LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(1));lp.topMargin=dp(20);lp.bottomMargin=dp(12);parent.addView(v,lp); }
-    private TextView text(LinearLayout parent,String value,int size,int color,String font,int margin) {
-        TextView t=new TextView(activity);t.setText(value);t.setTextSize(size);t.setTextColor(UiColors.color(activity,color));t.setTypeface(Typeface.create(InterfaceSettings.language(activity).equals("ar")||activity.isSimple()?"sans":font,Typeface.NORMAL));t.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);UiTypography.apply(t);t.setLineSpacing(dp(3),1);androidx.core.view.ViewCompat.setAccessibilityHeading(t,size>=24);
+    private TextView text(LinearLayout parent,String value,int size,int color,int margin) {
+        TextView t=new TextView(activity);t.setText(value);t.setTextSize(size);t.setTextColor(UiColors.color(activity,color));t.setTypeface(Typeface.create("sans",Typeface.NORMAL));t.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);UiTypography.apply(t);t.setLineSpacing(dp(3),1);androidx.core.view.ViewCompat.setAccessibilityHeading(t,size>=24);
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(margin);parent.addView(t,lp);return t;
     }
     private Button button(LinearLayout parent,String title,boolean primary,Runnable click) {
-        Button b=new androidx.appcompat.widget.AppCompatButton(activity);b.setText(title);UiTypography.apply(b);b.setTextSize(activity.isSimple()?15:13);b.setAllCaps(false);b.setTypeface(Typeface.create("sans-serif-condensed",Typeface.BOLD));b.setTextColor(UiColors.color(activity,primary?R.color.on_accent:R.color.ink));
-        b.setBackgroundResource(R.drawable.table_control);
-        if(activity.isSimple()){
-            android.graphics.drawable.GradientDrawable shape=new android.graphics.drawable.GradientDrawable();shape.setColor(UiColors.color(activity,primary?R.color.accent:R.color.surface));shape.setCornerRadius(dp(14));shape.setStroke(dp(1),UiColors.color(activity,R.color.line));b.setBackground(shape);
-        }
+        Button b=new androidx.appcompat.widget.AppCompatButton(activity);b.setText(title);UiTypography.apply(b);b.setTextSize(15);b.setAllCaps(false);b.setTypeface(Typeface.create("sans-serif-condensed",Typeface.BOLD));b.setTextColor(UiColors.color(activity,primary?R.color.on_accent:R.color.ink));
+        android.graphics.drawable.GradientDrawable shape=new android.graphics.drawable.GradientDrawable();shape.setColor(UiColors.color(activity,primary?R.color.accent:R.color.surface));shape.setCornerRadius(dp(14));shape.setStroke(dp(1),UiColors.color(activity,R.color.line));b.setBackground(shape);
         if(primary)b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(UiColors.color(activity,R.color.accent)));
         b.setMinHeight(dp(52));b.setPadding(dp(14),dp(8),dp(14),dp(8));b.setOnClickListener(v->{activity.playUiClick();click.run();});
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(10);UiTypography.apply(b);parent.addView(b,lp);return b;
@@ -78,8 +75,8 @@ final class KitchenScreens {
         base(activity.getString(R.string.archive_label,recipes.size()),activity.getString(R.string.archive_title),this::close);
         Button importRecipe=button(body,activity.getString(R.string.import_recipe),false,activity::importRecipe);importRecipe.setId(R.id.importRecipe);
         if(recipes.isEmpty()){
-            text(body,activity.getString(R.string.archive_empty_heading),22,R.color.ink,"sans-serif-condensed",28);
-            text(body,activity.getString(R.string.archive_empty_detail),16,R.color.muted,"sans",12);
+            text(body,activity.getString(R.string.archive_empty_heading),22,R.color.ink,28);
+            text(body,activity.getString(R.string.archive_empty_detail),16,R.color.muted,12);
             button(body,activity.getString(R.string.home),true,this::close);return;
         }
         for(RecipeCatalog.Recipe recipe:recipes){
@@ -89,11 +86,11 @@ final class KitchenScreens {
             surface.setColor(UiColors.color(activity,R.color.surface));surface.setCornerRadius(dp(24));
             surface.setStroke(dp(1),UiColors.color(activity,R.color.line));card.setBackground(surface);
             LinearLayout.LayoutParams cardLp=new LinearLayout.LayoutParams(-1,-2);cardLp.topMargin=dp(16);body.addView(card,cardLp);
-            text(card,UiLabels.option(activity,recipe.meal),12,R.color.accent,"sans",0);
-            TextView title=text(card,recipe.title,25,R.color.ink,"sans",4);
+            text(card,UiLabels.option(activity,recipe.meal),12,R.color.accent,0);
+            TextView title=text(card,recipe.title,25,R.color.ink,4);
             title.setTypeface(UiTypography.face(activity,"sans-serif",Typeface.BOLD));
-            text(card,recipe.description,15,R.color.muted,"sans",6);
-            TextView facts=text(card,overview(activity,recipe),14,R.color.accent,"sans",12);
+            text(card,recipe.description,15,R.color.muted,6);
+            TextView facts=text(card,overview(activity,recipe),14,R.color.accent,12);
             android.graphics.drawable.GradientDrawable band=new android.graphics.drawable.GradientDrawable();
             band.setColor(UiColors.color(activity,R.color.background));band.setCornerRadius(dp(12));facts.setBackground(band);
             facts.setPadding(dp(12),dp(8),dp(12),dp(8));
@@ -102,7 +99,7 @@ final class KitchenScreens {
             Button share=button(card,activity.getString(R.string.share_recipe),false,()->activity.shareRecipe(recipe));quietAction(share);share.setContentDescription(share.getText()+", "+recipe.title);
             Button nutritionToggle=button(card,activity.getString(R.string.saved_show_nutrition),false,()->{});
             quietAction(nutritionToggle);nutritionToggle.setContentDescription(nutritionToggle.getText()+", "+recipe.title);
-            TextView nutrition=text(card,nutrition(activity,recipe),14,R.color.muted,"sans",4);nutrition.setVisibility(View.GONE);
+            TextView nutrition=text(card,nutrition(activity,recipe),14,R.color.muted,4);nutrition.setVisibility(View.GONE);
             nutritionToggle.setOnClickListener(v->{
                 boolean expanded=nutrition.getVisibility()!=View.VISIBLE;nutrition.setVisibility(expanded?View.VISIBLE:View.GONE);
                 nutritionToggle.setText(activity.getString(expanded?R.string.saved_hide_nutrition:R.string.saved_show_nutrition));
@@ -127,16 +124,16 @@ final class KitchenScreens {
     void settings(){
         screen="settings";cooking=null;
         base(activity.getString(R.string.settings),activity.getString(R.string.appearance),this::close);
-        text(body,activity.getString(R.string.settings_description),16,R.color.muted,"sans",6);
-        text(body,activity.getString(R.string.theme_heading),21,R.color.ink,"sans",24).setGravity(Gravity.CENTER);
-        text(body,activity.getString(R.string.theme_description),14,R.color.muted,"sans",8);
+        text(body,activity.getString(R.string.settings_description),16,R.color.muted,6);
+        text(body,activity.getString(R.string.theme_heading),21,R.color.ink,24).setGravity(Gravity.CENTER);
+        text(body,activity.getString(R.string.theme_description),14,R.color.muted,8);
         String theme=AppearanceSettings.choice(activity);
         Button light=button(body,activity.getString(R.string.theme_light),theme.equals("light"),()->chooseTheme("light"));light.setId(R.id.themeLight);light.setSelected(theme.equals("light"));
         Button dark=button(body,activity.getString(R.string.theme_dark),theme.equals("dark"),()->chooseTheme("dark"));dark.setId(R.id.themeDark);dark.setSelected(theme.equals("dark"));
         Button system=button(body,activity.getString(R.string.theme_system),theme.equals("system"),()->chooseTheme("system"));system.setId(R.id.themeSystem);system.setSelected(theme.equals("system"));
         line(body);
-        text(body,activity.getString(R.string.language),21,R.color.ink,"sans",24).setGravity(Gravity.CENTER);
-        text(body,activity.getString(R.string.language_description),14,R.color.muted,"sans",8);
+        text(body,activity.getString(R.string.language),21,R.color.ink,24).setGravity(Gravity.CENTER);
+        text(body,activity.getString(R.string.language_description),14,R.color.muted,8);
         Button english=button(body,"English",InterfaceSettings.language(activity).equals("en"),()->activity.changeLanguage("en"));english.setId(R.id.settingsEnglish);
         Button arabic=button(body,"العربية",InterfaceSettings.language(activity).equals("ar"),()->activity.changeLanguage("ar"));arabic.setId(R.id.settingsArabic);
         line(body);
@@ -145,7 +142,7 @@ final class KitchenScreens {
         sounds.setChecked(InterfaceSettings.prefs(activity).getBoolean("ui_sounds",true));
         sounds.setOnCheckedChangeListener((v,on)->{InterfaceSettings.prefs(activity).edit().putBoolean("ui_sounds",on).apply();if(on)activity.playUiConfirm();});
         body.addView(sounds,new LinearLayout.LayoutParams(-1,-2));
-        text(body,activity.getString(R.string.ui_sounds_description),14,R.color.muted,"sans",4);
+        text(body,activity.getString(R.string.ui_sounds_description),14,R.color.muted,4);
         Button preferences=button(body,activity.getString(R.string.recipe_preferences),false,activity::showFilters);preferences.setId(R.id.settingsRecipePreferences);
     }
 
@@ -224,12 +221,12 @@ final class KitchenScreens {
         int selected=Math.max(0,Math.min(steps.size()-1,prefs.getInt("cook_step_"+recipe.id,0)));
         base(activity.getString(R.string.cook_label),recipe.title,this::close);
         if (steps.isEmpty()) {
-            text(body,activity.getString(R.string.cooking_instructions_missing),18,R.color.muted,"sans",12);
+            text(body,activity.getString(R.string.cooking_instructions_missing),18,R.color.muted,12);
             return;
         }
         // Android only honors this while the cooking view is visible in the foreground.
         host.setKeepScreenOn(true);
-        text(body,meta(activity,recipe),12,R.color.accent,"monospace",8);
+        text(body,overview(activity,recipe),14,R.color.accent,8);
         LinearLayout checklist=new LinearLayout(activity);checklist.setOrientation(LinearLayout.VERTICAL);
         Button checklistToggle=button(body,activity.getString(R.string.checklist_closed),false,()->{});
         checklistToggle.setContentDescription(activity.getString(R.string.checklist_a11y));
@@ -242,13 +239,19 @@ final class KitchenScreens {
             CheckBox check=new androidx.appcompat.widget.AppCompatCheckBox(activity);check.setText(value);UiTypography.apply(check);check.setTextSize(17);check.setTextColor(UiColors.color(activity,R.color.ink));check.setMinHeight(dp(52));check.setPadding(0,dp(5),0,dp(5));check.setChecked(prefs.getBoolean(key,false));
             check.setOnCheckedChangeListener((v,on)->prefs.edit().putBoolean(key,on).apply());checklist.addView(check,new LinearLayout.LayoutParams(-1,-2));
         }
-        if(activity.hasExclusions())text(body,activity.getString(R.string.allergy_note),13,R.color.muted,"sans",12);
-        line(body);
-        TextView progress=text(body,"",11,R.color.accent,"monospace",12);progress.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        ProgressBar bar=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(steps.size());bar.setProgressTintList(android.content.res.ColorStateList.valueOf(UiColors.color(activity,R.color.accent)));LinearLayout.LayoutParams barLp=new LinearLayout.LayoutParams(-1,dp(4));barLp.topMargin=dp(14);body.addView(bar,barLp);
-        TextView stepNumber=text(body,"",32,R.color.accent,"serif",24);
-        TextView instruction=text(body,"",21,R.color.ink,"sans",14);
-        CheckBox done=new androidx.appcompat.widget.AppCompatCheckBox(activity);done.setText(activity.getString(R.string.step_complete));UiTypography.apply(done);done.setTextSize(16);done.setTextColor(UiColors.color(activity,R.color.ink));done.setMinHeight(dp(56));body.addView(done);
+        if(activity.hasExclusions())text(body,activity.getString(R.string.allergy_note),13,R.color.muted,12);
+        LinearLayout stepCard=new LinearLayout(activity);stepCard.setOrientation(LinearLayout.VERTICAL);
+        stepCard.setTag("cooking-step-card");stepCard.setPadding(dp(20),dp(18),dp(20),dp(14));
+        android.graphics.drawable.GradientDrawable stepSurface=new android.graphics.drawable.GradientDrawable();
+        stepSurface.setColor(UiColors.color(activity,R.color.surface));stepSurface.setCornerRadius(dp(24));
+        stepSurface.setStroke(dp(1),UiColors.color(activity,R.color.line));stepCard.setBackground(stepSurface);
+        LinearLayout.LayoutParams stepCardLp=new LinearLayout.LayoutParams(-1,-2);stepCardLp.topMargin=dp(20);body.addView(stepCard,stepCardLp);
+        TextView progress=text(stepCard,"",14,R.color.accent,0);progress.setTypeface(UiTypography.face(activity,"sans-serif",Typeface.BOLD));
+        androidx.core.view.ViewCompat.setAccessibilityHeading(progress,true);
+        progress.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        ProgressBar bar=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(steps.size());bar.setProgressTintList(android.content.res.ColorStateList.valueOf(UiColors.color(activity,R.color.accent)));LinearLayout.LayoutParams barLp=new LinearLayout.LayoutParams(-1,dp(4));barLp.topMargin=dp(14);stepCard.addView(bar,barLp);
+        TextView instruction=text(stepCard,"",24,R.color.ink,18);
+        CheckBox done=new androidx.appcompat.widget.AppCompatCheckBox(activity);done.setText(activity.getString(R.string.step_complete));UiTypography.apply(done);done.setTextSize(16);done.setTextColor(UiColors.color(activity,R.color.ink));done.setMinHeight(dp(56));done.setPadding(0,dp(10),0,dp(6));stepCard.addView(done);
         CookingTimerView timer=new CookingTimerView(activity);timer.setId(R.id.cookingTimerDial);
         LinearLayout.LayoutParams timerLp=new LinearLayout.LayoutParams(-2,-2);
         timerLp.gravity=Gravity.CENTER_HORIZONTAL;timerLp.topMargin=dp(16);
@@ -256,12 +259,21 @@ final class KitchenScreens {
         LinearLayout timerActions=new LinearLayout(activity);timerActions.setOrientation(LinearLayout.VERTICAL);body.addView(timerActions);
         Button startTimer=button(timerActions,"",false,()->{});startTimer.setId(R.id.cookingTimerStart);
         Button resetTimer=button(timerActions,activity.getString(R.string.reset_timer),false,()->{});resetTimer.setId(R.id.cookingTimerReset);
-        text(timerActions,activity.getString(R.string.timer_notice),12,R.color.muted,"sans",8).setGravity(Gravity.CENTER);
+        text(timerActions,activity.getString(R.string.timer_notice),12,R.color.muted,8).setGravity(Gravity.CENTER);
         LinearLayout nav=new LinearLayout(activity);nav.setOrientation(LinearLayout.HORIZONTAL);body.addView(nav);
         Button previous=button(nav,activity.getString(R.string.previous_step),false,()->{}),next=button(nav,activity.getString(R.string.next_step),true,()->{});
         LinearLayout.LayoutParams left=new LinearLayout.LayoutParams(0,-2,1);left.topMargin=dp(18);left.setMarginEnd(dp(6));previous.setLayoutParams(left);
         LinearLayout.LayoutParams right=new LinearLayout.LayoutParams(0,-2,1);right.topMargin=dp(18);next.setLayoutParams(right);
-        TextView finish=text(body,"",19,R.color.accent,"serif",20);finish.setGravity(Gravity.CENTER);
+        TextView finish=text(body,"",19,R.color.accent,20);finish.setGravity(Gravity.CENTER);
+        Button nutritionToggle=button(body,activity.getString(R.string.saved_show_nutrition),false,()->{});quietAction(nutritionToggle);
+        TextView nutritionDetails=text(body,nutrition(activity,recipe),14,R.color.muted,4);
+        nutritionDetails.setTag("cooking-nutrition");nutritionDetails.setVisibility(View.GONE);
+        androidx.core.view.ViewCompat.setStateDescription(nutritionToggle,activity.getString(R.string.saved_nutrition_collapsed));
+        nutritionToggle.setOnClickListener(v->{
+            boolean expanded=nutritionDetails.getVisibility()!=View.VISIBLE;nutritionDetails.setVisibility(expanded?View.VISIBLE:View.GONE);
+            nutritionToggle.setText(activity.getString(expanded?R.string.saved_hide_nutrition:R.string.saved_show_nutrition));
+            androidx.core.view.ViewCompat.setStateDescription(nutritionToggle,activity.getString(expanded?R.string.saved_nutrition_expanded:R.string.saved_nutrition_collapsed));
+        });
         button(body,activity.getString(R.string.back_overview),false,this::close);
         final int[] current={selected};
         final Runnable[] render={null};
@@ -270,7 +282,7 @@ final class KitchenScreens {
             prefs.edit().putInt("cook_step_"+recipe.id,step).apply();
             int completed=0;for(int i=0;i<steps.size();i++)if(prefs.getBoolean("cook_done_"+recipe.id+"_"+i,false))completed++;
             progress.setText(activity.getString(R.string.step_progress,step+1,steps.size(),completed));bar.setProgress(completed);
-            stepNumber.setText(String.format(activity.getResources().getConfiguration().getLocales().get(0),"%02d /",step+1));instruction.setText(steps.get(step));
+            instruction.setText(steps.get(step));
             done.setOnCheckedChangeListener(null);done.setChecked(prefs.getBoolean(completeKey,false));
             done.setOnCheckedChangeListener((v,on)->{if(on)activity.playUiConfirm();prefs.edit().putBoolean(completeKey,on).apply();render[0].run();});
             previous.setEnabled(step>0);next.setEnabled(step<steps.size()-1);

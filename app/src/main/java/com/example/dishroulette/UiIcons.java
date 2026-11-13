@@ -1,6 +1,5 @@
 package com.example.dishroulette;
 
-import android.content.res.ColorStateList;
 import android.widget.TextView;
 import com.google.android.material.button.MaterialButton;
 

@@ -2,11 +2,7 @@
     <string name="home">Home</string>
     <string name="settings">Settings</string>
     <string name="language">Language / اللغة</string>
-    <string name="interface_mode">Interface mode</string>
-    <string name="simple_mode">Simple</string>
-    <string name="advanced_mode">Advanced</string>
-    <string name="simple_description">Clean, intuitive cooking. Your next meal, made simple.</string>
-    <string name="advanced_description">The interactive 3D cooking roulette experience.</string>
+
     <string name="appearance">Make yourself at home</string>
     <string name="settings_description">Choose your theme and language, and adjust recipe preferences.</string>
     <string name="recipe_preferences">Recipe preferences</string>
@@ -30,7 +26,7 @@
     <string name="update_ingredient">Update ingredient</string>
     <string name="ingredients_empty">Your ingredients go here</string>
     <string name="ingredients_empty_detail">Add what’s in your kitchen. We’ll take care of the inspiration.</string>
-    <string name="ingredients_count">%1$d ingredients added</string>
+    <string name="ingredients_count">Ingredients added: %1$d</string>
     <string name="edit_ingredient_a11y">Edit ingredient: %1$s</string>
     <string name="remove_ingredient_a11y">Remove ingredient: %1$s</string>
     <string name="tap_to_edit">Tap an ingredient to edit it. Use × to remove it.</string>
@@ -42,7 +38,6 @@
     <string name="generating_detail">Your recipe is being generated. You can cancel and keep your ingredients.</string>
     <string name="cancel_generation">Cancel request</string>
     <string name="recipe_ready">Something delicious awaits</string>
-    <string name="fresh_recipe">YOUR NEXT RECIPE</string>
     <string name="save_generic">Save recipe</string>
     <string name="saved_generic">Saved to favorites</string>
     <string name="archive_label">YOUR RECIPE COLLECTION / %1$d SAVED</string>
@@ -52,7 +47,7 @@ Worth keeping.</string>
     <string name="archive_empty_detail">Save a recipe you enjoy. It will be here whenever you need it.</string>
     <string name="open_recipe">Open recipe →</string>
     <string name="remove_saved">Remove from saved</string>
-    <string name="recipe_metadata">%1$d min · %2$d servings</string>
+    <string name="recipe_metadata">%1$d min · Servings: %2$d</string>
     <string name="cook_label">LET’S COOK</string>
     <string name="checklist_closed">Ingredient checklist  +</string>
     <string name="checklist_open">Ingredient checklist  −</string>
@@ -62,48 +57,20 @@ Worth keeping.</string>
     <string name="reset_timer">Reset timer</string>
     <string name="timer_notice">Timer is shown here. No background alarm is scheduled.</string>
     <string name="back_overview">Back to recipe overview</string>
-    <string name="step_progress">Step %1$d of %2$d · %3$d complete</string>
+    <string name="step_progress">Step %1$d of %2$d · Completed: %3$d</string>
     <string name="enjoy_meal">Your meal is ready. Enjoy!</string>
-    <string name="timer_display">Timer  %1$s%2$s</string>
-    <string name="timer_ready"> / Ready</string>
+
     <string name="pause_timer">Pause timer</string>
     <string name="restart_timer">Restart %1$d min timer</string>
     <string name="start_timer">Start / resume timer</string>
-    <string name="auto_load">AUTO LOAD</string>
-    <string name="manage">MANAGE ›</string>
-    <string name="state_empty">EMPTY</string>
-    <string name="state_full">FULL</string>
-    <string name="state_ready">READY</string>
-    <string name="empty_slot">+ empty</string>
-    <string name="cartridge_a11y">Cartridge %1$d: %2$s. Tap to edit.</string>
-    <string name="manage_ingredients">Manage loaded ingredients</string>
-    <string name="chef_choice">CHEF’S CHOICE / NO PANTRY NEEDED</string>
-    <string name="loaded_count">%1$d INGREDIENTS LOADED</string>
-    <string name="load_status">LOAD %1$02d / %2$02d INGREDIENTS</string>
-    <string name="loadout_title">YOUR INGREDIENT LOADOUT</string>
-    <string name="remove_selected">REMOVE SELECTED</string>
-    <string name="clear_ingredients">CLEAR ALL INGREDIENTS</string>
-    <string name="loadout_back">BACK TO LOADOUT</string>
+
     <string name="kitchen_error">The kitchen needs a moment</string>
-    <string name="loading_preheat">PREHEATING…</string>
-    <string name="loading_mix">MIXING INGREDIENTS…</string>
-    <string name="loading_chef">CONSULTING THE CHEF…</string>
-    <string name="loading_prepare">PREPARING YOUR DISH…</string>
-    <string name="weapon_precision">THE PRECISION</string>
-    <string name="weapon_heavy">THE HEAVYWEIGHT</string>
-    <string name="weapon_classic_detail">REVOLVER / BALANCED EVERYDAY COOKING</string>
-    <string name="weapon_cut_detail">BOLT ACTION / LIGHTER BALANCED COOKING</string>
-    <string name="weapon_bulk_detail">PUMP ACTION / HEARTIER BALANCED COOKING</string>
-    <string name="weapon_editor_hint">Ingredient / tap to load</string>
-    <string name="weapon_discovery_hint">Chef’s choice / no ingredients needed</string>
-    <string name="weapon_load">+ LOAD</string>
-    <string name="weapon_editor_a11y">Active ingredient. Enter a name, then press Next or Load.</string>
-    <string name="weapon_load_a11y">Load ingredient and select next cartridge</string>
+
     <string name="ingredient_single">One ingredient per entry. Press Enter to add the next.</string>
     <string name="ingredient_duplicate">That ingredient is already added. Edit or remove the existing entry.</string>
     <string name="ingredient_length">Use at most 80 characters per ingredient.</string>
     <string name="ingredient_limit">Use up to 20 ingredients and 300 characters in total.</string>
-    <string name="advanced_restrictions">Allergies &amp; exclusions</string>
+
     <string name="saved_original_language">Saved recipe · original language preserved</string>
     <string name="option_any_meal">Any meal</string>
     <string name="option_breakfast">Breakfast</string>
@@ -151,4 +118,5 @@ Worth keeping.</string>
     <string name="option_pepper">Pepper</string>
     <string name="option_cooking_oil">Cooking oil</string>
 <string name="option_mediterranean">Mediterranean</string>
-<string name="timer_finished">Ready</string></resources>
+<string name="timer_finished">Ready</string>    <string name="result_metadata">%1$s · %2$s</string>
+</resources>

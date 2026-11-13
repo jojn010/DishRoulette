@@ -1,9 +1,9 @@
 <resources>
-<color name="background">#101310</color><color name="surface">#1B201B</color>
-<color name="ink">#EEE5CE</color><color name="muted">#B5B7A6</color>
-<color name="accent">#D5AB68</color><color name="on_accent">#131610</color>
-<color name="line">#3A4237</color><color name="hero">#151A14</color>
-<color name="danger">#BA503A</color><color name="black">#000000</color><color name="white">#FFFFFF</color>
+<color name="background">@color/tabkha_background</color><color name="surface">@color/tabkha_surface</color>
+<color name="ink">@color/tabkha_ink</color><color name="muted">@color/tabkha_muted</color>
+<color name="accent">@color/tabkha_accent</color><color name="on_accent">@color/tabkha_on_accent</color>
+<color name="line">@color/tabkha_outline</color>
+
 <color name="tabkha_ivory">#FFF8EB</color>
 <color name="tabkha_apricot_surface">#FFE5CD</color>
 <color name="tabkha_aubergine">#4A173F</color>

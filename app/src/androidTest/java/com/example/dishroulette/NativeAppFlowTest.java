@@ -22,18 +22,18 @@ import okio.Timeout;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class DualInterfaceTest {
+public class NativeAppFlowTest {
     private SharedPreferences prefs(){return InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences(InterfaceSettings.STORE,0);}
     @Before public void defaults(){prefs().edit().putString(InterfaceSettings.MODE,"simple").putString(InterfaceSettings.LANGUAGE,"en").putString("spin_profile","{}").putString("loaded_ammunition","[]").putString("selected_meal","Any meal").putString("simple_input_draft","").putBoolean("reduce_motion",false).commit();}
     private Object field(Object target,String name){try{Field f=target.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(target);}catch(Exception e){throw new AssertionError(e);}}
-    private IngredientLoadout loadout(MainActivity a){return (IngredientLoadout)field(a,"loadout");}
+    private NativeIngredientLoadout loadout(MainActivity a){return (NativeIngredientLoadout)field(a,"loadout");}
     private void api(MainActivity a,RecipeApi api){try{Field f=MainActivity.class.getDeclaredField("recipeApi");f.setAccessible(true);f.set(a,api);}catch(Exception e){throw new AssertionError(e);}}
     private void add(MainActivity a,String name){EditText input=a.findViewById(R.id.simpleIngredientInput);input.setText(name);input.onEditorAction(EditorInfo.IME_ACTION_DONE);}
     private TextView text(View root,String value){if(root instanceof TextView&&((TextView)root).getText().toString().equals(value))return (TextView)root;if(root instanceof android.view.ViewGroup){android.view.ViewGroup g=(android.view.ViewGroup)root;for(int i=0;i<g.getChildCount();i++){TextView found=text(g.getChildAt(i),value);if(found!=null)return found;}}return null;}
     private void capture(String name)throws Exception{InstrumentationRegistry.getInstrumentation().waitForIdleSync();Thread.sleep(450);Bitmap b=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();File dir=InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir("v1.1.0");assertNotNull(dir);try(FileOutputStream out=new FileOutputStream(new File(dir,name+".png"))){assertNotNull(b);b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();}
     @Test public void simpleEnglishEditsValidatesGeneratesSavesAndCooksWithoutOpenGl()throws Exception{
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
-            scenario.onActivity(a->{assertTrue(a.isSimple());assertNull(a.findViewById(R.id.tabletop));assertTrue(loadout(a) instanceof NativeIngredientLoadout);add(a,"Eggs");add(a,"Rice");add(a,"rice");assertEquals(2,loadout(a).magazine().count());assertNotNull(((EditText)a.findViewById(R.id.simpleIngredientInput)).getError());((EditText)a.findViewById(R.id.simpleIngredientInput)).setText("");});
+            scenario.onActivity(a->{assertTrue(loadout(a) instanceof NativeIngredientLoadout);add(a,"Eggs");add(a,"Rice");add(a,"rice");assertEquals(2,loadout(a).magazine().count());assertNotNull(((EditText)a.findViewById(R.id.simpleIngredientInput)).getError());((EditText)a.findViewById(R.id.simpleIngredientInput)).setText("");});
             capture("01-simple-en-home");
             scenario.onActivity(a->{text(a.findViewById(R.id.simpleHome),"Eggs").performClick();add(a,"Tomato");assertEquals(2,loadout(a).magazine().count());assertFalse(loadout(a).magazine().ingredients().contains("Eggs"));api(a,r->{assertEquals("en",r.language);return new LocalReply(r);});a.findViewById(R.id.simpleGenerate).performClick();});Thread.sleep(700);
             scenario.onActivity(a->{assertEquals(View.VISIBLE,a.findViewById(R.id.cardMealResult).getVisibility());a.findViewById(R.id.btnLike).performClick();});capture("02-simple-en-recipe");
@@ -41,10 +41,22 @@ public class DualInterfaceTest {
             scenario.onActivity(MainActivity::showSavedRecipes);capture("04-simple-en-saved");
         }
     }
+    @Test public void editingSurvivesRotationAndUpdatesTheOriginalIngredient() {
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
+            scenario.onActivity(a->{add(a,"Rice");add(a,"Tomato");text(a.findViewById(R.id.simpleHome),"Rice").performClick();((EditText)a.findViewById(R.id.simpleIngredientInput)).setText("Tofu");});
+            scenario.recreate();
+            scenario.onActivity(a->{
+                add(a,"Tofu");assertEquals(2,loadout(a).magazine().count());
+                assertTrue(loadout(a).magazine().ingredients().contains("Tofu"));
+                assertFalse(loadout(a).magazine().ingredients().contains("Rice"));
+                assertFalse(prefs().contains("simple_input_edit_slot"));
+            });
+        }
+    }
     @Test public void arabicSimpleAcceptsArabicAndEnglishIngredientsAndShowsArabicRecipe()throws Exception{
         prefs().edit().putString(InterfaceSettings.LANGUAGE,"ar").commit();
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
-            scenario.onActivity(a->{assertEquals(View.LAYOUT_DIRECTION_RTL,a.findViewById(R.id.main).getLayoutDirection());assertEquals("شو بدك تطبخ اليوم؟",a.getString(R.string.simple_hero));assertNull(a.findViewById(R.id.tabletop));add(a,"أرز");add(a,"Tomato");assertTrue(loadout(a).magazine().ingredients().contains("أرز"));});capture("05-simple-ar-home");
+            scenario.onActivity(a->{assertEquals(View.LAYOUT_DIRECTION_RTL,a.findViewById(R.id.main).getLayoutDirection());assertEquals("شو بدك تطبخ اليوم؟",a.getString(R.string.simple_hero));add(a,"أرز");add(a,"Tomato");assertTrue(loadout(a).magazine().ingredients().contains("أرز"));});capture("05-simple-ar-home");
             scenario.onActivity(a->{api(a,r->{assertEquals("ar",r.language);assertTrue(r.ingredients.contains("rice"));return new LocalReply(r);});a.findViewById(R.id.simpleGenerate).performClick();});Thread.sleep(700);
             scenario.onActivity(a->{assertEquals("أرز بالبندورة",((TextView)a.findViewById(R.id.tvMealTitle)).getText().toString());a.findViewById(R.id.btnLike).performClick();});capture("06-simple-ar-recipe");
             scenario.onActivity(a->a.findViewById(R.id.btnRecipe).performClick());capture("07-simple-ar-cooking");
@@ -55,23 +67,23 @@ public class DualInterfaceTest {
         final Set<String>[] saved=new Set[]{null};
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             scenario.onActivity(a->{add(a,"أرز");add(a,"Tomato");saved[0]=new HashSet<>(prefs().getStringSet("saved_recipes",Collections.emptySet()));a.showSettings();
-                assertNull(a.findViewById(R.id.settingsAdvanced));assertNull(a.findViewById(R.id.settingsSimple));assertNull(a.findViewById(R.id.settingsGemini));
+                assertEquals(0, a.getResources().getIdentifier("settingsAdvanced", "id", a.getPackageName()));assertEquals(0, a.getResources().getIdentifier("settingsSimple", "id", a.getPackageName()));assertEquals(0, a.getResources().getIdentifier("settingsGemini", "id", a.getPackageName()));
                 a.findViewById(R.id.settingsArabic).performClick();});
             Thread.sleep(1000);
-            scenario.onActivity(a->{assertTrue(a.isSimple());assertNull(a.findViewById(R.id.tabletop));assertEquals("ar",InterfaceSettings.language(a));assertEquals(2,loadout(a).magazine().count());assertEquals(saved[0],prefs().getStringSet("saved_recipes",Collections.emptySet()));});
-            scenario.recreate();scenario.onActivity(a->{assertTrue(a.isSimple());a.findViewById(R.id.settingsEnglish).performClick();});Thread.sleep(900);
+            scenario.onActivity(a->{assertEquals("ar",InterfaceSettings.language(a));assertEquals(2,loadout(a).magazine().count());assertEquals(saved[0],prefs().getStringSet("saved_recipes",Collections.emptySet()));});
+            scenario.recreate();scenario.onActivity(a->{a.findViewById(R.id.settingsEnglish).performClick();});Thread.sleep(900);
             scenario.onActivity(a->{assertEquals("en",a.getResources().getConfiguration().getLocales().get(0).getLanguage());assertEquals(2,loadout(a).magazine().count());});
         }
     }
     @Test public void newInstallAndLegacyInstallsUseSimpleWithoutChangingLanguage(){
         android.content.Context base=InstrumentationRegistry.getInstrumentation().getTargetContext();
         android.content.Context clean=new android.content.ContextWrapper(base){@Override public SharedPreferences getSharedPreferences(String name,int mode){return base.getSharedPreferences("dual_interface_isolated_test",mode);}};
-        SharedPreferences p=clean.getSharedPreferences("",0);p.edit().clear().commit();assertTrue(InterfaceSettings.simple(clean));p.edit().putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"ar").commit();assertTrue(InterfaceSettings.simple(clean));assertEquals("ar",InterfaceSettings.language(clean));p.edit().clear().putString("spin_profile","{}").commit();assertTrue(InterfaceSettings.simple(clean));p.edit().clear().commit();
+        SharedPreferences p=clean.getSharedPreferences("",0);p.edit().clear().commit();InterfaceSettings.migrateLegacyMode(clean);assertEquals("simple",p.getString(InterfaceSettings.MODE,""));p.edit().putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"ar").commit();InterfaceSettings.migrateLegacyMode(clean);assertEquals("simple",p.getString(InterfaceSettings.MODE,""));assertEquals("ar",InterfaceSettings.language(clean));p.edit().clear().putString("spin_profile","{}").commit();InterfaceSettings.migrateLegacyMode(clean);assertEquals("simple",p.getString(InterfaceSettings.MODE,""));p.edit().clear().commit();
     }
     @Test public void legacyAdvancedChoiceMigratesAndSupportsArabicRecipesAndSurprise() throws Exception {
         prefs().edit().putString(InterfaceSettings.MODE,"advanced").putString(InterfaceSettings.LANGUAGE,"ar").putBoolean("reduce_motion",true).commit();
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
-            scenario.onActivity(a->{loadout(a).restore(Arrays.asList("أرز","Tomato"),0);api(a,r->{assertEquals("ar",r.language);return new LocalReply(r);});assertTrue(a.isSimple());assertNull(a.findViewById(R.id.tabletop));a.findViewById(R.id.simpleGenerate).performClick();});Thread.sleep(1200);
+            scenario.onActivity(a->{loadout(a).restore(Arrays.asList("أرز","Tomato"),0);api(a,r->{assertEquals("ar",r.language);return new LocalReply(r);});a.findViewById(R.id.simpleGenerate).performClick();});Thread.sleep(1200);
             scenario.onActivity(a->{assertEquals(View.VISIBLE,a.findViewById(R.id.cardMealResult).getVisibility());assertEquals("أرز بالبندورة",((TextView)a.findViewById(R.id.tvMealTitle)).getText().toString());});capture("14-advanced-ar-recipe");
         }
         prefs().edit().putString(InterfaceSettings.MODE,"simple").commit();

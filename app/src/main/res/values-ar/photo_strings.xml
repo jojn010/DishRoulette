@@ -14,7 +14,7 @@
     <string name="photo_add">إضافة إلى مكوّناتي</string>
     <string name="photo_added">تمت إضافة المكوّنات. اضغط على البحث عن وصفة لتحضير طبق.</string>
     <string name="photo_review_empty">أدخل مكوّناً واحداً على الأقل، كل مكوّن في سطر.</string>
-    <string name="photo_connect_first">اربط Gemini من الإعدادات أولاً، ثم جرّب صورتك مجدداً.</string>
+    <string name="photo_connect_first">أعدّ اتصالك الشخصي بـ Gemini، ثم جرّب صورتك مجددًا.</string>
     <string name="photo_interrupted">توقّف التحليل. اضغط على التعرّف على المكوّنات للمحاولة مجدداً.</string>
     <string name="photo_empty">لم يتم العثور على مكوّنات واضحة. جرّب صورة بإضاءة جيدة لأطعمة منفصلة أو أدخل المكوّنات يدوياً.</string>
     <string name="photo_read_error">تعذّرت قراءة الصورة. جرّب صورة أخرى.</string>
