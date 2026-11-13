@@ -103,10 +103,13 @@ final class SimpleHomeView extends LinearLayout {
         page.removeView(generate);actionDock=row();actionDock.setPadding(dp(24),dp(10),dp(24),dp(4));actionDock.setBackgroundColor(color(R.color.background));generate.setMinHeight(dp(60));actionDock.addView(generate,new LayoutParams(-1,-2));actionFrame=new AdaptivePageFrame(a,1000);actionFrame.addView(actionDock,new FrameLayout.LayoutParams(-1,-2));addView(actionFrame,new LayoutParams(-1,-2));
         page.removeView(loading);page.addView(loading,0);
         navigation=row();navigation.setPadding(dp(20),dp(4),dp(20),dp(8));navigation.setBackgroundColor(color(R.color.background));navigationFrame=new AdaptivePageFrame(a,1000);navigationFrame.addView(navigation,new FrameLayout.LayoutParams(-1,-2));addView(navigationFrame,new LayoutParams(-1,-2));
-        for(int index=0;index<3;index++){final int i=index;MaterialButton b=button(navigation,a.getString(index==0?R.string.home:index==1?R.string.saved:R.string.settings),false,()->{if(i==1)a.showSavedRecipes();else if(i==2)a.showSettings();else if(Experience.reduced(a))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);});UiIcons.button(b,index==0?R.drawable.ic_home:index==1?R.drawable.ic_bookmark:R.drawable.ic_settings);b.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_TOP);b.setIconPadding(dp(2));b.setTextSize(12);b.setStrokeWidth(0);b.setCornerRadius(dp(22));b.setSelected(index==0);
-            b.setBackgroundTintList(ColorStateList.valueOf(index==0?color(R.color.surface):android.graphics.Color.TRANSPARENT));
-            if(index==0)b.setTypeface(UiTypography.face(a,"sans-serif",Typeface.BOLD));
-            b.setPadding(dp(4),dp(6),dp(4),dp(6));b.setMinHeight(Math.round(dp(64)*Math.max(1f,getResources().getConfiguration().fontScale)));LayoutParams navLp=new LayoutParams(0,-2,1);navLp.setMarginStart(dp(3));navLp.setMarginEnd(dp(3));b.setLayoutParams(navLp);}
+        for(int index=0;index<3;index++){
+            final int i=index;
+            NavigationButton button=new NavigationButton(a,a.getString(index==0?R.string.home:index==1?R.string.saved:R.string.settings),
+                    index==0?R.drawable.ic_home:index==1?R.drawable.ic_bookmark:R.drawable.ic_settings,index==0,
+                    ()->{if(i==1)a.showSavedRecipes();else if(i==2)a.showSettings();else if(Experience.reduced(a))scroll.scrollTo(0,0);else scroll.smoothScrollTo(0,0);});
+            LayoutParams navLp=new LayoutParams(0,-2,1);navLp.setMarginStart(dp(3));navLp.setMarginEnd(dp(3));navigation.addView(button,navLp);
+        }
         input.setText(InterfaceSettings.prefs(a).getString("simple_input_draft",""));loadout.setFocusListener(this::editCurrent);refresh();setFocusableInTouchMode(true);requestFocus();
     }
     @Override protected void onMeasure(int widthSpec,int heightSpec){
@@ -128,8 +131,7 @@ final class SimpleHomeView extends LinearLayout {
         if(stackNav!=stackedNavigation){
             stackedNavigation=stackNav;navigation.setOrientation(stackNav?VERTICAL:HORIZONTAL);
             for(int i=0;i<navigation.getChildCount();i++){
-                MaterialButton b=(MaterialButton)navigation.getChildAt(i);b.setIconGravity(stackNav?MaterialButton.ICON_GRAVITY_TEXT_START:MaterialButton.ICON_GRAVITY_TEXT_TOP);
-                b.setMinHeight(Math.round(dp(stackNav?52:64)*font));
+                NavigationButton b=(NavigationButton)navigation.getChildAt(i);b.setStacked(stackNav);
                 LayoutParams lp=new LayoutParams(stackNav?-1:0,-2,stackNav?0:1);lp.setMarginStart(dp(3));lp.setMarginEnd(dp(3));b.setLayoutParams(lp);
             }
         }

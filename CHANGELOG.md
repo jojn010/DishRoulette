@@ -1,3 +1,8 @@
+## v1.7.5
+
+- Center each bottom navigation label directly beneath its own Google icon, including after repeated Arabic/English switches. Use separate centered icon and label views instead of MaterialButton compound-drawable positioning.
+- Preserve the selected Home appearance, full-size accessible button targets, RTL order and compact/large-text stacked navigation. Add a geometric regression check for all three icon/label centers through repeated language switches.
+
 ## v1.7.4
 
 - Generate and store full English and Arabic recipe text together. Imported recipes, saved cards, recipe overviews and guided cooking use the selected app language while keeping servings, nutrition, IDs and cooking progress.

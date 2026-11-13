@@ -36,8 +36,9 @@ public class HomeWorkspaceTest {
         assertNotNull(v);assertNotNull(v.getLayout());
         for(int i=0;i<v.getLayout().getLineCount();i++)assertEquals("Truncated: "+v.getText(),0,v.getLayout().getEllipsisCount(i));
         assertTrue("Vertical clipping: "+v.getText()+" layout="+v.getLayout().getHeight()+" height="+v.getHeight()+" padding="+(v.getCompoundPaddingTop()+v.getCompoundPaddingBottom()),v.getLayout().getHeight()<=v.getHeight()-v.getCompoundPaddingTop()-v.getCompoundPaddingBottom());
-        assertTrue("Small touch target: "+v.getText(),v.getHeight()/v.getResources().getDisplayMetrics().density>=48);
-        assertTrue(v.isImportantForAccessibility());
+        View target=v.getParent() instanceof NavigationButton?(View)v.getParent():v;
+        assertTrue("Small touch target: "+v.getText(),target.getHeight()/v.getResources().getDisplayMetrics().density>=48);
+        assertTrue(target.isImportantForAccessibility());
     }
     private void capture(String name)throws Exception{
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();Thread.sleep(300);
@@ -54,7 +55,7 @@ public class HomeWorkspaceTest {
                     View root=a.findViewById(R.id.simpleHome);
                     assertEquals(language.equals("ar")?View.LAYOUT_DIRECTION_RTL:View.LAYOUT_DIRECTION_LTR,root.getLayoutDirection());
                     for(int id:new int[]{R.string.home,R.string.saved,R.string.settings})readable(text(root,a.getString(id)));
-                    MaterialButton home=(MaterialButton)text(root,a.getString(R.string.home));assertTrue(home.isSelected());home.performClick();assertTrue(home.isSelected());
+                    View home=(View)text(root,a.getString(R.string.home)).getParent();assertTrue(home.isSelected());home.performClick();assertTrue(home.isSelected());
                     readable(a.findViewById(R.id.simpleGenerate));readable(a.findViewById(R.id.photoScan));readable(a.findViewById(R.id.simpleIngredientInput));
                     assertNull(a.findViewById(R.id.geminiConnect));
                 });

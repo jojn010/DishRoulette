@@ -28,11 +28,10 @@ public class UiPolishTest {
             try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
                 scenario.onActivity(a->{
                     View home=a.findViewById(R.id.simpleHome);
-                    MaterialButton nav=(MaterialButton)findText(home,a.getString(R.string.home));
-                    assertNotNull(nav);assertNotNull(nav.getIcon());
-                    assertEquals(Gravity.CENTER,nav.getGravity());
-                    assertTrue(nav.getIconGravity()==MaterialButton.ICON_GRAVITY_TEXT_TOP
-                            ||nav.getIconGravity()==MaterialButton.ICON_GRAVITY_TEXT_START);
+                    TextView navLabel=(TextView)findText(home,a.getString(R.string.home));assertNotNull(navLabel);
+                    NavigationButton nav=(NavigationButton)navLabel.getParent();
+                    assertEquals(Gravity.CENTER,nav.getGravity());assertTrue(nav.isClickable());assertTrue(nav.isSelected());
+                    assertNotNull(((android.widget.ImageView)nav.getChildAt(0)).getDrawable());
                     for(int id:new int[]{R.string.pantry_mode,R.string.discover_mode}){
                         MaterialButton mode=(MaterialButton)findText(home,a.getString(id));
                         assertNotNull(mode);assertEquals(mode.getCurrentTextColor(),mode.getIconTint().getDefaultColor());
