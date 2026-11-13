@@ -1,0 +1,7 @@
+<resources>
+<string name="theme_heading">المظهر</string>
+<string name="theme_description">اختر المظهر أو اتبع إعداد المظهر في هاتفك.</string>
+<string name="theme_light">فاتح</string>
+<string name="theme_dark">داكن</string>
+<string name="theme_system">حسب مظهر الجهاز</string>
+</resources>

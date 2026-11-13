@@ -8,9 +8,9 @@
     <string name="simple_description">واجهة واضحة ومريحة لاكتشاف وجبتك القادمة.</string>
     <string name="advanced_description">تجربة طبخ تفاعلية ثلاثية الأبعاد بطابع الروليت.</string>
     <string name="appearance">على ذوقك</string>
-    <string name="settings_description">اختر لغتك واضبط تفضيلات الوصفات.</string>
+    <string name="settings_description">اختر المظهر واللغة وعدّل تفضيلات الوصفات.</string>
     <string name="recipe_preferences">تفضيلات الوصفات</string>
-    <string name="language_description">تُنشأ الوصفات الجديدة بهذه اللغة. تبقى نصوص الوصفات المحفوظة كما هي.</string>
+    <string name="language_description">الوصفات المتوفرة باللغتين تظهر بلغتك المختارة، بما فيها الوصفات المحفوظة والمشتركة.</string>
     <string name="simple_hero">شو بدك تطبخ اليوم؟</string>
     <string name="simple_intro">حوّل المكونات الموجودة عندك لأكلة طيبة.</string>
     <string name="simple_eyebrow">أكل طيب، وحيرة أقل.</string>

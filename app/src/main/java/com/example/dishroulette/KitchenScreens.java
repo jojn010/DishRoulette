@@ -128,6 +128,13 @@ final class KitchenScreens {
         screen="settings";cooking=null;
         base(activity.getString(R.string.settings),activity.getString(R.string.appearance),this::close);
         text(body,activity.getString(R.string.settings_description),16,R.color.muted,"sans",6);
+        text(body,activity.getString(R.string.theme_heading),21,R.color.ink,"sans",24).setGravity(Gravity.CENTER);
+        text(body,activity.getString(R.string.theme_description),14,R.color.muted,"sans",8);
+        String theme=AppearanceSettings.choice(activity);
+        Button light=button(body,activity.getString(R.string.theme_light),theme.equals("light"),()->chooseTheme("light"));light.setId(R.id.themeLight);light.setSelected(theme.equals("light"));
+        Button dark=button(body,activity.getString(R.string.theme_dark),theme.equals("dark"),()->chooseTheme("dark"));dark.setId(R.id.themeDark);dark.setSelected(theme.equals("dark"));
+        Button system=button(body,activity.getString(R.string.theme_system),theme.equals("system"),()->chooseTheme("system"));system.setId(R.id.themeSystem);system.setSelected(theme.equals("system"));
+        line(body);
         text(body,activity.getString(R.string.language),21,R.color.ink,"sans",24).setGravity(Gravity.CENTER);
         text(body,activity.getString(R.string.language_description),14,R.color.muted,"sans",8);
         Button english=button(body,"English",InterfaceSettings.language(activity).equals("en"),()->activity.changeLanguage("en"));english.setId(R.id.settingsEnglish);
@@ -141,6 +148,8 @@ final class KitchenScreens {
         text(body,activity.getString(R.string.ui_sounds_description),14,R.color.muted,"sans",4);
         Button preferences=button(body,activity.getString(R.string.recipe_preferences),false,activity::showFilters);preferences.setId(R.id.settingsRecipePreferences);
     }
+
+    private void chooseTheme(String choice){AppearanceSettings.choose(activity,choice);settings();}
 
     private static String overview(android.content.Context context,RecipeCatalog.Recipe r) {
         String value=context.getString(R.string.recipe_metadata,r.minutes,r.servings);

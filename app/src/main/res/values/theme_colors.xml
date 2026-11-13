@@ -1,0 +1,7 @@
+<resources>
+<color name="tabkha_background">@color/tabkha_ivory</color>
+<color name="tabkha_surface">@color/tabkha_apricot_surface</color>
+<color name="tabkha_accent">@color/tabkha_aubergine</color>
+<color name="tabkha_on_accent">@color/tabkha_ivory</color>
+<bool name="tabkha_light_system_bars">true</bool>
+</resources>

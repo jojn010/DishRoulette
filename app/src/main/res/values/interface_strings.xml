@@ -8,9 +8,9 @@
     <string name="simple_description">Clean, intuitive cooking. Your next meal, made simple.</string>
     <string name="advanced_description">The interactive 3D cooking roulette experience.</string>
     <string name="appearance">Make yourself at home</string>
-    <string name="settings_description">Choose your language and adjust recipe preferences.</string>
+    <string name="settings_description">Choose your theme and language, and adjust recipe preferences.</string>
     <string name="recipe_preferences">Recipe preferences</string>
-    <string name="language_description">New recipes follow this language. Saved recipes keep their original text.</string>
+    <string name="language_description">Bilingual recipes display in your chosen language, including saved and shared recipes.</string>
     <string name="simple_hero">What’s cooking today?</string>
     <string name="simple_intro">Turn what you have into something delicious.</string>
     <string name="simple_eyebrow">GOOD FOOD. LESS GUESSWORK.</string>

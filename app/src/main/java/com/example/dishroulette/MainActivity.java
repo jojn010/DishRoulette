@@ -136,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
 
         androidx.core.view.WindowInsetsControllerCompat bars =
                 new androidx.core.view.WindowInsetsControllerCompat(getWindow(), binding.getRoot());
-        bars.setAppearanceLightStatusBars(simple);
-        bars.setAppearanceLightNavigationBars(simple);
+        bars.setAppearanceLightStatusBars(!AppearanceSettings.dark(this));
+        bars.setAppearanceLightNavigationBars(!AppearanceSettings.dark(this));
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (view, insets) -> {
             Insets padding = insets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());

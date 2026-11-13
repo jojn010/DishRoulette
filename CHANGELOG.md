@@ -1,3 +1,9 @@
+## v1.7.9
+
+- Add Light, Dark and Use device theme choices in Settings, saved across restarts and applied throughout the app. System mode follows device changes, while explicit Light/Dark choices override them.
+- Add a dark aubergine palette with warm apricot controls and high-contrast text. Keep the ivory/apricot Light palette and adapt system bar icons, dialogs, recipe actions, navigation, saved recipes and cooking screens.
+- Update Settings descriptions for themes and bilingual recipes. Verify English/Arabic rendering, palette contrast, persisted choices and live system-theme transitions.
+
 ## v1.7.8
 
 - Show the official filled Google bookmark icon for a saved recipe and the outline icon when unsaved. Update immediately when saving or removing a favorite and when reopening a recipe.

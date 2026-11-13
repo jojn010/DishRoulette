@@ -1,0 +1,10 @@
+<resources>
+<color name="tabkha_background">#1C131B</color>
+<color name="tabkha_surface">#30202C</color>
+<color name="tabkha_accent">#FFC28F</color>
+<color name="tabkha_on_accent">#35152E</color>
+<color name="tabkha_ink">#FFF1E5</color>
+<color name="tabkha_muted">#D4BBC8</color>
+<color name="tabkha_outline">#745362</color>
+<bool name="tabkha_light_system_bars">false</bool>
+</resources>
