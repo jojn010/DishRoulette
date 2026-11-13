@@ -1,3 +1,7 @@
+## v1.7.7
+
+- Make Try another, Edit preferences and Share recipe clear full-width secondary buttons with peach backgrounds, visible borders, rounded corners, readable bold labels, pressed feedback and consistent spacing.
+
 ## v1.7.6
 
 - Use the theme’s dark ink color for preferences switch labels, including “Inspired by my favorites”, so they remain readable on the peach dialog in English and Arabic.

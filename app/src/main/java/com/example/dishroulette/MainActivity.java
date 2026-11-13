@@ -592,11 +592,34 @@ public class MainActivity extends AppCompatActivity {
         binding.tvResultEyebrow.setGravity(android.view.Gravity.CENTER);
         binding.tvResultSection.setGravity(android.view.Gravity.CENTER);
         binding.btnCloseResult.setAllCaps(false);binding.btnRecipe.setAllCaps(false);binding.btnRecipe.setText(R.string.view_recipe);binding.btnRecipe.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));binding.btnLike.setCornerRadius(Math.round(16*getResources().getDisplayMetrics().density));
-        if(resultPreferences==null){resultPreferences=new androidx.appcompat.widget.AppCompatButton(this);resultPreferences.setText(R.string.edit_preferences);resultPreferences.setAllCaps(false);resultPreferences.setTextColor(UiColors.color(this,R.color.accent));resultPreferences.setBackgroundColor(UiColors.color(this,R.color.surface));resultPreferences.setMinHeight(Math.round(52*getResources().getDisplayMetrics().density));resultPreferences.setOnClickListener(v->{binding.cardMealResult.setVisibility(View.GONE);showFilters();});binding.resultActions.addView(resultPreferences,new LinearLayout.LayoutParams(-1,-2));}
-        if(resultShare==null){resultShare=new androidx.appcompat.widget.AppCompatButton(this);resultShare.setId(R.id.shareRecipe);resultShare.setText(R.string.share_recipe);resultShare.setAllCaps(false);resultShare.setTextColor(UiColors.color(this,R.color.accent));resultShare.setBackgroundColor(UiColors.color(this,R.color.surface));resultShare.setMinHeight(Math.round(52*getResources().getDisplayMetrics().density));resultShare.setOnClickListener(v->shareRecipe(currentRecipe));binding.resultActions.addView(resultShare,new LinearLayout.LayoutParams(-1,-2));}
+        if(resultPreferences==null){
+            resultPreferences=new com.google.android.material.button.MaterialButton(this);resultPreferences.setText(R.string.edit_preferences);
+            resultPreferences.setOnClickListener(v->{binding.cardMealResult.setVisibility(View.GONE);showFilters();});
+            binding.resultActions.addView(resultPreferences,new LinearLayout.LayoutParams(-1,-2));
+        }
+        if(resultShare==null){
+            resultShare=new com.google.android.material.button.MaterialButton(this);resultShare.setId(R.id.shareRecipe);resultShare.setText(R.string.share_recipe);
+            resultShare.setOnClickListener(v->shareRecipe(currentRecipe));binding.resultActions.addView(resultShare,new LinearLayout.LayoutParams(-1,-2));
+        }
+        styleSecondaryResultAction(binding.btnDislike);
+        styleSecondaryResultAction((com.google.android.material.button.MaterialButton)resultPreferences);
+        styleSecondaryResultAction((com.google.android.material.button.MaterialButton)resultShare);
         UiIcons.button(binding.btnRecipe,R.drawable.ic_bowl);UiIcons.button(binding.btnLike,R.drawable.ic_bookmark);
         binding.simpleRecipeDetails.setVisibility(View.VISIBLE);binding.simpleRecipeDetails.removeAllViews();
         recipeDetailText(getString(R.string.ingredients_title),true);recipeDetailText(currentRecipe.ingredients,false);recipeDetailText(getString(R.string.method_title),true);recipeDetailText(currentRecipe.method,false);
+    }
+    private void styleSecondaryResultAction(com.google.android.material.button.MaterialButton button){
+        float density=getResources().getDisplayMetrics().density;
+        button.setAllCaps(false);button.setTextSize(15);button.setTextColor(UiColors.color(this,R.color.ink));
+        button.setTypeface(UiTypography.face(this,"sans-serif",android.graphics.Typeface.BOLD));
+        button.setGravity(android.view.Gravity.CENTER);button.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(UiColors.color(this,R.color.surface)));
+        button.setStrokeColor(android.content.res.ColorStateList.valueOf(androidx.core.graphics.ColorUtils.setAlphaComponent(UiColors.color(this,R.color.accent),110)));
+        button.setStrokeWidth(Math.max(1,Math.round(density)));button.setCornerRadius(Math.round(16*density));
+        button.setRippleColor(android.content.res.ColorStateList.valueOf(androidx.core.graphics.ColorUtils.setAlphaComponent(UiColors.color(this,R.color.accent),32)));
+        button.setInsetTop(0);button.setInsetBottom(0);button.setMinHeight(Math.round(56*density));
+        button.setPadding(Math.round(16*density),Math.round(12*density),Math.round(16*density),Math.round(12*density));button.setElevation(0);
+        LinearLayout.LayoutParams layout=(LinearLayout.LayoutParams)button.getLayoutParams();layout.topMargin=Math.round(10*density);button.setLayoutParams(layout);
     }
     private void recipeDetailText(String text,boolean title){
         TextView view=new TextView(this);view.setText(text);view.setTextSize(title?21:16);view.setTextColor(UiColors.color(this,title?R.color.ink:R.color.muted));view.setLineSpacing(6,1);androidx.core.view.ViewCompat.setAccessibilityHeading(view,title);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=Math.round(16*getResources().getDisplayMetrics().density);binding.simpleRecipeDetails.addView(view,lp);
