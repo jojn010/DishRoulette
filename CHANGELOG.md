@@ -1,3 +1,7 @@
+## v1.7.8
+
+- Show the official filled Google bookmark icon for a saved recipe and the outline icon when unsaved. Update immediately when saving or removing a favorite and when reopening a recipe.
+
 ## v1.7.7
 
 - Make Try another, Edit preferences and Share recipe clear full-width secondary buttons with peach backgrounds, visible borders, rounded corners, readable bold labels, pressed feedback and consistent spacing.

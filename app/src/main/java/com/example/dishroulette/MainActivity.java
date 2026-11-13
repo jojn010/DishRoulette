@@ -630,6 +630,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateSaveButton() {
         boolean saved = currentRecipe != null && savedIds.contains(currentRecipe.id);
+        UiIcons.button(binding.btnLike,saved?R.drawable.ic_bookmark_filled:R.drawable.ic_bookmark);
         binding.btnLike.setText(saved ? R.string.saved_generic : R.string.save_generic);
         binding.btnLike.setContentDescription(getString(saved ? R.string.remove_recipe : R.string.save_recipe));
     }

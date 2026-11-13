@@ -19,3 +19,5 @@ assets/kenney/interface-sounds/Audio/ on 2026-11-13.
 Files are unmodified. Original license: kenney-interface-sounds-LICENSE.txt.
 Sounds can be disabled in Settings and respect silent/vibrate mode and system volume.
 Timer sound is foreground feedback; it does not add a background alarm service.
+
+The filled saved-state bookmark uses the official Google Material Icons Round `bookmark` Android vector (Apache 2.0), downloaded 2026-11-13. Its path geometry is unchanged.
