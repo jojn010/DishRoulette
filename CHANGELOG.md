@@ -1,3 +1,7 @@
+## v1.7.6
+
+- Use the theme’s dark ink color for preferences switch labels, including “Inspired by my favorites”, so they remain readable on the peach dialog in English and Arabic.
+
 ## v1.7.5
 
 - Center each bottom navigation label directly beneath its own Google icon, including after repeated Arabic/English switches. Use separate centered icon and label views instead of MaterialButton compound-drawable positioning.

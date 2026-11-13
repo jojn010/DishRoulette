@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.7.5 — Centered navigation in both languages**
+**v1.7.6 — Readable preference labels**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
