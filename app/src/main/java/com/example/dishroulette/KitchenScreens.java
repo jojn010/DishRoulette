@@ -299,7 +299,7 @@ final class KitchenScreens {
                     timer.update(remaining,minutes*60000L,deadline>0 && remaining>0);
                     startTimer.setText(deadline>0&&remaining>0?activity.getString(R.string.pause_timer):remaining==0?activity.getString(R.string.restart_timer,minutes):activity.getString(R.string.start_timer));
                     if(deadline>0&&remaining==0){prefs.edit().putLong(prefix+"_end",0).putLong(prefix+"_left",0).apply();activity.playTimerComplete();}
-                    handler.postDelayed(this,1000);
+                    if (deadline > 0 && remaining > 0) handler.postDelayed(this, 1000);
                 }};timerTick.run();
                 startTimer.setOnClickListener(v->{
                     long end=prefs.getLong(prefix+"_end",0);SharedPreferences.Editor e=prefs.edit();

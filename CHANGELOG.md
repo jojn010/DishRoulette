@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Stop refreshing the cooking timer every second while it is idle, paused or finished. Starting or resuming the timer restarts the updates.
+
 - Recognize Arabic cooking durations written with vowel marks, including “١٥ دَقِيقَةً” and “سَاعَةٍ وَ٣٠ دَقِيقَةً”, and offer the corresponding timer while preserving the recipe text.
 
 ## v1.8.0
