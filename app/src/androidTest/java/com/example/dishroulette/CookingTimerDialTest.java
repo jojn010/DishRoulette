@@ -79,7 +79,7 @@ public class CookingTimerDialTest {
                                     public void remove(RecipeCatalog.Recipe r) { }
                                 });
                         RecipeCatalog.Recipe recipe = new RecipeCatalog.Recipe("hours", "Roast", "Dinner", 90, 1,
-                                "", "", "", language.equals("ar") ? "اطبخ لمدة ساعة و٣٠ دقيقة." : "Bake for 1 hour and 30 minutes.");
+                                "", "", "", language.equals("ar") ? "اطبخ لمدة سَاعَةٍ وَ٣٠ دَقِيقَةً." : "Bake for 1 hour and 30 minutes.");
                         screens.cook(recipe);
                         CookingTimerView dial = a.findViewById(R.id.cookingTimerDial);
                         assertEquals(View.VISIBLE, dial.getVisibility());

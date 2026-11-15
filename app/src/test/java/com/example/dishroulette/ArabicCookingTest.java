@@ -44,6 +44,13 @@ public class ArabicCookingTest {
   assertEquals(0,KitchenScreens.suggestedMinutes("Wait item5 hours."));
   assertEquals(0,KitchenScreens.suggestedMinutes("Use the hourly schedule."));
  }
+ @Test public void arabicTimersRecognizeVowelMarksWithoutChangingWordBoundaries(){
+  assertEquals(15,KitchenScreens.suggestedMinutes("اطبخ لِمُدَّةِ ١٥ دَقِيقَةً."));
+  assertEquals(2,KitchenScreens.suggestedMinutes("اتركه دَقِيقَتَيْنِ."));
+  assertEquals(90,KitchenScreens.suggestedMinutes("اطبخ لِمُدَّةِ سَاعَةٍ وَ٣٠ دَقِيقَةً."));
+  assertEquals(7,KitchenScreens.suggestedMinutes("اطبخ ٥ إِلَى ٧ دَقَائِقَ."));
+  assertEquals(0,KitchenScreens.suggestedMinutes("هذه سَاعَةٌغيرصحيحة."));
+ }
  @Test public void numberedInstructionsSplitAcrossLanguagesAndLineEndings(){
   assertSteps("١. اغسل الأرز.\n٢. اطبخ لمدة ١٥ دقيقة.", "اغسل الأرز.", "اطبخ لمدة ١٥ دقيقة.");
   assertSteps("۱) Wash rice.\r\n  ۲) Simmer.", "Wash rice.", "Simmer.");

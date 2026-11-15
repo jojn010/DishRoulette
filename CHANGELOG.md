@@ -1,3 +1,7 @@
+## Unreleased
+
+- Recognize Arabic cooking durations written with vowel marks, including “١٥ دَقِيقَةً” and “سَاعَةٍ وَ٣٠ دَقِيقَةً”, and offer the corresponding timer while preserving the recipe text.
+
 ## v1.8.0
 
 - Remove the abandoned Advanced interface: renderer, gestures, mechanical audio, hidden views, duplicate tablet XML and no-op adapters. Remove the OpenGL device requirement and the unused ConstraintLayout dependency.
