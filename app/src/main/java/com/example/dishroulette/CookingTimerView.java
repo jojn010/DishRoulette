@@ -9,9 +9,12 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.view.View;
+
 import java.util.Locale;
 
-/** A remaining-time dial that scales down on narrow screens. */
+/**
+ * A remaining-time dial that scales down on narrow screens.
+ */
 final class CookingTimerView extends View {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF ring = new RectF();
@@ -39,15 +42,16 @@ final class CookingTimerView extends View {
         displayedFraction = remainingFraction();
         boolean reduceMotion = InterfaceSettings.prefs(getContext()).getBoolean("reduce_motion", false);
         float animationScale = Settings.Global.getFloat(getContext().getContentResolver(),
-                Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
-        if (running && remaining > 0 && !reduceMotion && animationScale > 0 && isAttachedToWindow() && isShown() && getWindowVisibility() == VISIBLE) {
+            Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
+        if (running && remaining > 0 && !reduceMotion && animationScale > 0 && isAttachedToWindow() && isShown() &&
+            getWindowVisibility() == VISIBLE) {
             // Interpolate only the dial; the persisted deadline remains the source of truth.
-            float next = Math.max(0f, (float)(remaining - 1000) / duration);
+            float next = Math.max(0f, (float) (remaining - 1000) / duration);
             sweep = ValueAnimator.ofFloat(displayedFraction, next);
             sweep.setDuration(1000);
             sweep.setInterpolator(new LinearInterpolator());
             sweep.addUpdateListener(value -> {
-                displayedFraction = (float)value.getAnimatedValue();
+                displayedFraction = (float) value.getAnimatedValue();
                 invalidate();
             });
             sweep.start();
@@ -56,22 +60,31 @@ final class CookingTimerView extends View {
     }
 
     private void stopSweep() {
-        if (sweep != null) { sweep.cancel(); sweep = null; }
+        if (sweep != null) {
+            sweep.cancel();
+            sweep = null;
+        }
     }
 
-    @Override protected void onDetachedFromWindow() {
+    @Override
+    protected void onDetachedFromWindow() {
         stopSweep();
         super.onDetachedFromWindow();
     }
 
-    @Override protected void onWindowVisibilityChanged(int visibility) {
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
         super.onWindowVisibilityChanged(visibility);
-        if (visibility != VISIBLE) stopSweep();
+        if (visibility != VISIBLE)
+            stopSweep();
     }
 
-    float remainingFraction() { return Math.min(1f, (float) remaining / duration); }
+    float remainingFraction() {
+        return Math.min(1f, (float) remaining / duration);
+    }
 
-    @Override protected void onMeasure(int widthSpec, int heightSpec) {
+    @Override
+    protected void onMeasure(int widthSpec, int heightSpec) {
         int desired = Math.round(260 * getResources().getDisplayMetrics().density);
         int width = resolveSize(desired, widthSpec);
         int height = resolveSize(desired, heightSpec);
@@ -79,7 +92,8 @@ final class CookingTimerView extends View {
         setMeasuredDimension(size, size);
     }
 
-    @Override protected void onDraw(Canvas canvas) {
+    @Override
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         float size = Math.min(getWidth(), getHeight());
         float cx = getWidth() / 2f, cy = getHeight() / 2f, radius = size * .42f;
@@ -93,7 +107,7 @@ final class CookingTimerView extends View {
         canvas.drawCircle(cx, cy, radius, paint);
         paint.setColor(accent);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        ring.set(cx-radius, cy-radius, cx+radius, cy+radius);
+        ring.set(cx - radius, cy - radius, cx + radius, cy + radius);
         canvas.drawArc(ring, -90, 360 * displayedFraction, false, paint);
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStrokeWidth(size * .006f);
@@ -102,26 +116,29 @@ final class CookingTimerView extends View {
             float outer = radius - size * .04f;
             float inner = outer - size * (i % 5 == 0 ? .035f : .015f);
             paint.setColor(UiColors.color(getContext(), i % 5 == 0 ? R.color.muted : R.color.line));
-            canvas.drawLine(cx+(float)Math.cos(angle)*inner, cy+(float)Math.sin(angle)*inner,
-                    cx+(float)Math.cos(angle)*outer, cy+(float)Math.sin(angle)*outer, paint);
+            canvas.drawLine(cx + (float) Math.cos(angle) * inner, cy + (float) Math.sin(angle) * inner,
+                cx + (float) Math.cos(angle) * outer, cy + (float) Math.sin(angle) * outer, paint);
         }
         if (remaining > 0) {
             double angle = Math.toRadians(360 * displayedFraction - 90);
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(accent);
-            canvas.drawCircle(cx+(float)Math.cos(angle)*radius, cy+(float)Math.sin(angle)*radius, size*.028f, paint);
+            canvas.drawCircle(cx + (float) Math.cos(angle) * radius, cy + (float) Math.sin(angle) * radius,
+                size * .028f, paint);
         }
         paint.setStyle(Paint.Style.FILL);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTypeface(timeTypeface);
         paint.setColor(UiColors.color(getContext(), R.color.ink));
         paint.setTextSize(size * .19f);
-        if (paint.measureText(time) > size * .66f) paint.setTextSize(paint.getTextSize() * size * .66f / paint.measureText(time));
-        canvas.drawText(time, cx, cy-(paint.ascent()+paint.descent())/2, paint);
+        if (paint.measureText(time) > size * .66f)
+            paint.setTextSize(paint.getTextSize() * size * .66f / paint.measureText(time));
+        canvas.drawText(time, cx, cy - (paint.ascent() + paint.descent()) / 2, paint);
         paint.setTypeface(statusTypeface);
         paint.setTextSize(size * .055f);
-        if (paint.measureText(status) > size * .64f) paint.setTextSize(paint.getTextSize() * size * .64f / paint.measureText(status));
+        if (paint.measureText(status) > size * .64f)
+            paint.setTextSize(paint.getTextSize() * size * .64f / paint.measureText(status));
         paint.setColor(UiColors.color(getContext(), R.color.muted));
-        canvas.drawText(status, cx, cy+size*.17f, paint);
+        canvas.drawText(status, cx, cy + size * .17f, paint);
     }
 }

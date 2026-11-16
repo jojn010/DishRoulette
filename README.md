@@ -1,6 +1,6 @@
 # Tabkha / طبخة
 
-**v1.8.0 — Native app cleanup and reliable editing**
+**v1.9.0 — Clearer code and leaner updates**
 
 A native Android recipe app with a warm, lightweight interface, ingredient entry, recipe preferences, saved recipes, guided cooking and a personal Gemini connection. Choose English or Arabic in Settings.
 
@@ -85,6 +85,12 @@ The app uses native Android controls, one responsive layout and the Tabkha palet
 
 No fabricated dish images, image service, or production mock recipes are included. Gemini calls use the personal HTTPS connection and shared exclusion validation; ingredient screening cannot guarantee allergy safety.
 
+## Understanding and maintaining the code
+
+Start with the [code guide](docs/CODE_GUIDE.md) for the main screen, request flow, cooking state and storage boundaries. Large setup and rendering blocks are split into named methods; pantry and preferences classes use recipe-related names.
+
+Run `./tools/format-java.sh` to format all Java production and test sources with the checked-in Android Studio style. It uses `$HOME/android-studio` by default; set `TABKHA_STUDIO_HOME` for another installation. `.editorconfig` defines common whitespace rules. Build output, local configuration and private owner artifacts stay ignored.
+
 ## Verification
 
 ```sh
@@ -98,7 +104,7 @@ Run instrumentation against a dedicated emulator: fixtures modify preferences, s
 ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.liveRecipe=true
 ```
 
-Use Android Studio Device Manager to start an emulator. Verification notes for this cleanup are in `docs/v1.8.0-verification.md`; generated test reports and captures remain local build artifacts.
+Use Android Studio Device Manager to start an emulator. Verification notes for this refactor are in `docs/v1.9.0-verification.md`; generated test reports and captures remain local build artifacts.
 
 ## Version checkpoints
 

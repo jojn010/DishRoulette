@@ -1,6 +1,7 @@
 package com.example.dishroulette;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,52 +10,125 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-/** Small offline collection used while the live recipe service is being built. */
+/**
+ * Recipe data, pantry-name normalization and the bilingual library retained for older saved dishes.
+ */
 public final class RecipeCatalog {
-    private RecipeCatalog() { }
+    private RecipeCatalog() {
+    }
 
     public static final class Recipe {
-        @SerializedName("translations") public java.util.Map<String,com.example.dishroulette.core.RecipeTranslation> translations;
-        public boolean bilingual(){
-            try {com.example.dishroulette.core.RecipeTranslation.validate(translations);return true;}catch(RuntimeException e){return false;}
-        }
-        public Recipe forLanguage(String target){
-            if(!bilingual())return this;
-            com.example.dishroulette.core.RecipeTranslation t=translations.get(target);if(t==null)return this;
-            com.google.gson.Gson gson=new com.google.gson.Gson();
-            com.google.gson.JsonObject object=gson.toJsonTree(this).getAsJsonObject();
-            object.addProperty("title",t.title);object.addProperty("description",t.description);
-            object.addProperty("ingredients",String.join("\n",t.ingredients));object.addProperty("method",t.method());object.addProperty("language",target);
-            // Personal explanations are authored in the generation language; do not show them in another language.
-            if(!target.equals(language)){object.addProperty("whyThisDish", "");object.addProperty("goalFit", "");}
-            return gson.fromJson(object,Recipe.class);
-        }
-        @SerializedName("id") public final String id;
-        @SerializedName("title") public final String title;
-        @SerializedName("meal") public final String meal;
-        @SerializedName("description") public final String description;
-        @SerializedName("ingredients") public final String ingredients;
-        @SerializedName("method") public final String method;
-        @SerializedName("minutes") public final int minutes;
-        @SerializedName("servings") public final int servings;
-        @SerializedName("caloriesPerServing") public Integer caloriesPerServing;
-        @SerializedName("proteinGramsPerServing") public Double proteinGramsPerServing;
-        @SerializedName("carbohydratesGramsPerServing") public Double carbohydratesGramsPerServing;
-        @SerializedName("fatGramsPerServing") public Double fatGramsPerServing;
-        @SerializedName("fiberGramsPerServing") public Double fiberGramsPerServing;
-        @SerializedName("sugarGramsPerServing") public Double sugarGramsPerServing;
-        @SerializedName("sodiumMilligramsPerServing") public Double sodiumMilligramsPerServing;
+        @SerializedName("translations")
+        public java.util.Map<String, com.example.dishroulette.core.RecipeTranslation> translations;
 
-        @SerializedName("keys") public final List<String> keys;
-        @SerializedName("language") public String language = "";
-        @SerializedName("goal") public String goal = "";
-        @SerializedName("cuisine") public String cuisine = "";
-        @SerializedName("whyThisDish") public String whyThisDish = "";
-        @SerializedName("goalFit") public String goalFit = "";
-        @SerializedName("discovery") public boolean discovery;
-        @SerializedName("shared") public boolean shared;
-        @SerializedName("aiGenerated") public boolean aiGenerated;
-        @SerializedName("additionalIngredients") public List<String> additionalIngredients = new ArrayList<>();
+        public boolean bilingual() {
+            try {
+                com.example.dishroulette.core.RecipeTranslation.validate(translations);
+                return true;
+            } catch (RuntimeException e) {
+                return false;
+            }
+        }
+
+        public Recipe forLanguage(String target) {
+            final java.util.Map<String, com.example.dishroulette.core.RecipeTranslation> pair;
+            try {
+                pair = com.example.dishroulette.core.RecipeTranslation.validate(translations);
+            } catch (RuntimeException invalid) {
+                return this;
+            }
+            com.example.dishroulette.core.RecipeTranslation text = pair.get(target);
+            if (text == null)
+                return this;
+            return new Recipe(this, text, target, pair);
+        }
+
+        /**
+         * Copy recipe facts explicitly, while replacing only the selected language's text.
+         */
+        private Recipe(Recipe source, com.example.dishroulette.core.RecipeTranslation text, String target,
+                       java.util.Map<String, com.example.dishroulette.core.RecipeTranslation> pair) {
+            id = source.id;
+            meal = source.meal;
+            minutes = source.minutes;
+            servings = source.servings;
+            title = text.title;
+            description = text.description;
+            ingredients = String.join("\n", text.ingredients);
+            method = text.method();
+            language = target;
+            keys = source.keys == null ? null : new ArrayList<>(source.keys);
+            translations = pair;
+            caloriesPerServing = source.caloriesPerServing;
+            proteinGramsPerServing = source.proteinGramsPerServing;
+            carbohydratesGramsPerServing = source.carbohydratesGramsPerServing;
+            fatGramsPerServing = source.fatGramsPerServing;
+            fiberGramsPerServing = source.fiberGramsPerServing;
+            sugarGramsPerServing = source.sugarGramsPerServing;
+            sodiumMilligramsPerServing = source.sodiumMilligramsPerServing;
+            goal = source.goal;
+            cuisine = source.cuisine;
+            discovery = source.discovery;
+            shared = source.shared;
+            aiGenerated = source.aiGenerated;
+            additionalIngredients =
+                source.additionalIngredients == null ? null : new ArrayList<>(source.additionalIngredients);
+            // Personal explanations are authored in the generation language.
+            whyThisDish = target.equals(source.language) ? source.whyThisDish : "";
+            goalFit = target.equals(source.language) ? source.goalFit : "";
+        }
+
+        @SerializedName("id")
+        public final String id;
+        @SerializedName("title")
+        public final String title;
+        @SerializedName("meal")
+        public final String meal;
+        @SerializedName("description")
+        public final String description;
+        @SerializedName("ingredients")
+        public final String ingredients;
+        @SerializedName("method")
+        public final String method;
+        @SerializedName("minutes")
+        public final int minutes;
+        @SerializedName("servings")
+        public final int servings;
+        @SerializedName("caloriesPerServing")
+        public Integer caloriesPerServing;
+        @SerializedName("proteinGramsPerServing")
+        public Double proteinGramsPerServing;
+        @SerializedName("carbohydratesGramsPerServing")
+        public Double carbohydratesGramsPerServing;
+        @SerializedName("fatGramsPerServing")
+        public Double fatGramsPerServing;
+        @SerializedName("fiberGramsPerServing")
+        public Double fiberGramsPerServing;
+        @SerializedName("sugarGramsPerServing")
+        public Double sugarGramsPerServing;
+        @SerializedName("sodiumMilligramsPerServing")
+        public Double sodiumMilligramsPerServing;
+
+        @SerializedName("keys")
+        public final List<String> keys;
+        @SerializedName("language")
+        public String language = "";
+        @SerializedName("goal")
+        public String goal = "";
+        @SerializedName("cuisine")
+        public String cuisine = "";
+        @SerializedName("whyThisDish")
+        public String whyThisDish = "";
+        @SerializedName("goalFit")
+        public String goalFit = "";
+        @SerializedName("discovery")
+        public boolean discovery;
+        @SerializedName("shared")
+        public boolean shared;
+        @SerializedName("aiGenerated")
+        public boolean aiGenerated;
+        @SerializedName("additionalIngredients")
+        public List<String> additionalIngredients = new ArrayList<>();
 
         Recipe(String id, String title, String meal, int minutes, int servings,
                String description, String keys, String ingredients, String method) {
@@ -64,20 +138,25 @@ public final class RecipeCatalog {
             this.minutes = minutes;
             this.servings = servings;
             this.description = description;
-            this.keys = keys.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(Arrays.asList(keys.split(",")));
+            this.keys =
+                keys.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(Arrays.asList(keys.split(",")));
             this.ingredients = ingredients;
             this.method = method;
         }
 
         public int matches(Set<String> pantry) {
             int count = 0;
-            for (String key : keys) if (pantry.contains(key)) count++;
+            for (String key : keys)
+                if (pantry.contains(key))
+                    count++;
             return count;
         }
 
         public List<String> missing(Set<String> pantry) {
             List<String> missing = new ArrayList<>();
-            for (String key : keys) if (!pantry.contains(key)) missing.add(key);
+            for (String key : keys)
+                if (!pantry.contains(key))
+                    missing.add(key);
             return missing;
         }
     }
@@ -108,7 +187,8 @@ public final class RecipeCatalog {
             "180 g dry pasta\n1 can chopped tomatoes (400 g)\n2 garlic cloves, minced\n1 tbsp olive oil\nSalt, pepper, and dried basil",
             "1. Cook pasta in boiling salted water following the pack instructions. Reserve half a cup of pasta water.\n\n2. Warm olive oil in a pan. Add garlic and stir for 30 seconds.\n\n3. Add tomatoes and basil. Simmer for 12–15 minutes; season to taste.\n\n4. Toss with the drained pasta, adding a little pasta water to loosen the sauce."),
         new Recipe("chicken_wrap", "Crunchy chicken wraps", "Lunch", 15, 2,
-            "A fresh, satisfying wrap with cooked chicken and a tangy yogurt dressing.", "chicken,tortilla,cucumber,yogurt",
+            "A fresh, satisfying wrap with cooked chicken and a tangy yogurt dressing.",
+            "chicken,tortilla,cucumber,yogurt",
             "200 g ready-to-eat cooked chicken\n2 large tortillas\n½ cucumber\n3 tbsp plain yogurt\n1 tsp lemon juice\nSalt and pepper",
             "1. Slice the cooked chicken and cucumber.\n\n2. Mix yogurt with lemon juice, salt, and pepper.\n\n3. Warm the tortillas in a dry pan.\n\n4. Spread with dressing, add chicken and cucumber, then fold and serve."),
         new Recipe("chickpea_skillet", "Smoky chickpea skillet", "Dinner", 20, 2,
@@ -117,34 +197,59 @@ public final class RecipeCatalog {
             "1. Warm olive oil in a pan over medium heat. Stir in garlic for 30 seconds.\n\n2. Add paprika, tomatoes, and chickpeas.\n\n3. Simmer for 12–15 minutes, stirring occasionally. Add a splash of water if needed.\n\n4. Season with salt and pepper, and spoon into bowls.")
     ));
 
-    static { OfflineRecipeTranslations.apply(ALL); }
+    static {
+        OfflineRecipeTranslations.apply(ALL);
+    }
 
     public static Set<String> parseIngredients(String input) {
         Set<String> result = new LinkedHashSet<>();
-        if (input == null) return result;
+        if (input == null)
+            return result;
         for (String token : input.toLowerCase(Locale.ROOT).split("[,;،؛\\n]+")) {
             String key = normalize(token.trim());
-            if (!key.isEmpty()) result.add(key);
+            if (!key.isEmpty())
+                result.add(key);
         }
         return result;
     }
 
     private static String normalize(String key) {
-        key=com.example.dishroulette.core.FoodNames.canonical(key);
+        key = com.example.dishroulette.core.FoodNames.canonical(key);
         switch (key) {
-            case "egg": return "eggs";
-            case "tomatoes": case "tomatos": case "canned tomatoes": return "tomato";
-            case "chickpea": case "canned chickpeas": case "garbanzo beans": return "chickpeas";
-            case "bananas": return "banana";
-            case "cucumbers": return "cucumber";
-            case "lemons": return "lemon";
-            case "tortillas": case "wraps": return "tortilla";
-            case "yoghurt": case "plain yogurt": return "yogurt";
-            case "rolled oats": case "oatmeal": return "oats";
-            case "cooked rice": return "rice";
-            case "cooked chicken": return "chicken";
-            case "frozen peas": case "pea": return "peas";
-            default: return key;
+            case "egg":
+                return "eggs";
+            case "tomatoes":
+            case "tomatos":
+            case "canned tomatoes":
+                return "tomato";
+            case "chickpea":
+            case "canned chickpeas":
+            case "garbanzo beans":
+                return "chickpeas";
+            case "bananas":
+                return "banana";
+            case "cucumbers":
+                return "cucumber";
+            case "lemons":
+                return "lemon";
+            case "tortillas":
+            case "wraps":
+                return "tortilla";
+            case "yoghurt":
+            case "plain yogurt":
+                return "yogurt";
+            case "rolled oats":
+            case "oatmeal":
+                return "oats";
+            case "cooked rice":
+                return "rice";
+            case "cooked chicken":
+                return "chicken";
+            case "frozen peas":
+            case "pea":
+                return "peas";
+            default:
+                return key;
         }
     }
 
@@ -159,7 +264,9 @@ public final class RecipeCatalog {
     }
 
     public static Recipe find(String id) {
-        for (Recipe recipe : ALL) if (recipe.id.equals(id)) return recipe;
+        for (Recipe recipe : ALL)
+            if (recipe.id.equals(id))
+                return recipe;
         return null;
     }
 }

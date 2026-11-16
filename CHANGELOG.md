@@ -1,7 +1,14 @@
-## Unreleased
+## v1.9.0
 
+- Split Home construction, adaptive layout, refreshes, activity setup, result rendering and cooking controls into named methods. Give preferences their own dialog with a private draft and typed view binding.
+- Replace legacy magazine/loadout/spin class names with PantryEntries, PantryController, RecipePreferences and RecipeOptions. Keep persisted keys, recipe fields and application identity compatible with existing installations.
+- Reuse ingredient chips and goal controls during routine refreshes, preserving focus while changing servings or goals. Avoid recreating unchanged icons and styles.
+- Copy preferences and bilingual recipe facts directly instead of round-tripping through JSON. Validate typed translations without serializing them first.
+- Share the Gemini connection pool, request building, response size bounds and configuration-error handling across generation, photo recognition and translation.
+- Extract cooking instruction parsing and recipe display text into focused helpers. Replace nested mutable callback holders with explicit cooking workspace state.
+- Remove superseded classes, unused helpers and duplicated request construction. Add consistent Java formatting, a reusable formatter and a code walkthrough for maintainers.
+- Add regressions for independent data copies, bounded network responses and stable Home control focus. Preserve existing bilingual, sharing, timer and lifecycle behavior.
 - Stop refreshing the cooking timer every second while it is idle, paused or finished. Starting or resuming the timer restarts the updates.
-
 - Recognize Arabic cooking durations written with vowel marks, including “١٥ دَقِيقَةً” and “سَاعَةٍ وَ٣٠ دَقِيقَةً”, and offer the corresponding timer while preserving the recipe text.
 
 ## v1.8.0
