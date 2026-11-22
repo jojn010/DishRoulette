@@ -1,3 +1,7 @@
+## Unreleased
+
+- Add an opt-in live photo regression using the bundled pantry image. Verify photo preparation, the saved Gemini connection, structured ingredient recognition and visible tomatoes in English and Arabic. Restore language settings and delete the temporary JPEG after each check.
+
 ## v1.9.0
 
 - Split Home construction, adaptive layout, refreshes, activity setup, result rendering and cooking controls into named methods. Give preferences their own dialog with a private draft and typed view binding.

@@ -104,6 +104,16 @@ Run instrumentation against a dedicated emulator: fixtures modify preferences, s
 ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.liveRecipe=true
 ```
 
+For live image recognition, install the debug and instrumentation APKs on a configured emulator,
+then run the photo test below. It sends the bundled pantry illustration through photo preparation
+and the saved Gemini connection, verifies a usable ingredient list and visible tomatoes, and
+restores the previous language afterward. Repeat with `photoLanguage ar` to check Arabic output.
+The photo test is skipped unless `livePhoto` is enabled.
+
+```sh
+adb -s emulator-5554 shell am instrument -w -e livePhoto true -e photoLanguage en -e class com.example.dishroulette.LivePhotoConnectionTest com.example.dishroulette.test/androidx.test.runner.AndroidJUnitRunner
+```
+
 Use Android Studio Device Manager to start an emulator. Verification notes for this refactor are in `docs/v1.9.0-verification.md`; generated test reports and captures remain local build artifacts.
 
 ## Version checkpoints
